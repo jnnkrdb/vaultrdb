@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/jnnkrdb/vaultrdb/routines/api/handlers"
@@ -12,10 +13,18 @@ import (
 	"github.com/jnnkrdb/gomw/middlewares/security/cors"
 )
 
-var DefaultMW = mw.New(
-	cors.AddCORSHeaders,
-	apikey.APIKeyCheck,
-)
+// default http api port is 8080
+func HandleAPI() {
+	// checking for errors
+	if err := (&http.Server{
+		Addr:    ":8080",
+		Handler: hndlrs.GetHandler(httpHandlers),
+	}).ListenAndServe(); err != nil {
+		log.Panicf("%#v\n", err)
+	}
+}
+
+var DefaultMW = mw.New(cors.AddCORSHeaders, apikey.APIKeyCheck)
 
 var httpHandlers = hndlrs.HttpFunctionSet{
 

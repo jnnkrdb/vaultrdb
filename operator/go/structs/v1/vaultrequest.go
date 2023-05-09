@@ -9,6 +9,13 @@ import (
 )
 
 type VaultRequestSpec struct {
+	Data []struct {
+		VaultSetID string `json:"vaultsetid"`
+		StoreKey   string `json:"storekey"`
+	} `json:"data"`
+
+	Secrets    []BluePrintSecret    `json:"secrets"`
+	ConfigMaps []BluePrintConfigMap `json:"configmaps"`
 }
 
 // deepcopy
@@ -57,9 +64,7 @@ func (in *VaultRequestList) DeepCopyObject() runtime.Object {
 const _VR_RESOURCE string = "vaultrequests"
 
 // requests all deployed vaultrequests and returns them as a vaultrequestslist
-func GetGlobalSecretList() (vrList VaultRequestList, err error) {
-
+func GetVaultRequestList() (vrList VaultRequestList, err error) {
 	err = operator.CRD().Get().Resource(_VR_RESOURCE).Do(context.TODO()).Into(&vrList)
-
 	return
 }
