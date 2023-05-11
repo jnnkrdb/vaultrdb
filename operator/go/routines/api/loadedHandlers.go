@@ -9,7 +9,6 @@ import (
 
 	hndlrs "github.com/jnnkrdb/gomw/handlers"
 	mw "github.com/jnnkrdb/gomw/middlewares"
-	"github.com/jnnkrdb/gomw/middlewares/security/authorization/apikey"
 	"github.com/jnnkrdb/gomw/middlewares/security/cors"
 )
 
@@ -24,9 +23,9 @@ func HandleAPI() {
 	}
 }
 
-var DefaultMW = mw.New(cors.AddCORSHeaders, apikey.APIKeyCheck)
-
 var httpHandlers = hndlrs.HttpFunctionSet{
+	// get a new uuidv4
+	{Pattern: "/api/v1/uuidv4", MainHandler: http.HandlerFunc(handlers.UUIDv4), Middlewares: mw.New(cors.AddCORSHeaders)},
 
 	// encrypt/decrypt functions
 	{Pattern: "/api/v1/encrypt", MainHandler: http.HandlerFunc(handlers.Encrypt), Middlewares: mw.New(cors.AddCORSHeaders)},

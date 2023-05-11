@@ -10,19 +10,18 @@ import (
 
 type VaultSet struct {
 	ID          string `json:"id"`
-	Name        string `json:"name"`
 	Description string `json:"description"`
 	Data        string `json:"data"`
 }
 
 func Select(aditionalSQLSuffix string) (vsArr []VaultSet, err error) {
 	var rows *sql.Rows
-	if rows, err = settings.PSQL.Query("SELECT id, name, description, data FROM vaultsets%s;"); err != nil {
+	if rows, err = settings.PSQL.Query("SELECT id, description, data FROM vaultsets%s;"); err != nil {
 		err = fmt.Errorf("error receiving vaultsets from db: %#v", err)
 	} else {
 		for rows.Next() {
 			var new VaultSet
-			if err = rows.Scan(&new.ID, &new.Name, &new.Description, &new.Data); err != nil {
+			if err = rows.Scan(&new.ID, &new.Description, &new.Data); err != nil {
 				err = fmt.Errorf("error parsing vaultset from datasets: %#v", err)
 			} else {
 				vsArr = append(vsArr, new)
@@ -33,7 +32,7 @@ func Select(aditionalSQLSuffix string) (vsArr []VaultSet, err error) {
 }
 
 func SelectByID(id string) (vs VaultSet, err error) {
-	if err = settings.PSQL.QueryRow("SELECT id, name, description, data FROM vaultsets WHERE id=$1;", id).Scan(&vs); err != nil {
+	if err = settings.PSQL.QueryRow("SELECT id, description, data FROM vaultsets WHERE id=$1;", id).Scan(&vs.ID, &vs.Description, &vs.Data); err != nil {
 		err = fmt.Errorf("error selecting vaultset with id[%s]: %#v", id, err)
 	}
 	return
@@ -65,20 +64,15 @@ func (vs *VaultSet) Insert() error {
 	}
 
 	// insert the data into the database
-	if vs.Name != "" {
-		return fmt.Errorf("error: name can't be empty string")
-	} else {
-
-		if _, err := settings.PSQL.Exec("INSERT INTO vaultsets (id, name, description, data) VALUES ($1, $2, $3, $4);", vs.ID, vs.Name, vs.Description); err != nil {
-			return err
-		}
+	if _, err := settings.PSQL.Exec("INSERT INTO vaultsets (id, description, data) VALUES ($1, $2, $3);", vs.ID, vs.Description); err != nil {
+		return err
 	}
 	return nil
 }
 
 // update a specific vaultset with new values
 func (vs *VaultSet) Update() error {
-	if _, err := settings.PSQL.Exec("UPDATE vaultsets SET name=$1, description=$2, data=$3) WHERE id=$4;", vs.Name, vs.Description, vs.Data, vs.ID); err != nil {
+	if _, err := settings.PSQL.Exec("UPDATE vaultsets SET description=$1, data=$2) WHERE id=$3;", vs.Description, vs.Data, vs.ID); err != nil {
 		return fmt.Errorf("error updating the vaultset: %#v", err)
 	}
 	return nil
