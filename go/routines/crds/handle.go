@@ -20,12 +20,11 @@ func HandleCRDS() {
 		}
 
 		for _, vr := range vrList.Items { // handle each vaultrequest in the cluster
-
-			log.Printf("[%s/%s]\n", vr.Namespace, vr.Name)
-
 			for _, vrdata := range vr.Data { // handle each data request in the vaultrequest
 
-				log.Printf("\t\t%v\n", vrdata)
+				if e := vrdata.Validate(); e != nil {
+					log.Printf("[%s/%s:%s] error validating data: %v\n", vr.Namespace, vr.Name, vrdata.VaultSetID, e)
+				}
 			}
 		}
 	}

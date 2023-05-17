@@ -39,11 +39,11 @@ func SelectByID(id string) (vs VaultSet, err error) {
 }
 
 // insert a new vaultset, if id is empty, a new uuidv4 will be created, else, the uuidv4 in the id field will be validated and used, if the format is correct
-func (vs *VaultSet) Insert() error {
+func (vs *VaultSet) Create() error {
 
-	var uuidv4Set bool = false
+	var uuidv4UnSet bool = true
 	// create a new uuidv4 for the object, must be unique in the table
-	for !uuidv4Set {
+	for uuidv4UnSet {
 		// set the first uuid
 		if vs.ID == "" {
 			vs.ID = uuid.New().String()
@@ -53,13 +53,10 @@ func (vs *VaultSet) Insert() error {
 			}
 		}
 
-		var count int
-		if err := settings.PSQL.QueryRow("SELECT COUNT(*) FROM vaultsets WHERE id=$1", vs.ID).Scan(&count); err != nil {
-			return fmt.Errorf("error requesting vaultsets via uuidv4: %#v", err)
+		if exists, err := vaultsetExists(vs.ID); err != nil {
+			return err
 		} else {
-			if count == 0 {
-				uuidv4Set = true
-			}
+			uuidv4UnSet = !exists
 		}
 	}
 
@@ -80,8 +77,23 @@ func (vs *VaultSet) Update() error {
 
 // remove a vaultset via uuidv4
 func Delete(id string) error {
-	if _, err := settings.PSQL.Exec("DELETE FROM vaultsets WHERE id=$1", id); err != nil {
-		return fmt.Errorf("error removing the vaultset with id[%s]: %#v", id, err)
+	if exists, err := vaultsetExists(id); err != nil {
+		return err
+	} else {
+		if exists {
+			if _, err := settings.PSQL.Exec("DELETE FROM vaultsets WHERE id=$1", id); err != nil {
+				return fmt.Errorf("error removing the vaultset with id[%s]: %#v", id, err)
+			}
+		}
 	}
 	return nil
+}
+
+func vaultsetExists(id string) (bool, error) {
+	var exists bool
+	if err := settings.PSQL.QueryRow("SELECT exists(SELECT 1 FROM vaultsets WHERE id=$1)", id).Scan(&exists); err != nil {
+		return false, fmt.Errorf("error checking existance of a vaultsets via uuidv4[%s]: %#v", id, err)
+	}
+
+	return exists, nil
 }
