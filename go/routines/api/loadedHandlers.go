@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jnnkrdb/vaultrdb/routines/api/handlers"
+	"github.com/jnnkrdb/vaultrdb/routines/api/handlers/vaultset"
 	"github.com/jnnkrdb/vaultrdb/routines/api/healthz"
 
 	hndlrs "github.com/jnnkrdb/gomw/handlers"
@@ -24,6 +25,10 @@ func HandleAPI() {
 }
 
 var httpHandlers = hndlrs.HttpFunctionSet{
+
+	// handle vaultsets
+	{Pattern: "/api/v1/vaultset", MainHandler: http.HandlerFunc(vaultset.HandleHTTP), Middlewares: mw.New(cors.AddCORSHeaders)},
+
 	// get a new uuidv4
 	{Pattern: "/api/v1/uuidv4", MainHandler: http.HandlerFunc(handlers.UUIDv4), Middlewares: mw.New(cors.AddCORSHeaders)},
 
