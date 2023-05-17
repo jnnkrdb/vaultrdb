@@ -16,7 +16,7 @@ type VaultSet struct {
 
 func Select(aditionalSQLSuffix string) (vsArr []VaultSet, err error) {
 	var rows *sql.Rows
-	if rows, err = settings.PSQL.Query("SELECT id, description, data FROM vaultsets%s;"); err != nil {
+	if rows, err = settings.PSQL.Query(fmt.Sprintf("SELECT id, description, data FROM vaultsets%s;", aditionalSQLSuffix)); err != nil {
 		err = fmt.Errorf("error receiving vaultsets from db: %#v", err)
 	} else {
 		for rows.Next() {
@@ -43,7 +43,16 @@ func (vs *VaultSet) Create() error {
 
 	var uuidv4UnSet bool = true
 	// create a new uuidv4 for the object, must be unique in the table
+
+	var counter = 1
+	const maxCounter = 5
+
 	for uuidv4UnSet {
+
+		if counter > maxCounter {
+			return fmt.Errorf("error: max tries eexceeded")
+		}
+
 		// set the first uuid
 		if vs.ID == "" {
 			vs.ID = uuid.New().String()
@@ -58,10 +67,11 @@ func (vs *VaultSet) Create() error {
 		} else {
 			uuidv4UnSet = !exists
 		}
+		counter++
 	}
 
 	// insert the data into the database
-	if _, err := settings.PSQL.Exec("INSERT INTO vaultsets (id, description, data) VALUES ($1, $2, $3);", vs.ID, vs.Description); err != nil {
+	if _, err := settings.PSQL.Exec("INSERT INTO vaultsets (id, description, data) VALUES ($1, $2, $3);", vs.ID, vs.Description, vs.Data); err != nil {
 		return err
 	}
 	return nil

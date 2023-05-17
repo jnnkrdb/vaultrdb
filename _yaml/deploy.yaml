@@ -37,6 +37,46 @@ rules:
     resources: ["vaultrequests"]
     verbs: ["list"]
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-vaultrdb
+  namespace: vaultrdb
+  labels:
+    app: vaultrdb
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  type: ClusterIP
+  selector:
+    app: vaultrdb
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vaultrdb
+  namespace: vaultrdb
+  labels:
+    app: vaultrdb
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: vrdb.vrg.corp
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-vaultrdb
+            port:
+              number: 80
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -58,6 +98,8 @@ spec:
       - name: vaultrdb
         image: docker.io/jnnkrdb/vaultrdb:latest
         imagePullPolicy: Always
+        ports:
+        - containerPort: 80
         # see in operator/go/settings/envs.go
         env: []
         envFrom:
@@ -95,7 +137,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
+    matchLabels: 
       app: postgres-vaultrdb
   template:
     metadata:
@@ -134,7 +176,6 @@ spec:
   type: ClusterIP
   selector:
     app: postgres-vaultrdb
----
 --- # ========================================= Secret
 apiVersion: v1
 kind: Secret
