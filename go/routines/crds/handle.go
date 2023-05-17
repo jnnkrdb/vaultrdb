@@ -19,9 +19,14 @@ func HandleCRDS() {
 			log.Panicf("error receiving list of vaulterquests: %#v", err)
 		}
 
-		for _, vaultrequest := range vrList.Items {
+		for _, vr := range vrList.Items { // handle each vaultrequest in the cluster
 
-			log.Printf("%v\n", vaultrequest)
+			log.Printf("[%s/%s]\n", vr.Namespace, vr.Name)
+
+			for _, vrdata := range vr.Data { // handle each data request in the vaultrequest
+
+				log.Printf("\t\t%v\n", vrdata)
+			}
 		}
 	}
 }

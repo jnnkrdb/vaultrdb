@@ -8,12 +8,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-type VaultRequestData struct {
-	VaultSetID string               `json:"vaultsetid"`
-	Secrets    []BluePrintSecret    `json:"secrets"`
-	ConfigMaps []BluePrintConfigMap `json:"configmaps"`
-}
-
 // deepcopy
 func (in *VaultRequest) DeepCopyInto(out *VaultRequest) {
 	out.TypeMeta = in.TypeMeta
