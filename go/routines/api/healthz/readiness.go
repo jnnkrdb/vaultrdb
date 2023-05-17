@@ -8,7 +8,7 @@ import (
 )
 
 // healthz check -> readyness
-func Readyness(w http.ResponseWriter, r *http.Request) {
+func Readiness(w http.ResponseWriter, r *http.Request) {
 
 	var errors = []error{}
 

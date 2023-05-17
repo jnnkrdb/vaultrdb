@@ -36,6 +36,6 @@ var httpHandlers = hndlrs.HttpFunctionSet{
 
 	// healthz checks
 	{Pattern: "/healthz/live", MainHandler: http.HandlerFunc(healthz.Liveness), Middlewares: mw.MiddleWareChain{}},
-	{Pattern: "/healthz/ready", MainHandler: http.HandlerFunc(healthz.Readyness), Middlewares: mw.MiddleWareChain{}},
+	{Pattern: "/healthz/ready", MainHandler: http.HandlerFunc(healthz.Readiness), Middlewares: mw.MiddleWareChain{}},
 	{Pattern: "/metrics", MainHandler: http.HandlerFunc(healthz.Metrics), Middlewares: mw.MiddleWareChain{}},
 }

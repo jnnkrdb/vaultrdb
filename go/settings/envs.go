@@ -12,7 +12,7 @@ var (
 	PSQL_PASSWORD = os.Getenv("PSQL_PASSWORD")
 	PSQL_HOST     = os.Getenv("PSQL_HOST")
 	PSQL_PORT     = os.Getenv("PSQL_PORT")
-	PSQL_DATABASE = os.Getenv("PSQL_PORT")
+	PSQL_DATABASE = os.Getenv("PSQL_DATABASE")
 
 	CRYPTKEY = os.Getenv("CRYPTKEY")
 )

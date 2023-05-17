@@ -16,4 +16,4 @@ docker push jnnkrdb/vaultrdb:%enginetag_release%
 
 REM ### Finished
 :END
-ECHO "FINIESHED BUILD"
+ECHO "FINISHED BUILD"

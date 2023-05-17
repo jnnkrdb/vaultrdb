@@ -1,3 +1,4 @@
+--- # ------------------------------------------------------------- vaultrdb
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -6,8 +7,8 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: vaultrdb
   name: sa-vaultrdb
+  namespace: vaultrdb
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -55,13 +56,13 @@ spec:
       serviceAccountName: sa-vaultrdb
       containers:
       - name: vaultrdb
-        image: docker.io/jnnkrdb/vaultrdb:v1
+        image: docker.io/jnnkrdb/vaultrdb:latest
         imagePullPolicy: Always
-        env: # see in operator/go/settings/envs.go
-          - name: LOGLEVEL
-            value: "trace"
-          - name: TIMEOUTSECONDS
-            value: "30"
+        # see in operator/go/settings/envs.go
+        env: []
+        envFrom:
+        - secretRef:
+            name: scrt-postgres-vaultrdb
         resources: {}
 #          requests:
 #            memory: "64Mi"
@@ -76,11 +77,74 @@ spec:
             path: /healthz/live
             port: 80
           failureThreshold: 5
-        readynessProbe:
+        readinessProbe:
           initialDelaySeconds: 5
           periodSeconds: 5
           httpGet:
             path: /healthz/ready
             port: 80
           failureThreshold: 5
+--- # ------------------------------------------------------------- postgres
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-vaultrdb
+  namespace: vaultrdb
+  labels:
+    app: postgres-vaultrdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-vaultrdb
+  template:
+    metadata:
+      labels:
+        app: postgres-vaultrdb
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:14
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: scrt-postgres-vaultrdb
+              key: PSQL_PASSWORD
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        resources: {}
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-postgres-vaultrdb
+  namespace: vaultrdb
+  labels:
+    app: postgres-vaultrdb
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  type: ClusterIP
+  selector:
+    app: postgres-vaultrdb
+---
+--- # ========================================= Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: scrt-postgres-vaultrdb
+  namespace: vaultrdb
+type: Opaque
+stringData:
+  PSQL_USER: postgres
+  PSQL_HOST: svc-postgres-vaultrdb.vaultrdb
+  PSQL_PORT: "5432"
+  PSQL_DATABASE: vault
+  PSQL_PASSWORD: VlJHSVQxMjM0IQ
