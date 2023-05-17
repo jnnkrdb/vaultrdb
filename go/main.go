@@ -9,7 +9,6 @@ import (
 	"github.com/jnnkrdb/k8s/operator"
 	"github.com/jnnkrdb/vaultrdb/routines/api"
 	"github.com/jnnkrdb/vaultrdb/routines/crds"
-	"github.com/jnnkrdb/vaultrdb/routines/ui"
 	"github.com/jnnkrdb/vaultrdb/settings"
 	structs_v1 "github.com/jnnkrdb/vaultrdb/structs/v1"
 )
@@ -41,9 +40,6 @@ func main() {
 
 		// start cluster resource handler
 		go crds.HandleCRDS()
-
-		// start ui service
-		go ui.HandleUI()
 
 		// start api backend
 		api.HandleAPI()

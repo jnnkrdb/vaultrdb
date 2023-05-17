@@ -16,7 +16,7 @@ import (
 func HandleAPI() {
 	// checking for errors
 	if err := (&http.Server{
-		Addr:    ":8080",
+		Addr:    ":80",
 		Handler: hndlrs.GetHandler(httpHandlers),
 	}).ListenAndServe(); err != nil {
 		log.Panicf("%#v\n", err)
@@ -30,6 +30,9 @@ var httpHandlers = hndlrs.HttpFunctionSet{
 	// encrypt/decrypt functions
 	{Pattern: "/api/v1/encrypt", MainHandler: http.HandlerFunc(handlers.Encrypt), Middlewares: mw.New(cors.AddCORSHeaders)},
 	{Pattern: "/api/v1/decrypt", MainHandler: http.HandlerFunc(handlers.Decrypt), Middlewares: mw.New(cors.AddCORSHeaders)},
+
+	// host ui
+	{Pattern: "/ui", MainHandler: http.StripPrefix("/ui", http.FileServer(http.Dir("/app/ui"))), Middlewares: mw.New(cors.AddCORSHeaders)},
 
 	// healthz checks
 	{Pattern: "/healthz/live", MainHandler: http.HandlerFunc(healthz.Liveness), Middlewares: mw.MiddleWareChain{}},

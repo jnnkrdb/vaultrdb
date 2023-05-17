@@ -8,12 +8,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-type VaultRequestSpec struct {
-	Data []struct {
-		VaultSetID string `json:"vaultsetid"`
-		StoreKey   string `json:"storekey"`
-	} `json:"data"`
-
+type VaultRequestData struct {
+	VaultSetID string               `json:"vaultsetid"`
 	Secrets    []BluePrintSecret    `json:"secrets"`
 	ConfigMaps []BluePrintConfigMap `json:"configmaps"`
 }
@@ -22,7 +18,7 @@ type VaultRequestSpec struct {
 func (in *VaultRequest) DeepCopyInto(out *VaultRequest) {
 	out.TypeMeta = in.TypeMeta
 	out.ObjectMeta = in.ObjectMeta
-	out.Spec = VaultRequestSpec{}
+	out.Data = []VaultRequestData{}
 }
 
 // ----------------------------------------------------
@@ -30,7 +26,7 @@ func (in *VaultRequest) DeepCopyInto(out *VaultRequest) {
 type VaultRequest struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              VaultRequestSpec `json:"spec"`
+	Data              []VaultRequestData `json:"data"`
 }
 
 type VaultRequestList struct {

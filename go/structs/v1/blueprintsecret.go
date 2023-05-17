@@ -11,6 +11,7 @@ type BluePrintSecret struct {
 	Namespace string `json:"namespace"`
 	Type      string `json:"type"`
 	Immutable bool   `json:"immutable"`
+	KeyName   string `json:"keyname"`
 }
 
 func (bps BluePrintSecret) Validate() error {

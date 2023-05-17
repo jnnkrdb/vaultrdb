@@ -18,7 +18,7 @@ func init() {
 
 	// running preflight table checks
 	for _, sql := range []string{
-		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS public.vaultsets (id text NOT NULL,	name text NOT NULL,	description text NOT NULL, data text NOT NULL, PRIMARY KEY (id));ALTER TABLE IF EXISTS public.vaultsets OWNER to %s;`, PSQL_USER),
+		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS public.vaultsets (id text NOT NULL,	description text NOT NULL, data text NOT NULL, PRIMARY KEY (id));ALTER TABLE IF EXISTS public.vaultsets OWNER to %s;`, PSQL_USER),
 	} {
 		if _, err = PSQL.Exec(sql); err != nil {
 			break

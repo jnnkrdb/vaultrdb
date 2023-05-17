@@ -17,8 +17,9 @@ RUN go build -o /gobinary
 # FINAL STAGE
 FROM alpine:3.16
 # GET gobinary
-RUN mkdir /app
+RUN mkdir -p /app/ui
 COPY --from=build-go /gobinary /app/gobinary
+COPY ui/ /app/ui/
 RUN chmod a+x /app/gobinary
 # Define ENTRYPOINT
 ENTRYPOINT ["/app/gobinary"]

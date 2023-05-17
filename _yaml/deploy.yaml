@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vaultrdb
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: vaultrdb
+  name: sa-vaultrdb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crb-vaultrdb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cr-vaultrdb
+subjects:
+  - kind: ServiceAccount
+    name: sa-vaultrdb
+    namespace: vaultrdb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cr-vaultrdb
+rules:
+  # Get/Create/List/Delete Configmaps and Secrets
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["list", "get", "create", "update", "patch", "delete"]
+  # Get/List vaultrdb.jnnkrdb.de
+  - apiGroups: ["vaultrdb.jnnkrdb.de"]
+    resources: ["vaultrequests"]
+    verbs: ["list"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vaultrdb
+  namespace: vaultrdb
+  labels:
+    app: vaultrdb
+spec:
+  selector:
+    matchLabels:
+      app: vaultrdb
+  template:
+    metadata:
+      labels:
+        app: vaultrdb
+    spec:
+      serviceAccountName: sa-vaultrdb
+      containers:
+      - name: vaultrdb
+        image: docker.io/jnnkrdb/vaultrdb:v1
+        imagePullPolicy: Always
+        env: # see in operator/go/settings/envs.go
+          - name: LOGLEVEL
+            value: "trace"
+          - name: TIMEOUTSECONDS
+            value: "30"
+        resources: {}
+#          requests:
+#            memory: "64Mi"
+#            cpu: "250m"
+#          limits:
+#            memory: "128Mi"
+#            cpu: "500m"
+        livenessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          httpGet:
+            path: /healthz/live
+            port: 80
+          failureThreshold: 5
+        readynessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          httpGet:
+            path: /healthz/ready
+            port: 80
+          failureThreshold: 5
+---
