@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jnnkrdb/corerdb/crypt"
 	"github.com/jnnkrdb/vaultrdb/settings"
 )
 
@@ -40,16 +41,10 @@ func SelectByID(id string) (vs VaultSet, err error) {
 
 // insert a new vaultset, if id is empty, a new uuidv4 will be created, else, the uuidv4 in the id field will be validated and used, if the format is correct
 func (vs *VaultSet) Create() error {
-
-	var uuidv4UnSet bool = true
-	// create a new uuidv4 for the object, must be unique in the table
-
 	var counter = 1
-	const maxCounter = 5
+	for {
 
-	for uuidv4UnSet {
-
-		if counter > maxCounter {
+		if counter > 5 {
 			return fmt.Errorf("error: max tries eexceeded")
 		}
 
@@ -64,13 +59,19 @@ func (vs *VaultSet) Create() error {
 
 		if exists, err := vaultsetExists(vs.ID); err != nil {
 			return err
-		} else {
-			uuidv4UnSet = !exists
+		} else if !exists {
+			break
 		}
 		counter++
 	}
 
 	// insert the data into the database
+	if d, err := crypt.EncryptWithDefault(vs.Data); err != nil {
+		return fmt.Errorf("error encrypting data: %v", err)
+	} else {
+		vs.Data = d
+	}
+
 	if _, err := settings.PSQL.Exec("INSERT INTO vaultsets (id, description, data) VALUES ($1, $2, $3);", vs.ID, vs.Description, vs.Data); err != nil {
 		return err
 	}
@@ -79,7 +80,7 @@ func (vs *VaultSet) Create() error {
 
 // update a specific vaultset with new values
 func (vs *VaultSet) Update() error {
-	if _, err := settings.PSQL.Exec("UPDATE vaultsets SET description=$1, data=$2) WHERE id=$3;", vs.Description, vs.Data, vs.ID); err != nil {
+	if _, err := settings.PSQL.Exec("UPDATE vaultsets SET description=$1, data=$2 WHERE id=$3;", vs.Description, vs.Data, vs.ID); err != nil {
 		return fmt.Errorf("error updating the vaultset: %#v", err)
 	}
 	return nil
@@ -104,6 +105,5 @@ func vaultsetExists(id string) (bool, error) {
 	if err := settings.PSQL.QueryRow("SELECT exists(SELECT 1 FROM vaultsets WHERE id=$1)", id).Scan(&exists); err != nil {
 		return false, fmt.Errorf("error checking existance of a vaultsets via uuidv4[%s]: %#v", id, err)
 	}
-
 	return exists, nil
 }
