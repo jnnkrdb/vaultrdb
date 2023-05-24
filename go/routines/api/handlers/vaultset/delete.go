@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jnnkrdb/gomw/handlers/httpfnc"
-	structs_v1 "github.com/jnnkrdb/vaultrdb/structs/v1"
+	"github.com/jnnkrdb/vaultrdb/structs/v1/v1_vaultset"
 )
 
 func delete(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +15,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := structs_v1.Delete(r.URL.Query().Get("id")); err != nil {
+	if err := v1_vaultset.Delete(r.URL.Query().Get("id")); err != nil {
 		httpfnc.AddErrorToHeaderIfAny(&w, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	} else {

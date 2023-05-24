@@ -6,13 +6,19 @@ import (
 )
 
 var (
-	PSQL_CONNECTION = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", PSQL_HOST, PSQL_PORT, PSQL_USER, PSQL_PASSWORD, PSQL_DATABASE)
+	PSQL_CONNECTION = fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		POSTGRES_HOST,
+		POSTGRES_PORT,
+		POSTGRES_USER,
+		POSTGRES_PASSWORD,
+		POSTGRES_DB)
 
-	PSQL_USER     = os.Getenv("PSQL_USER")
-	PSQL_PASSWORD = os.Getenv("PSQL_PASSWORD")
-	PSQL_HOST     = os.Getenv("PSQL_HOST")
-	PSQL_PORT     = os.Getenv("PSQL_PORT")
-	PSQL_DATABASE = os.Getenv("PSQL_DATABASE")
+	POSTGRES_USER     = os.Getenv("POSTGRES_USER")
+	POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
+	POSTGRES_HOST     = os.Getenv("POSTGRES_HOST")
+	POSTGRES_PORT     = os.Getenv("POSTGRES_PORT")
+	POSTGRES_DB       = os.Getenv("POSTGRES_DB")
 
 	CRYPTKEY = os.Getenv("CRYPTKEY")
 )

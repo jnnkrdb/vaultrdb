@@ -21,7 +21,7 @@ spec:
           type: object
           properties:
             data:
-              type: arrayvault
+              type: array
               items: 
                 type: object
                 required: [vaultsetid]

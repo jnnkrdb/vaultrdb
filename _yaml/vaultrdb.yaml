@@ -1,15 +1,15 @@
---- # ------------------------------------------------------------- vaultrdb
+--- # ============================================================= Namespace
 apiVersion: v1
 kind: Namespace
 metadata:
   name: vaultrdb
----
+--- # ============================================================= ServiceAccount
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sa-vaultrdb
   namespace: vaultrdb
----
+--- # ============================================================= ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -22,7 +22,7 @@ subjects:
   - kind: ServiceAccount
     name: sa-vaultrdb
     namespace: vaultrdb
----
+--- # ============================================================= ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -36,7 +36,7 @@ rules:
   - apiGroups: ["vaultrdb.jnnkrdb.de"]
     resources: ["vaultrequests"]
     verbs: ["list"]
----
+--- # ============================================================= Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -50,33 +50,12 @@ spec:
     port: 80
     protocol: TCP
     targetPort: 80
-  type: ClusterIP
+    nodePort: 30080
+#  type: ClusterIP
+  type: NodePort
   selector:
     app: vaultrdb
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: vaultrdb
-  namespace: vaultrdb
-  labels:
-    app: vaultrdb
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-spec:
-  ingressClassName: traefik
-  rules:
-  - host: vrdb.vrg.corp
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: svc-vaultrdb
-            port:
-              number: 80
----
+--- # ============================================================= Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -101,7 +80,9 @@ spec:
         ports:
         - containerPort: 80
         # see in operator/go/settings/envs.go
-        env: []
+        env: 
+        - name: CRYPTKEY
+          value: "randomkey"
         envFrom:
         - secretRef:
             name: scrt-postgres-vaultrdb
@@ -126,66 +107,3 @@ spec:
             path: /healthz/ready
             port: 80
           failureThreshold: 5
---- # ------------------------------------------------------------- postgres
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres-vaultrdb
-  namespace: vaultrdb
-  labels:
-    app: postgres-vaultrdb
-spec:
-  replicas: 1
-  selector:
-    matchLabels: 
-      app: postgres-vaultrdb
-  template:
-    metadata:
-      labels:
-        app: postgres-vaultrdb
-    spec:
-      containers:
-      - name: postgres
-        image: postgres:14
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: scrt-postgres-vaultrdb
-              key: PSQL_PASSWORD
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        resources: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: svc-postgres-vaultrdb
-  namespace: vaultrdb
-  labels:
-    app: postgres-vaultrdb
-spec:
-  ports:
-  - name: postgres
-    port: 5432
-    protocol: TCP
-    targetPort: 5432
-  type: ClusterIP
-  selector:
-    app: postgres-vaultrdb
---- # ========================================= Secret
-apiVersion: v1
-kind: Secret
-metadata:
-  name: scrt-postgres-vaultrdb
-  namespace: vaultrdb
-type: Opaque
-stringData:
-  PSQL_USER: postgres
-  PSQL_HOST: svc-postgres-vaultrdb.vaultrdb
-  PSQL_PORT: "5432"
-  PSQL_DATABASE: vault
-  PSQL_PASSWORD: VlJHSVQxMjM0IQ

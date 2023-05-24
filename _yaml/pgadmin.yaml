@@ -1,0 +1,94 @@
+--- # ============================================================= Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  namespace: vaultrdb
+  labels:
+    app: pgadmin
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30081
+  type: NodePort
+  selector:
+    app: pgadmin
+--- # ============================================================= Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: scrt-pgadmin
+  namespace: vaultrdb
+  labels:
+    app: pgadmin
+type: Opaque
+stringData:
+  PGADMIN_DEFAULT_PASSWORD: kennwort1
+  PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+  PGADMIN_DEFAULT_EMAIL: "pgadmin@example.com"
+  PGADMIN_PORT: "80"
+--- # ============================================================= ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgadmin-config
+  namespace: vaultrdb
+  labels:
+    app: pgadmin
+data:
+  servers.json: |
+    {
+      "Servers": {
+        "1": {
+          "Name": "VaultRDB",
+          "Group": "Servers",
+          "Port": 5432,
+          "Username": "vault",
+          "Host": "postgres.vaultrdb",
+          "SSLMode": "prefer",
+          "MaintenanceDB": "postgres"
+        }
+      }
+    }
+--- # ============================================================= Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: vaultrdb
+  labels:
+    app: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      volumes:
+      - name: pgadmin-config
+        configMap:
+          name: pgadmin-config
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4:6.20
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - secretRef:
+            name: scrt-pgadmin
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+          - name: pgadmin-config
+            mountPath: /pgadmin4/servers.json
+            subPath: servers.json
+            readOnly: true  
+---
+
