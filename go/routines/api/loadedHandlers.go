@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/jnnkrdb/vaultrdb/routines/api/handlers"
-	"github.com/jnnkrdb/vaultrdb/routines/api/handlers/vaultset"
 	"github.com/jnnkrdb/vaultrdb/routines/api/healthz"
+	"github.com/jnnkrdb/vaultrdb/routines/api/v1/v1_uuidv4"
+	"github.com/jnnkrdb/vaultrdb/routines/api/v1/v1_vault"
 
 	hndlrs "github.com/jnnkrdb/gomw/handlers"
 	mw "github.com/jnnkrdb/gomw/middlewares"
@@ -27,14 +27,10 @@ func HandleAPI() {
 var httpHandlers = hndlrs.HttpFunctionSet{
 
 	// handle vaultsets
-	{Pattern: "/api/v1/vaultset", MainHandler: http.HandlerFunc(vaultset.HandleHTTP), Middlewares: mw.New(cors.AddCORSHeaders)},
+	{Pattern: "/api/v1/vaultset", MainHandler: http.HandlerFunc(v1_vault.HandleHTTP), Middlewares: mw.New(cors.AddCORSHeaders)},
 
 	// get a new uuidv4
-	{Pattern: "/api/v1/uuidv4", MainHandler: http.HandlerFunc(handlers.UUIDv4), Middlewares: mw.New(cors.AddCORSHeaders)},
-
-	// encrypt/decrypt functions
-	{Pattern: "/api/v1/encrypt", MainHandler: http.HandlerFunc(handlers.Encrypt), Middlewares: mw.New(cors.AddCORSHeaders)},
-	{Pattern: "/api/v1/decrypt", MainHandler: http.HandlerFunc(handlers.Decrypt), Middlewares: mw.New(cors.AddCORSHeaders)},
+	{Pattern: "/api/v1/uuidv4", MainHandler: http.HandlerFunc(v1_uuidv4.UUIDv4), Middlewares: mw.New(cors.AddCORSHeaders)},
 
 	// host ui
 	{Pattern: "/ui", MainHandler: http.StripPrefix("/ui", http.FileServer(http.Dir("/app/ui"))), Middlewares: mw.New(cors.AddCORSHeaders)},

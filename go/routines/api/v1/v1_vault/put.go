@@ -1,4 +1,4 @@
-package vaultset
+package v1_vault
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/jnnkrdb/vaultrdb/structs/v1/v1_vaultset"
 )
 
-func post(w http.ResponseWriter, r *http.Request) {
+func put(w http.ResponseWriter, r *http.Request) {
 	var vaultset v1_vaultset.VaultSet
 	if err := json.NewDecoder(r.Body).Decode(&vaultset); err != nil {
 		httpfnc.AddErrorToHeaderIfAny(&w, err)
@@ -16,7 +16,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := v1_vaultset.Insert(&vaultset); err != nil {
+	if _, err := v1_vaultset.Update(vaultset); err != nil {
 		httpfnc.AddErrorToHeaderIfAny(&w, err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

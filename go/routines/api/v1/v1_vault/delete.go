@@ -1,4 +1,4 @@
-package vaultset
+package v1_vault
 
 import (
 	"fmt"

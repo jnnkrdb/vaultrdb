@@ -1,6 +1,10 @@
-package v1
+package v1_vaultrequest
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jnnkrdb/vaultrdb/structs/v1/v1_vaultset"
+)
 
 type VaultRequestData struct {
 	VaultSetID string               `json:"vaultsetid"`
@@ -10,7 +14,7 @@ type VaultRequestData struct {
 
 func (vrd VaultRequestData) Validate() error {
 
-	if _, e := SelectByID(vrd.VaultSetID); e != nil {
+	if _, e := v1_vaultset.SelectByID(vrd.VaultSetID); e != nil {
 		return fmt.Errorf("error requesting vaultset[%s] from database: %v", vrd.VaultSetID, e)
 	}
 
