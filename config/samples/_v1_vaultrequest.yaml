@@ -1,0 +1,12 @@
+apiVersion: jnnkrdb.de/v1
+kind: VaultRequest
+metadata:
+  labels:
+    app.kubernetes.io/name: vaultrequest
+    app.kubernetes.io/instance: vaultrequest-sample
+    app.kubernetes.io/part-of: app
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: app
+  name: vaultrequest-sample
+spec:
+  # TODO(user): Add fields here
