@@ -18,7 +18,9 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,7 +49,46 @@ type VaultRequestReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
 func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+
+	// initialize the logger
+	var _log = log.FromContext(ctx).WithName(fmt.Sprintf("vaultrequest [%s]", req.NamespacedName))
+
+	// create caching object
+	// cache vaultrequests
+	var vaultreq = &jnnkrdbdev1.VaultRequest{}
+
+	// parse the ctrl.Request into a vaultrequest
+	if err := r.Get(ctx, req.NamespacedName, vaultreq); err != nil {
+
+		// if the error is an "NotFound" error, then the vaultrequest probably was deleted
+		// returning no error
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+
+		_log.Error(err, "error reconciling vaultrequest")
+
+		// if the error is something else, return the error
+		return ctrl.Result{}, err
+	}
+
+	_log = _log.WithValues()
+
+	// check if the object contains the finalization flags, or has to be terminated
+	if finalized, err := checkFinalizationVaultRequest(_log, ctx, r, vaultreq); err != nil || finalized {
+		return ctrl.Result{}, err
+	}
+
+	_log.Info("start reconciling")
+
+	// validate the date, provided by the dataref fields. First check if there are any keys provided, if not
+	// return with a nil error and no requeuing
+	if (len(vaultreq.Spec.DataReference.Data) + len(vaultreq.Spec.DataReference.UUIDs) + len(vaultreq.Spec.DataReference.StringData)) <= 0 {
+		_log.Info("data fields are empty")
+		return ctrl.Result{}, nil
+	}
+
+	// validate the data fields
 
 	// TODO(user): your logic here
 

@@ -40,10 +40,14 @@ type VaultRequestStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// +operator-sdk:csv:customresourcedefinitions:type=status
-	DeployedSecrets []DeployedSecret `json:"deployedsecrets,omitempty"`
+	Deployed []deployedObject `json:"deployed,omitempty"`
+}
 
-	// +operator-sdk:csv:customresourcedefinitions:type=status
-	DeployedConfigMaps []DeployedConfigMap `json:"deployedconfigmaps,omitempty"`
+type deployedObject struct {
+	Kind            string `json:"kind"`
+	Namespace       string `json:"namespace"`
+	Name            string `json:"name"`
+	ResourceVersion string `json:"resourceversion"`
 }
 
 //+kubebuilder:object:root=true

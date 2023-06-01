@@ -9,16 +9,27 @@ import (
 // struct which contains the information about the namespace regex
 type DataReference struct {
 
+	// The Data field must contain all values, as a base64 encoded version
+	//
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	// +kubebuilder:default={}
-	RefData DataField `json:"refdata,omitempty"`
+	Data DataField `json:"data,omitempty"`
 
+	// The StringData field must contain all values, as an unencoded version
+	//
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	// +kubebuilder:default={}
-	RefUUID UUIDField `json:"refuuid,omitempty"`
+	StringData DataField `json:"stringData,omitempty"`
+
+	// The UUIDs field must contain all values, as an uuid v4, existing in the mounted database
+	//
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	// +kubebuilder:default={}
+	UUIDs UUIDField `json:"uuids,omitempty"`
 }
 
 // ============================================== reference fields
+
 type DataField map[string]string
 
 type UUIDField map[string]string

@@ -44,6 +44,24 @@ func (nsr NamespacesRegex) CalculateNamespaces(l logr.Logger, ctx context.Contex
 
 	var namespaceList = &v1.NamespaceList{}
 
+	// create the compare function
+	// check whether a string exists in a list of regexpressions or not
+	stringMatchesRegExpList := func(comp string, regexpList []string) (matched bool, err error) {
+
+		for i := range regexpList {
+
+			// if the matchstring function fails, the response will be false, error
+			// else, the error will be return, or the "true" value
+			if matched, err = regexp.MatchString(regexpList[i], comp); err != nil || matched {
+				return
+			}
+		}
+
+		// since no string in the regexpList matches the string comp
+		// false and error nil will be returned
+		return false, nil
+	}
+
 	l.Info("calculating namespaces for the following lists", "NamespacesRegex", nsr)
 
 	if err = c.List(ctx, namespaceList, &client.ListOptions{}); err == nil {
@@ -91,18 +109,4 @@ func (nsr NamespacesRegex) CalculateNamespaces(l logr.Logger, ctx context.Contex
 		}
 	}
 	return
-}
-
-// check whether a string exists in a list of regexpressions or not
-func stringMatchesRegExpList(comp string, regexpList []string) (bool, error) {
-	for i := range regexpList {
-		if matched, err := regexp.MatchString(regexpList[i], comp); err != nil {
-			return false, nil
-		} else {
-			if matched {
-				return true, nil
-			}
-		}
-	}
-	return false, nil
 }
