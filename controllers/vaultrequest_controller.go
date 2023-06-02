@@ -19,12 +19,14 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 )
@@ -59,24 +61,19 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	// parse the ctrl.Request into a vaultrequest
 	if err := r.Get(ctx, req.NamespacedName, vaultreq); err != nil {
-
 		// if the error is an "NotFound" error, then the vaultrequest probably was deleted
 		// returning no error
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
-
 		_log.Error(err, "error reconciling vaultrequest")
-
 		// if the error is something else, return the error
 		return ctrl.Result{}, err
 	}
 
-	_log = _log.WithValues()
-
 	// check if the object contains the finalization flags, or has to be terminated
 	if finalized, err := checkFinalizationVaultRequest(_log, ctx, r, vaultreq); err != nil || finalized {
-		return ctrl.Result{}, err
+		return ctrl.Result{Requeue: !finalized}, err
 	}
 
 	_log.Info("start reconciling")
@@ -88,7 +85,13 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, nil
 	}
 
-	// validate the data fields
+	// validate all datafields in the vaultrequest
+	if err := vaultreq.Spec.DataReference.RunValidations(_log); err != nil {
+		_log.Error(err, "validating datafields failed")
+		return ctrl.Result{Requeue: true, RequeueAfter: time.Minute * 2}, err
+	}
+
+	_log.V(1)
 
 	// TODO(user): your logic here
 
@@ -99,5 +102,9 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 func (r *VaultRequestReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&jnnkrdbdev1.VaultRequest{}).
+		// this eventfilter is set, to prevent reconcilation loops, because, if unset, the
+		// reconcilation controller gets called, everytime the deployrequest gets updated,
+		// even if the update occurs in metadata- or status-fields
+		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		Complete(r)
 }
