@@ -35,6 +35,7 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
+	"github.com/jnnkrdb/vaultrdb/db"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -93,6 +94,11 @@ func main() {
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
+	if err = db.InitETCDConnection(setupLog); err != nil {
+		setupLog.Error(err, "unable to connect to etcd", "controller", "VaultRequest")
 		os.Exit(1)
 	}
 

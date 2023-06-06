@@ -80,18 +80,22 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	// validate the date, provided by the dataref fields. First check if there are any keys provided, if not
 	// return with a nil error and no requeuing
-	if (len(vaultreq.Spec.DataReference.Data) + len(vaultreq.Spec.DataReference.UUIDs) + len(vaultreq.Spec.DataReference.StringData)) <= 0 {
-		_log.Info("data fields are empty")
+	if len(vaultreq.Spec.DataMap) <= 0 {
+		_log.Info("empty datamaps are not allowed")
 		return ctrl.Result{}, nil
 	}
 
-	// validate all datafields in the vaultrequest
-	if err := vaultreq.Spec.DataReference.RunValidations(_log); err != nil {
-		_log.Error(err, "validating datafields failed")
-		return ctrl.Result{Requeue: true, RequeueAfter: time.Minute * 2}, err
-	}
+	// start processing the datamap fields
+	for datamapKey, datamap := range vaultreq.Spec.DataMap {
 
-	_log.V(1)
+		_log = _log.WithValues("datamapkey", datamapKey)
+
+		// first validate the datafield
+		if err := datamap.Validate(_log); err != nil {
+			_log.Error(err, "validating datafields failed")
+			return ctrl.Result{Requeue: true, RequeueAfter: time.Minute * 2}, err
+		}
+	}
 
 	// TODO(user): your logic here
 

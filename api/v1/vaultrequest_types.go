@@ -29,7 +29,8 @@ type VaultRequestSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	DataReference DataReference `json:"datareference"`
+	DataMap map[string]DataMap `json:"datamap"`
+
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Namespaces NamespacesRegex `json:"namespaces"`
 }
