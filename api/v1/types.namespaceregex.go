@@ -15,11 +15,11 @@ type NamespacesRegex struct {
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Name string `json:"name,omitempty"`
 
-	// +kubebuilder:default=[]
+	// +kubebuilder:default={}
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	MustAvoidRegex []string `json:"mustavoidregex"`
 
-	// +kubebuilder:default=[]
+	// +kubebuilder:default={}
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	MustMatchRegex []string `json:"mustmatchregex"`
 

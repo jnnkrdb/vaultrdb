@@ -35,13 +35,21 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
-	"github.com/jnnkrdb/vaultrdb/db"
+	"github.com/jnnkrdb/vaultrdb/svc/db"
+	"github.com/jnnkrdb/vaultrdb/svc/etcdui"
+	"github.com/jnnkrdb/vaultrdb/svc/etcdui/config"
 	//+kubebuilder:scaffold:imports
 )
 
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
+
+	metricsAddr          string
+	enableLeaderElection bool
+	probeAddr            string
+	verbosity            int
+	startDevelopment     bool
 )
 
 func init() {
@@ -52,18 +60,29 @@ func init() {
 }
 
 func main() {
-	var metricsAddr string
-	var enableLeaderElection bool
-	var probeAddr string
-	var verbosity int
-	var startDevelopment bool
+
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.IntVar(&verbosity, "verbosity", 0, "Sets the log verbosity level, which produce more logs at a higher number.")
 	flag.BoolVar(&startDevelopment, "mode-development", false, "Adds development output to the logs.")
-	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
-		"Enable leader election for controller manager. "+
-			"Enabling this will ensure there is only one active controller manager.")
+	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
+
+	// setting params for the etcd ui
+	flag.BoolVar(&config.UseETCDWebUi, "enable-etcd-webui", false, "Use ETCD WebUi?")
+	flag.StringVar(&config.ETCDUIHost, "etcd-ui-host", "", "Sets the IP-Address/Hostname of the etcd-webui.")
+	flag.IntVar(&config.ETCDUIPort, "etcd-ui-port", 80, "Sets the Port of the etcd-webui.")
+
+	flag.StringVar(&config.Separator, "seperator", "/", "Sets the Separator.")
+
+	flag.BoolVar(&config.UseTLS, "usetls", false, "Use TLS?")
+	flag.StringVar(&config.CACert, "cacert", "", "Verify certificates of TLS-enabled secure servers using this CA bundle (v3).")
+	flag.StringVar(&config.Cert, "cert", "", "Identify secure client using this TLS Certificate file (v3).")
+	flag.StringVar(&config.KeyFile, "key", "", "Identify secure client using this TLS Key file (v3).")
+
+	flag.BoolVar(&config.UseAuth, "useauth", false, "Use Auth?")
+	flag.IntVar(&config.ConnectTimeout, "timeout", 5, "ETCD client connection timeout.")
+	flag.IntVar(&config.SendMessageSize, "send-message-size", 2*1024*1024, "ETCD client max send message size.")
+
 	opts := zap.Options{
 		Development: startDevelopment,
 		Level:       zapcore.Level(verbosity),
@@ -98,7 +117,12 @@ func main() {
 	}
 
 	if err = db.InitETCDConnection(setupLog); err != nil {
-		setupLog.Error(err, "unable to connect to etcd", "controller", "VaultRequest")
+		setupLog.Error(err, "unable to connect to etcd", "controller", "ETCD")
+		os.Exit(1)
+	}
+
+	if err = etcdui.StartETCDUi(setupLog); err != nil {
+		setupLog.Error(err, "unable to start etcd webui", "controller", "ETCD WebUi")
 		os.Exit(1)
 	}
 
