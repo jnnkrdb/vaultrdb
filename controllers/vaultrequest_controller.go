@@ -19,8 +19,8 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"time"
 
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -85,17 +85,24 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, nil
 	}
 
+	var objectData = make(map[string]string)
+
 	// start processing the datamap fields
 	for datamapKey, datamap := range vaultreq.Spec.DataMap {
 
 		_log = _log.WithValues("datamapkey", datamapKey)
 
-		// first validate the datafield
-		if err := datamap.Validate(_log); err != nil {
-			_log.Error(err, "validating datafields failed")
-			return ctrl.Result{Requeue: true, RequeueAfter: time.Minute * 2}, err
+		// get the data for the key
+		dat, e := datamap.GetData(_log)
+		if e != nil {
+			_log.Error(e, "invalid datamap object")
+			return ctrl.Result{Requeue: false}, e
 		}
+
+		objectData[datamapKey] = dat
 	}
+
+	// create the objects, based on the vaultreq.Spec.Namespaces field
 
 	// TODO(user): your logic here
 
@@ -110,5 +117,8 @@ func (r *VaultRequestReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		// reconcilation controller gets called, everytime the deployrequest gets updated,
 		// even if the update occurs in metadata- or status-fields
 		WithEventFilter(predicate.GenerationChangedPredicate{}).
+		// trying to watch namespace, so when a namespace gets created, all the vaultrequests
+		// will be synchronized again. That means, the rescheduling can be deactivated
+		Owns(&v1.Namespace{}).
 		Complete(r)
 }

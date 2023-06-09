@@ -1,52 +1,71 @@
 package v1
 
 import (
-	"sync"
+	"context"
+	"encoding/base64"
+	"fmt"
 
 	"github.com/go-logr/logr"
+	"github.com/jnnkrdb/vaultrdb/svc/redis"
 )
 
 // struct which contains the information about the namespace regex
+
 type DataMap struct {
 
-	// The Data field must contain all values, as a base64 encoded version
+	// The RedisKey field must contain a key, existing in the mounted redis database
+	//
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	RedisKey string `json:"rdskey,omitempty"`
+
+	// The Data field must an base64 encoded version of the required value
 	//
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Data string `json:"data,omitempty"`
 
-	// The StringData field must contain all values, as an unencoded version
+	// The StringData field must an unencoded version of the required value
 	//
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	StringData string `json:"stringData,omitempty"`
-
-	// The UUIDs field must contain all values, as an uuid v4, existing in the mounted database
-	//
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	UUIDs string `json:"uuids,omitempty"`
 }
 
 // run datafield validations, for all datafields int the datareference object
-func (dm DataMap) Validate(_log logr.Logger) error {
+func (dm DataMap) GetData(_log logr.Logger) (string, error) {
 
-	var (
-		err    error = nil
-		eMutex sync.Mutex
-		wg     sync.WaitGroup
-	)
+	_log.V(5).Info("parsing data", "rdskey", dm.RedisKey, "data", dm.Data, "stringData", dm.StringData)
 
-	wg.Add(3)
-	eMutex.Lock()
+	var errors = [3]error{nil, nil, nil}
 
-	wg.Done()
-	wg.Done()
-	wg.Done()
+	if len(dm.RedisKey) > 0 && redis.USEREDIS {
+		var data string
+		if err := redis.RDS.Get(context.Background(), dm.RedisKey).Scan(&data); err != nil {
 
-	eMutex.Unlock()
+			_log.V(5).Error(err, "couldn't get data from redis", "rdskey", dm.RedisKey)
+			errors[0] = err
 
-	// create 3 goroutines to validate the datafields, since we have 3 datafields in the objects
-	// we add 3 goroutines
+		} else {
 
-	wg.Wait()
+			return data, nil
+		}
+	}
 
-	return err
+	if len(dm.Data) > 0 {
+		if unenc, err := base64.StdEncoding.DecodeString(dm.Data); err != nil {
+
+			_log.V(5).Error(err, "couldn't decode base64 data from datafield", "data", dm.Data)
+			errors[1] = err
+
+		} else {
+
+			return string(unenc), nil
+		}
+	}
+
+	if len(dm.StringData) > 0 {
+		return dm.Data, nil
+	} else {
+		errors[2] = fmt.Errorf("stringData field souldn't be empty, when data and rdskey are not in use")
+	}
+
+	return "", fmt.Errorf("errors[0]: %v | errors[1]: %v | errors[2]: %v", errors[0], errors[1], errors[2])
 }

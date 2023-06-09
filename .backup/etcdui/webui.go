@@ -19,7 +19,7 @@ import (
 var httpHandlers = hdnlrs.HttpFunctionSet{
 
 	// web ui
-	{Pattern: "/", MainHandler: http.FileServer(http.Dir("/app/etcdwebui/assets")), Middlewares: middlewares.MiddleWareChain{}},
+	{Pattern: "/", MainHandler: http.FileServer(http.Dir("/app/assets")), Middlewares: middlewares.MiddleWareChain{}},
 
 	// version 2 api
 	{Pattern: "/v2/separator", MainHandler: http.HandlerFunc(apiv3.GetSeparator), Middlewares: middlewares.MiddleWareChain{}},
