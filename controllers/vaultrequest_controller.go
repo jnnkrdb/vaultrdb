@@ -19,10 +19,12 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -102,11 +104,147 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		objectData[datamapKey] = dat
 	}
 
-	// create the objects, based on the vaultreq.Spec.Namespaces field
+	// calculating the namespaces
+	match, avoid, err := vaultreq.Spec.Namespaces.CalculateNamespaces(_log, ctx, r.Client)
+	if err != nil {
+		_log.Error(err, "couldn't calculate namespaces")
+		return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+	}
+
+	// remove the configmap/secrets, which should not exist anymore
+	for _, statusObject := range vaultreq.Status.Deployed {
+
+		nsLog := _log.WithValues("kind", statusObject.Kind, "namespace", statusObject.Namespace, "name", statusObject.Name)
+
+		// check if the namespace of the status object is in the avoid namespaces
+		// array
+		for _, avoidNamespace := range avoid {
+			if avoidNamespace.Name != statusObject.Namespace {
+				continue
+			}
+		}
+
+		switch statusObject.Kind {
+		case "Secret":
+			// check if the secret exists
+			var s = &v1.Secret{}
+			if err = r.Get(ctx, types.NamespacedName{Namespace: statusObject.Namespace, Name: statusObject.Name}, s, &client.GetOptions{}); err != nil && !errors.IsNotFound(err) {
+				nsLog.Error(err, "couldn't receive object information")
+				return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+			}
+
+			// remove the secret from the cluster
+			if err = r.Delete(ctx, s, &client.DeleteOptions{}); err != nil {
+				nsLog.Error(err, "couldn't remove object")
+				return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+			}
+
+		case "ConfigMap":
+			// check if the configmap exists
+			var cm = &v1.ConfigMap{}
+			if err = r.Get(ctx, types.NamespacedName{Namespace: statusObject.Namespace, Name: statusObject.Name}, cm, &client.GetOptions{}); err != nil && !errors.IsNotFound(err) {
+				nsLog.Error(err, "couldn't receive object information")
+				return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+			}
+
+			// remove the configmap from the cluster
+			if err = r.Delete(ctx, cm, &client.DeleteOptions{}); err != nil {
+				nsLog.Error(err, "couldn't remove object")
+				return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+			}
+		}
+
+	}
+
+	// create or update the configmaps/secrets from in the match namespaces
+	for _, matchNamespace := range match {
+
+		nsLog := _log.WithValues("kind", vaultreq.Spec.Namespaces.Kind, "namespace", matchNamespace.Name)
+
+		var lbls = make(map[string]string)
+		for k := range objectData {
+			lbls[k] = "validkey"
+		}
+
+		// check the kind of the requested resource
+		switch vaultreq.Spec.Namespaces.Kind {
+		case "Secret":
+
+			var s = &v1.Secret{}
+
+			// checking existance of the secret
+			if err = r.Get(ctx, types.NamespacedName{Namespace: matchNamespace.Name, Name: vaultreq.Name}, s, &client.GetOptions{}); err != nil && !errors.IsNotFound(err) {
+				nsLog.Error(err, "couldn't validate, if object exists or not")
+				return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+			}
+
+			s.StringData = objectData
+			s.Labels = lbls
+			s.Type = v1.SecretType(vaultreq.Spec.Namespaces.Type)
+
+			// if the object is not found, then create the object
+			// else, update the obkect
+			if errors.IsNotFound(err) {
+
+				// fill the neccessary informations
+				s.Name = vaultreq.Name
+				s.Namespace = matchNamespace.Name
+
+				if err = r.Create(ctx, s, &client.CreateOptions{}); err != nil {
+					nsLog.Error(err, "couldn't creating existing object")
+					return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+				}
+
+			} else {
+
+				if err = r.Update(ctx, s, &client.UpdateOptions{}); err != nil {
+					nsLog.Error(err, "couldn't update existing object")
+					return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+				}
+			}
+
+		case "ConfigMap":
+
+			var cm = &v1.ConfigMap{}
+
+			// checking existance of the configmap
+			if err = r.Get(ctx, types.NamespacedName{Namespace: matchNamespace.Name, Name: vaultreq.Name}, cm, &client.GetOptions{}); err != nil && !errors.IsNotFound(err) {
+				nsLog.Error(err, "couldn't validate, if object exists or not")
+				return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+			}
+
+			cm.Data = objectData
+			cm.Labels = lbls
+
+			// if the object is not found, then create the object
+			// else, update the obkect
+			if errors.IsNotFound(err) {
+
+				// fill the neccessary informations
+				cm.Name = vaultreq.Name
+				cm.Namespace = matchNamespace.Name
+
+				if err = r.Create(ctx, cm, &client.CreateOptions{}); err != nil {
+					nsLog.Error(err, "couldn't creating existing object")
+					return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+				}
+
+			} else {
+
+				if err = r.Update(ctx, cm, &client.UpdateOptions{}); err != nil {
+					nsLog.Error(err, "couldn't update existing object")
+					return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
+				}
+			}
+		}
+	}
 
 	// TODO(user): your logic here
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{
+		Requeue:      true,
+		RequeueAfter: 5 * time.Minute,
+	}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
