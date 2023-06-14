@@ -152,7 +152,7 @@ func (in *VaultRequestStatus) DeepCopyInto(out *VaultRequestStatus) {
 	*out = *in
 	if in.Deployed != nil {
 		in, out := &in.Deployed, &out.Deployed
-		*out = make([]deployedObject, len(*in))
+		*out = make([]DeployedObject, len(*in))
 		copy(*out, *in)
 	}
 }

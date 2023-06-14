@@ -1,4 +1,4 @@
-package controllers
+package vaultrequest
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
@@ -18,7 +19,7 @@ import (
 // if the finalizer is not appended to the object, it
 // will be added, else, if the object is marked, to be deleted,
 // the operations to remove the connected objects will be launched
-func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *VaultRequestReconciler, vr *jnnkrdbdev1.VaultRequest) (bool, error) {
+func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrdbdev1.VaultRequest) (bool, error) {
 	_log.Info("check finalization")
 
 	const _finalizer string = "vaultrequest.jnnkrdb.de/v1.finalizer"
@@ -32,14 +33,14 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 		controllerutil.AddFinalizer(vr, _finalizer)
 
 		// update the vaultrequest, with new finalizer
-		if err := r.Update(ctx, vr); err != nil {
+		if err := c.Update(ctx, vr); err != nil {
 			_log.Error(err, "error adding finalizer")
 			return false, err
 		}
 	}
 
 	// receive the new version of the updated vaultrequest
-	if err := r.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
+	if err := c.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
 		_log.Error(err, "error updating cached object")
 		return false, err
 	}
@@ -53,7 +54,7 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 
 			// remove all objects from the status.Deployed field
 			for _, obj := range vr.Status.Deployed {
-				var l = _log.WithValues("kind", obj.Kind, "namespace", obj.Namespace, "name", obj.Name, "resourceversion", obj.ResourceVersion)
+				var l = _log.WithValues("kind", obj.Kind, "namespace", obj.Namespace, "name", obj.Name)
 				l.Info("finalizing object")
 
 				// get the kind of the object and remove the actual object
@@ -62,7 +63,7 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 				case "ConfigMap":
 					var cm = &v1.ConfigMap{}
 					// get the object from declarations
-					if err := r.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, cm); err != nil {
+					if err := c.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, cm); err != nil {
 						// if the error is an "NotFound" error, then the configmap probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
@@ -74,7 +75,7 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 						return false, err
 					}
 					// remove the cached object from the cluster
-					if err := r.Delete(ctx, cm); err != nil {
+					if err := c.Delete(ctx, cm); err != nil {
 						l.Error(err, "error removing the object")
 						return false, err
 					}
@@ -82,7 +83,7 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 				case "Secret":
 					var scrt = &v1.Secret{}
 					// get the object from declarations
-					if err := r.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, scrt); err != nil {
+					if err := c.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, scrt); err != nil {
 						// if the error is an "NotFound" error, then the secret probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
@@ -94,7 +95,7 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 						return false, err
 					}
 					// remove the cached object from the cluster
-					if err := r.Delete(ctx, scrt); err != nil {
+					if err := c.Delete(ctx, scrt); err != nil {
 						l.Error(err, "error removing the object")
 						return false, err
 					}
@@ -112,13 +113,13 @@ func checkFinalizationVaultRequest(_log logr.Logger, ctx context.Context, r *Vau
 			_log.Info("finished finalizing vaultrequests")
 
 			// receive the new version of the updated vaultrequest
-			if err := r.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
+			if err := c.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
 				_log.Error(err, "error updating cached object")
 				return false, err
 			}
 			// remove the finalizer from the vaultrequest
 			controllerutil.RemoveFinalizer(vr, _finalizer)
-			if err := r.Update(ctx, vr); err != nil {
+			if err := c.Update(ctx, vr); err != nil {
 				return false, err
 			}
 

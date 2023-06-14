@@ -41,14 +41,13 @@ type VaultRequestStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// +operator-sdk:csv:customresourcedefinitions:type=status
-	Deployed []deployedObject `json:"deployed,omitempty"`
+	Deployed []DeployedObject `json:"deployed,omitempty"`
 }
 
-type deployedObject struct {
-	Kind            string `json:"kind"`
-	Namespace       string `json:"namespace"`
-	Name            string `json:"name"`
-	ResourceVersion string `json:"resourceversion"`
+type DeployedObject struct {
+	Kind      string `json:"kind"`
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
 }
 
 //+kubebuilder:object:root=true
