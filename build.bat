@@ -9,6 +9,10 @@ git push origin master
 
 git tag
 
+docker build docker.io/jnnkrdb/vaultrdb:latest
+
+docker push docker.io/jnnkrdb/vaultrdb:latest
+
 set /p tag=NewTag:
 
 if "%tag%" == "" goto END
