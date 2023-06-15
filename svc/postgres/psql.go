@@ -82,7 +82,7 @@ func Connect(_log logr.Logger) error {
 		return err
 	}
 
-	if _, err := PSQL.Exec("CREATE TABLE IF NOT EXISTS public.vault (psqlid text NOT NULL, data text NOT NULL, PRIMARY KEY (psqlid)); ALTER TABLE IF EXISTS public.vault OWNER to $1;", psql_user); err != nil {
+	if _, err := PSQL.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS public.vault (psqlid text NOT NULL, data text NOT NULL, PRIMARY KEY (psqlid)); ALTER TABLE IF EXISTS public.vault OWNER to %s;", psql_user)); err != nil {
 		_log.Error(err, "error executing preflight statement")
 		return err
 	}
