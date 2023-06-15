@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/go-logr/logr"
+
+	_ "github.com/lib/pq"
 )
 
 var (
