@@ -6,15 +6,15 @@ metadata:
 spec:
   datamap: 
     testkey1:
-      psqlid: sdfsdwe
+      psqlid: testkey1
       data: dG9sbGVkYXRlbnh5eg==
       stringData: tolledatenxyz
     testkey2:
       psqlid: sdfsdwe
-      data: dG9sbGVkYXRlbnh5eg==
+      data: ""
       stringData: tolledatenxyz
     testkey3:
-      psqlid: sdfsdwe
+      psqlid: ""
       data: dG9sbGVkYXRlbnh5eg==
       stringData: tolledatenxyz
   namespaces:

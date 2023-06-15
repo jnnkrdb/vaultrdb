@@ -19,7 +19,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -72,37 +71,8 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	// check if the object contains the finalization flags, or has to be terminated
-	if finalized, err := vaultrequest.Finalize(_log, ctx, r.Client, vaultreq); err != nil || finalized {
-		return ctrl.Result{Requeue: !finalized}, err
-	}
-
-	_log.Info("start reconciling")
-
-	// calculating the namespaces
-	match, avoid, err := vaultreq.Spec.Namespaces.CalculateNamespaces(_log, ctx, r.Client)
-	if err != nil {
-		_log.Error(err, "couldn't calculate namespaces")
-		return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
-	}
-
-	// remove the configmap/secrets, which should not exist anymore
-	if err = vaultrequest.RemoveUnwantedObjects(_log, r.Client, ctx, vaultreq, avoid); err != nil {
-		return ctrl.Result{Requeue: true, RequeueAfter: 2 * time.Minute}, err
-	}
-
-	// create or update the configmaps/secrets from in the match namespaces
-	rec, result, err := vaultrequest.CreateOrUpdateObjects(_log, ctx, r.Client, vaultreq, match)
-	if err != nil || rec {
-		return result, err
-	}
-
-	// TODO(user): your logic here
-
-	return ctrl.Result{
-		Requeue:      true,
-		RequeueAfter: 5 * time.Minute,
-	}, nil
+	// run reconcilation of the identified vaultrequest
+	return vaultrequest.Reconcile(_log, ctx, r.Client, vaultreq)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -110,7 +80,7 @@ func (r *VaultRequestReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&jnnkrdbdev1.VaultRequest{}).
 		// this eventfilter is set, to prevent reconcilation loops, because, if unset, the
-		// reconcilation controller gets called, everytime the deployrequest gets updated,
+		// reconcilation controller gets called, everytime the vaultrequest gets updated,
 		// even if the update occurs in metadata- or status-fields
 		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		// trying to watch namespace, so when a namespace gets created, all the vaultrequests

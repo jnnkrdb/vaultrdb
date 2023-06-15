@@ -19,14 +19,18 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
-	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
+	"github.com/jnnkrdb/vaultrdb/controllers/vaultrequest"
 )
 
 // NamespaceReconciler reconciles a Namespace object
@@ -51,17 +55,41 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	// initialize the logger
 	var _log = log.FromContext(ctx).WithName(fmt.Sprintf("namespace [%s]", req.NamespacedName))
 
+	// create caching object
+	// cache namespace
+	var ns = &v1.Namespace{}
+
+	// parse the ctrl.Request into a namespace
+	if err := r.Get(ctx, req.NamespacedName, ns, &client.GetOptions{}); err != nil {
+		// if the error is an "NotFound" error, then the namespace probably was deleted
+		// returning no error
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		_log.Error(err, "error reconciling vaultrequest at namespace event")
+		// if the error is something else, return the error
+		return ctrl.Result{}, err
+	}
+
+	// since the namespace was found, start the checks for the namespace
 	_log.Info("namespace changed")
 
+	// requesting the list of vaultrequests, existing in the cluster
 	var vaultrequestList = &jnnkrdbdev1.VaultRequestList{}
-
 	if err := r.List(ctx, vaultrequestList, &client.ListOptions{}); err != nil {
 		_log.Error(err, "error listing the vaultrequests")
 		return ctrl.Result{Requeue: true}, err
 	}
 
+	// for every item in the vaultrequestslist, start the reconcilation
 	for _, vr := range vaultrequestList.Items {
 		_log.Info("identified vaultrequest", "vr.name", vr.Name, "vr.Namespace", vr.Namespace)
+
+		if _, err := vaultrequest.Reconcile(_log, ctx, r.Client, &vr); err != nil {
+			return ctrl.Result{Requeue: true, RequeueAfter: 30 * time.Second}, err
+		}
+
+		_log.Info("successfully reconciled vaultrequest", "vr.name", vr.Name, "vr.Namespace", vr.Namespace)
 	}
 
 	// TODO(user): your logic here
@@ -72,6 +100,10 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 // SetupWithManager sets up the controller with the Manager.
 func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&corev1.Namespace{}).
+		For(&v1.Namespace{}).
+		// this eventfilter is set, to prevent reconcilation loops, because, if unset, the
+		// reconcilation controller gets called, everytime the namespace gets updated,
+		// even if the update occurs in metadata- or status-fields
+		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		Complete(r)
 }
