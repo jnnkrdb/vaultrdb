@@ -22,6 +22,6 @@ RUN go build -o /vaultrdb .
 
 FROM alpine:3.10
 WORKDIR /
-COPY --from=builder /vaultrdb .
-RUN chmod a+x /gobinary
+COPY --from=builder /vaultrdb /vaultrdb
+RUN chmod a+x /vaultrdb
 ENTRYPOINT ["/vaultrdb"]
