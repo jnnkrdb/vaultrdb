@@ -37,22 +37,26 @@ func Connect(_log logr.Logger) error {
 
 	// check if postgres url is configured
 	var psql_host, psql_port, psql_user, psql_pass, psql_db string
-	var usePsql bool = true
-	for _, c := range []struct {
-		ENV string
-		Var *string
-	}{
-		{"POSTGRES_HOST", &psql_host},
-		{"POSTGRES_PORT", &psql_port},
-		{"POSTGRES_USER", &psql_user},
-		{"POSTGRES_PASSWORD", &psql_pass},
-		{"POSTGRES_DB", &psql_db},
-	} {
-		if res, set := os.LookupEnv(c.ENV); set {
-			c.Var = &res
-			continue
-		}
-		_log.Info("environment variable not set", "env", c.ENV)
+	var usePsql, set bool = true, false
+
+	if psql_host, set = os.LookupEnv("POSTGRES_HOST"); !set {
+		_log.Info("postgres config variable missing", "POSTGRES_HOST", psql_host)
+		usePsql = false
+	}
+	if psql_port, set = os.LookupEnv("POSTGRES_PORT"); !set {
+		_log.Info("postgres config variable missing", "POSTGRES_PORT", psql_port)
+		usePsql = false
+	}
+	if psql_user, set = os.LookupEnv("POSTGRES_USER"); !set {
+		_log.Info("postgres config variable missing", "POSTGRES_USER", psql_user)
+		usePsql = false
+	}
+	if psql_pass, set = os.LookupEnv("POSTGRES_PASSWORD"); !set {
+		_log.Info("postgres config variable missing", "POSTGRES_PASSWORD", psql_pass)
+		usePsql = false
+	}
+	if psql_db, set = os.LookupEnv("POSTGRES_DB"); !set {
+		_log.Info("postgres config variable missing", "POSTGRES_DB", psql_db)
 		usePsql = false
 	}
 
@@ -67,7 +71,7 @@ func Connect(_log logr.Logger) error {
 		_log.Error(err, "error connecting to postgres server")
 		return err
 	} else {
-		_log.Info("postgres connection upserted")
+		_log.Info("postgres connection created")
 		PSQL = r
 		USEPOSTGRES = true
 	}
