@@ -1,4 +1,16 @@
----
+--- # ============================================================= Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: scrt-vaultrdb
+type: Opaque
+stringData:
+  POSTGRES_HOST: postgres.vaultrdb
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: vaultmanager
+  POSTGRES_PASSWORD: VlJHSVQxMjM0IQ
+  POSTGRES_DB : vaultrdb
+--- # ============================================================= Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,23 +20,25 @@ spec:
   selector:
     matchLabels:
       control-plane: vaultrdb
+  revisionHistoryLimit: 1
   replicas: 1
   template:
     metadata:
-      annotations:
-        kubectl.kubernetes.io/default-container: manager
       labels:
         control-plane: vaultrdb
     spec:
-      securityContext:
-        runAsNonRoot: true
       containers:
-      - command:
-        - /manager
+      - name: vaultrdb
+        image: docker.io/jnnkrdb/vaultrdb:latest
+        envFrom:
+        - secretRef:
+            name: scrt-vaultrdb
+        command:
+        - /vaultrdb
         args:
         - --leader-elect
-        image: controller:latest
-        name: manager
+        - --verbosity=5
+        - --mode-development
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

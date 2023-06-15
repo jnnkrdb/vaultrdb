@@ -35,7 +35,7 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
-	rds "github.com/jnnkrdb/vaultrdb/svc/redis"
+	"github.com/jnnkrdb/vaultrdb/svc/postgres"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -82,7 +82,7 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "vaultrequests.v1.jnnkrdb.de", // "2b4be3d4.jnnkrdb.de",
+		LeaderElectionID:       "vaultrequests.v1.jnnkrdb.de",
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
@@ -100,8 +100,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = rds.Connect(setupLog); err != nil {
-		setupLog.Error(err, "unable to connect to redis", "controller", "REDIS")
+	if err = postgres.Connect(setupLog); err != nil {
+		setupLog.Error(err, "unable to connect to postgres", "controller", "POSTGRES")
 		os.Exit(1)
 	}
 
@@ -128,7 +128,7 @@ func main() {
 
 	if err := mgr.AddReadyzCheck("readyz", healthz.Checker(func(req *http.Request) error {
 
-		if err := rds.RedisConnected(); err != nil {
+		if err := postgres.PSQLConnected(); err != nil {
 			return err
 		}
 

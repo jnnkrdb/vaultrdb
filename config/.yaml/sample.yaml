@@ -1,3 +1,4 @@
+--- # ============================================================= VaultRequest
 apiVersion: jnnkrdb.de/v1
 kind: VaultRequest
 metadata:
