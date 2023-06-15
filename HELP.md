@@ -7,6 +7,7 @@ operator-sdk init --domain jnnkrdb.de --repo github.com/jnnkrdb/vaultrdb
 
 ```bash
 operator-sdk create api --version v1 --kind VaultRequest --resource --controller
+operator-sdk create api --group="core" --version v1 --kind Namespace --resource=false --controller=true
 ```
 --group vault 
 ```bash

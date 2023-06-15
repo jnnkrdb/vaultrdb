@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -116,6 +115,6 @@ func (r *VaultRequestReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		// trying to watch namespace, so when a namespace gets created, all the vaultrequests
 		// will be synchronized again. That means, the rescheduling can be deactivated
-		Owns(&v1.Namespace{}).
+		// Owns(&v1.Namespace{}).
 		Complete(r)
 }
