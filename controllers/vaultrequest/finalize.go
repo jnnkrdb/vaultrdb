@@ -12,7 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//+kubebuilder:rbac:groups=core,resources=secrets;configmaps,verbs=get;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=secrets;configmaps,verbs=get;create;update;patch;delete;list
 
 // check the finalization for the objects
 //
