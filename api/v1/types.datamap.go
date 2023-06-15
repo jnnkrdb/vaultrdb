@@ -37,7 +37,7 @@ func (dm DataMap) GetData(_log logr.Logger) (string, error) {
 
 	if len(dm.PSQLID) > 0 && postgres.USEPOSTGRES {
 		var data string
-		if err := postgres.PSQL.QueryRow("SELECT data FROM public.vault WHERE psqlid=$1", dm.PSQLID).Scan(&data); err != nil {
+		if err := postgres.PSQL.QueryRow("SELECT data FROM public.vault WHERE psqlid=$1;", dm.PSQLID).Scan(&data); err != nil {
 			_log.V(5).Error(err, "couldn't get data from postgres")
 			errors[0] = err
 		} else {
