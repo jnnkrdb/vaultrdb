@@ -59,8 +59,14 @@ func (r *PostgresReconciler) Reconcile(ctx context.Context, log logr.Logger) err
 			return err
 		}
 
-		recon := func(namespace, name string) error {
-			var rl = log.WithValues("namespace", namespace, "name", name)
+		recon := func(c client.Object) error {
+
+			var (
+				name      string = c.GetAnnotations()["v1.vaultrequest.jnnkrdb.de/source.name"]
+				namespace string = c.GetAnnotations()["v1.vaultrequest.jnnkrdb.de/source.namespace"]
+
+				rl = log.WithValues("namespace", namespace, "name", name)
+			)
 
 			rl.V(2).Info("requesting vaultrequest")
 
@@ -82,23 +88,16 @@ func (r *PostgresReconciler) Reconcile(ctx context.Context, log logr.Logger) err
 		}
 
 		if len(configMapList.Items) > 0 {
-			if err = recon(
-				configMapList.Items[0].Annotations["v1.vaultrequest.jnnkrdb.de/source.namespace"],
-				configMapList.Items[0].Annotations["v1.vaultrequest.jnnkrdb.de/source.name"],
-			); err != nil {
+			if err = recon(&configMapList.Items[0]); err != nil {
 				return err
 			}
 		}
 
 		if len(secretList.Items) > 0 {
-			if err = recon(
-				secretList.Items[0].Annotations["v1.vaultrequest.jnnkrdb.de/source.namespace"],
-				secretList.Items[0].Annotations["v1.vaultrequest.jnnkrdb.de/source.name"],
-			); err != nil {
+			if err = recon(&secretList.Items[0]); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	return nil
