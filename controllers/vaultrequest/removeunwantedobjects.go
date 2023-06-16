@@ -12,10 +12,10 @@ import (
 )
 
 // remove secrets/configmaps from the cluster, which shouldn't exist anymore
-func RemoveUnwantedObjects(_log logr.Logger, c client.Client, ctx context.Context, vr *jnnkrdbdev1.VaultRequest, avoidList []v1.Namespace) error {
+func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context, vr *jnnkrdbdev1.VaultRequest, avoidList []v1.Namespace) error {
 
 	for indexDeployed, _do := range vr.Status.Deployed {
-		_log = _log.WithValues("kind", _do.Kind, "namespace", _do.Namespace, "name", _do.Name)
+		var l = _l.WithValues("kind", _do.Kind, "namespace", _do.Namespace, "name", _do.Name)
 
 		var remove bool = false
 
@@ -30,7 +30,7 @@ func RemoveUnwantedObjects(_log logr.Logger, c client.Client, ctx context.Contex
 		}
 
 		if !remove {
-			_log.Info("object must not be removed")
+			l.V(3).Info("object must not be removed")
 			continue
 		}
 
@@ -42,7 +42,7 @@ func RemoveUnwantedObjects(_log logr.Logger, c client.Client, ctx context.Contex
 		case "Secret":
 			removeObject = &v1.Secret{}
 		default:
-			_log.Info("object has unknown kind")
+			l.V(3).Info("object has unknown kind")
 			continue
 		}
 
@@ -52,16 +52,16 @@ func RemoveUnwantedObjects(_log logr.Logger, c client.Client, ctx context.Contex
 			Name:      _do.Name,
 		}, removeObject, &client.GetOptions{}); err != nil {
 			if errors.IsNotFound(err) {
-				_log.Info("object not found")
+				l.V(3).Info("object not found")
 				continue
 			}
-			_log.Error(err, "couldn't receive object informations")
+			l.V(0).Error(err, "couldn't receive object informations")
 			return err
 		}
 
 		// remove the actual object
 		if err := c.Delete(ctx, removeObject, &client.DeleteOptions{}); err != nil {
-			_log.Error(err, "couldn't remove object")
+			l.V(0).Error(err, "couldn't remove object")
 			return err
 		}
 
@@ -79,14 +79,14 @@ func RemoveUnwantedObjects(_log logr.Logger, c client.Client, ctx context.Contex
 			Namespace: vr.Namespace,
 			Name:      vr.Name,
 		}, vr, &client.GetOptions{}); err != nil {
-			_log.Error(err, "FATAL error while re-caching the vaultrequest")
+			l.V(0).Error(err, "FATAL error while re-caching the vaultrequest")
 			return err
 		}
 
 		// update the status of the current vautlrequest
 		vr.Status.Deployed = newStatus
 		if err := c.Status().Update(ctx, vr); err != nil {
-			_log.Error(err, "error updating status object")
+			l.V(0).Error(err, "error updating status object")
 			return err
 		}
 	}

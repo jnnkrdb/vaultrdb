@@ -12,8 +12,6 @@ import (
 
 func Reconcile(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrdbdev1.VaultRequest) (ctrl.Result, error) {
 
-	_log.Info("start reconciling")
-
 	// check if the object contains the finalization flags, or has to be terminated
 	if finalized, err := Finalize(_log, ctx, c, vr); err != nil || finalized {
 		return ctrl.Result{Requeue: !finalized}, err
@@ -22,7 +20,7 @@ func Reconcile(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkr
 	// calculating the namespaces
 	match, avoid, err := vr.Spec.Namespaces.CalculateNamespaces(_log, ctx, c)
 	if err != nil {
-		_log.Error(err, "couldn't calculate namespaces")
+		_log.V(0).Error(err, "couldn't calculate namespaces")
 		return ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
 	}
 

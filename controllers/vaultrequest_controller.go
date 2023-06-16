@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -53,7 +52,10 @@ type VaultRequestReconciler struct {
 func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	// initialize the logger
-	var _log = log.FromContext(ctx).WithName(fmt.Sprintf("vaultrequest [%s]", req.NamespacedName))
+	var _log = log.FromContext(ctx).WithValues("vaultrequest", req.NamespacedName)
+
+	// intro log
+	_log.V(0).Info("starting reconcilation")
 
 	// create caching object
 	// cache vaultrequests
@@ -64,9 +66,10 @@ func (r *VaultRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		// if the error is an "NotFound" error, then the vaultrequest probably was deleted
 		// returning no error
 		if errors.IsNotFound(err) {
+			_log.V(3).Info("vaultrequest not found")
 			return ctrl.Result{}, nil
 		}
-		_log.Error(err, "error reconciling vaultrequest")
+		_log.V(0).Error(err, "error reconciling vaultrequest")
 		// if the error is something else, return the error
 		return ctrl.Result{}, err
 	}

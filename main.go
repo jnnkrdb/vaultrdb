@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"net/http"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -101,7 +100,16 @@ func main() {
 	}
 
 	if err = postgres.Connect(setupLog); err != nil {
-		setupLog.Error(err, "unable to connect to postgres", "controller", "POSTGRES")
+		setupLog.Error(err, "unable to connect to postgres")
+		os.Exit(1)
+	}
+
+	// set up postgres reconciler
+	if err = (&controllers.PostgresReconciler{
+		Client:   mgr.GetClient(),
+		Postgres: postgres.PSQL,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "PostgreSQL")
 		os.Exit(1)
 	}
 
@@ -126,14 +134,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := mgr.AddReadyzCheck("readyz", healthz.Checker(func(req *http.Request) error {
-
-		if err := postgres.PSQLConnected(); err != nil {
-			return err
-		}
-
-		return nil
-	})); err != nil {
+	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}

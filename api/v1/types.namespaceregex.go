@@ -46,14 +46,13 @@ func (nsr NamespacesRegex) CalculateNamespaces(l logr.Logger, ctx context.Contex
 
 	// create the compare function
 	// check whether a string exists in a list of regexpressions or not
-	stringMatchesRegExpList := func(comp string, regexpList []string) (matched bool, err error) {
+	stringMatchesRegExpList := func(comp string, regexpList []string) (bool, error) {
 
 		for i := range regexpList {
-
 			// if the matchstring function fails, the response will be false, error
 			// else, the error will be return, or the "true" value
-			if matched, err = regexp.MatchString(regexpList[i], comp); err != nil || matched {
-				return
+			if matched, err := regexp.MatchString(regexpList[i], comp); err != nil || matched {
+				return true, err
 			}
 		}
 
@@ -62,7 +61,7 @@ func (nsr NamespacesRegex) CalculateNamespaces(l logr.Logger, ctx context.Contex
 		return false, nil
 	}
 
-	l.Info("calculating namespaces for the following lists", "NamespacesRegex", nsr)
+	l.V(2).Info("calculating namespaces for the following lists", "NamespacesRegex", nsr)
 
 	if err = c.List(ctx, namespaceList, &client.ListOptions{}); err == nil {
 
@@ -72,39 +71,31 @@ func (nsr NamespacesRegex) CalculateNamespaces(l logr.Logger, ctx context.Contex
 			// check, if the namespace has to be avoided during deployment
 			var inList bool = false
 			if inList, err = stringMatchesRegExpList(namespaceList.Items[i].Name, nsr.MustAvoidRegex); err != nil {
-
-				l.Error(err, "error calculating avoids", "current namespace", namespaceList.Items[i].Name, "MustAvoidRegex", nsr.MustAvoidRegex)
-
+				l.V(0).Error(err, "error calculating avoids", "current namespace", namespaceList.Items[i].Name, "MustAvoidRegex", nsr.MustAvoidRegex)
 				return
+			}
 
-			} else {
-				if inList {
-					// if the namespace is in the list [MustAvoidRegex], append the namespace to the list [mustAvoid]
-					// and calculate the next namespace
-					mustAvoid = append(mustAvoid, namespaceList.Items[i])
-					continue
-				}
+			if inList {
+				// if the namespace is in the list [MustAvoidRegex], append the namespace to the list [mustAvoid]
+				// and calculate the next namespace
+				mustAvoid = append(mustAvoid, namespaceList.Items[i])
+				continue
 			}
 
 			// if the namespace is not in the list [MustAvoidRegex], check if the namespace is in the list [MustMatchRegex]
 			if inList, err = stringMatchesRegExpList(namespaceList.Items[i].Name, nsr.MustMatchRegex); err != nil {
-
-				l.Error(err, "error calculating matches", "current namespace", namespaceList.Items[i].Name, "MustMatchRegex", nsr.MustMatchRegex)
-
+				l.V(0).Error(err, "error calculating matches", "current namespace", namespaceList.Items[i].Name, "MustMatchRegex", nsr.MustMatchRegex)
 				return
+			}
 
+			if inList {
+				// if the namespace is in the list [MustMatchRegex], then append the namespace to
+				// the namespaces [mustMatch]
+				mustMatch = append(mustMatch, namespaceList.Items[i])
 			} else {
-
-				if inList {
-					// if the namespace is in the list [MustMatchRegex], then append the namespace to
-					// the namespaces [mustMatch]
-					mustMatch = append(mustMatch, namespaceList.Items[i])
-
-				} else {
-					// if the namespace also is not in the list [MustMatchRegex], then append the namespace to
-					// the namespaces [mustAvoid]
-					mustAvoid = append(mustAvoid, namespaceList.Items[i])
-				}
+				// if the namespace also is not in the list [MustMatchRegex], then append the namespace to
+				// the namespaces [mustAvoid]
+				mustAvoid = append(mustAvoid, namespaceList.Items[i])
 			}
 		}
 	}

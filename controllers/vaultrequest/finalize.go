@@ -20,28 +20,28 @@ import (
 // will be added, else, if the object is marked, to be deleted,
 // the operations to remove the connected objects will be launched
 func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrdbdev1.VaultRequest) (bool, error) {
-	_log.Info("check finalization")
+	_log.V(0).Info("check finalization")
 
 	const _finalizer string = "vaultrequest.jnnkrdb.de/v1.finalizer"
 
 	// check, wether the vaultrequest has the required finalizer or not
 	// if not, then add the finalizer
 	if controllerutil.ContainsFinalizer(vr, _finalizer) {
-		_log.Info("appending finalizer")
+		_log.V(1).Info("appending finalizer")
 
 		// add the desired finalizer and update the object
 		controllerutil.AddFinalizer(vr, _finalizer)
 
 		// update the vaultrequest, with new finalizer
 		if err := c.Update(ctx, vr); err != nil {
-			_log.Error(err, "error adding finalizer")
+			_log.V(0).Error(err, "error adding finalizer")
 			return false, err
 		}
 	}
 
 	// receive the new version of the updated vaultrequest
 	if err := c.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
-		_log.Error(err, "error updating cached object")
+		_log.V(0).Error(err, "error updating cached object")
 		return false, err
 	}
 
@@ -50,11 +50,11 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 		// check, wether the vaultrequest has the required finalizer or not
 		if controllerutil.ContainsFinalizer(vr, _finalizer) {
 			// start the finalizing routine
-			_log.Info("finalizing vaultrequest")
+			_log.V(1).Info("finalizing vaultrequest")
 
 			// remove all objects from the status.Deployed field
 			for _, obj := range vr.Status.Deployed {
-				var l = _log.WithValues("kind", obj.Kind, "namespace", obj.Namespace, "name", obj.Name)
+				var l = _log.V(3).WithValues("kind", obj.Kind, "namespace", obj.Namespace, "name", obj.Name)
 				l.Info("finalizing object")
 
 				// get the kind of the object and remove the actual object
@@ -110,16 +110,17 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 				l.Info("object removed")
 			}
 
-			_log.Info("finished finalizing vaultrequests")
+			_log.V(1).Info("finished finalizing vaultrequests")
 
 			// receive the new version of the updated vaultrequest
 			if err := c.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
-				_log.Error(err, "error updating cached object")
+				_log.V(0).Error(err, "error updating cached object")
 				return false, err
 			}
 			// remove the finalizer from the vaultrequest
 			controllerutil.RemoveFinalizer(vr, _finalizer)
 			if err := c.Update(ctx, vr); err != nil {
+				_log.V(0).Error(err, "error removing finalizer flag from cluster object")
 				return false, err
 			}
 

@@ -31,27 +31,25 @@ type DataMap struct {
 // run datafield validations, for all datafields int the datareference object
 func (dm DataMap) GetData(_log logr.Logger) (string, error) {
 
-	_log.V(5).Info("parsing data", "psqlid", dm.PSQLID, "data", dm.Data, "stringData", dm.StringData)
+	_log.V(3).Info("parsing data", "psqlid", dm.PSQLID, "data", dm.Data, "stringData", dm.StringData)
 
 	var errors = [3]error{nil, nil, nil}
 
 	if len(dm.PSQLID) > 0 && postgres.USEPOSTGRES {
 		var data string
 		if err := postgres.PSQL.QueryRow("SELECT data FROM public.vault WHERE psqlid=$1;", dm.PSQLID).Scan(&data); err != nil {
-			_log.V(5).Error(err, "couldn't get data from postgres")
+			_log.V(3).Info("couldn't get data from postgres", "error.message", err)
 			errors[0] = err
 		} else {
-
 			return data, nil
 		}
 	}
 
 	if len(dm.Data) > 0 {
 		if unenc, err := base64.StdEncoding.DecodeString(dm.Data); err != nil {
-			_log.V(5).Error(err, "couldn't decode base64 data from datafield", "data", dm.Data)
+			_log.V(3).Info("couldn't decode base64 data from datafield", "data", dm.Data, "error.message", err)
 			errors[1] = err
 		} else {
-
 			return string(unenc), nil
 		}
 	}
@@ -59,6 +57,7 @@ func (dm DataMap) GetData(_log logr.Logger) (string, error) {
 	if len(dm.StringData) > 0 {
 		return dm.Data, nil
 	} else {
+		_log.V(3).Info("data field is empty", "data", dm.Data)
 		errors[2] = fmt.Errorf("stringData field shouldn't be empty, when data and psqlid are not in use")
 	}
 

@@ -66,30 +66,30 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
-		_log.Error(err, "error reconciling vaultrequest at namespace event")
+		_log.V(0).Error(err, "error reconciling vaultrequest at namespace event")
 		// if the error is something else, return the error
 		return ctrl.Result{}, err
 	}
 
 	// since the namespace was found, start the checks for the namespace
-	_log.Info("namespace changed")
+	_log.V(0).Info("namespace changed")
 
 	// requesting the list of vaultrequests, existing in the cluster
 	var vaultrequestList = &jnnkrdbdev1.VaultRequestList{}
 	if err := r.List(ctx, vaultrequestList, &client.ListOptions{}); err != nil {
-		_log.Error(err, "error listing the vaultrequests")
+		_log.V(0).Error(err, "error listing the vaultrequests")
 		return ctrl.Result{Requeue: true}, err
 	}
 
 	// for every item in the vaultrequestslist, start the reconcilation
 	for _, vr := range vaultrequestList.Items {
-		_log.Info("identified vaultrequest", "vr.name", vr.Name, "vr.Namespace", vr.Namespace)
+		_log.V(1).Info("identified vaultrequest", "vr.name", vr.Name, "vr.Namespace", vr.Namespace)
 
 		if _, err := vaultrequest.Reconcile(_log, ctx, r.Client, &vr); err != nil {
 			return ctrl.Result{Requeue: true, RequeueAfter: 30 * time.Second}, err
 		}
 
-		_log.Info("successfully reconciled vaultrequest", "vr.name", vr.Name, "vr.Namespace", vr.Namespace)
+		_log.V(1).Info("successfully reconciled vaultrequest", "vr.name", vr.Name, "vr.Namespace", vr.Namespace)
 	}
 
 	// TODO(user): your logic here
