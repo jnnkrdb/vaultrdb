@@ -123,9 +123,9 @@ func CreateOrUpdateObjects(_log logr.Logger, ctx context.Context, c client.Clien
 			return true, ctrl.Result{Requeue: true}, err
 		}
 
-		if !vr.Status.Deployed.Contains(obj.GetObjectKind().GroupVersionKind().Kind, obj.GetNamespace()) {
+		if !jnnkrdbdev1.Contains(vr.Status.Deployed, obj.GetObjectKind().GroupVersionKind().Kind, obj.GetNamespace()) {
 
-			vr.Status.Deployed = vr.Status.Deployed.Append(vr.Spec.Namespaces.Kind, matchList[i].Name)
+			vr.Status.Deployed = jnnkrdbdev1.Append(vr.Status.Deployed, vr.Spec.Namespaces.Kind, matchList[i].Name)
 
 			if err = c.Status().Update(ctx, vr); err != nil {
 				l.V(0).Error(err, "could not update the status of the vaultrequest")

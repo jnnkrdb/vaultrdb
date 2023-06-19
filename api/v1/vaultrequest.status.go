@@ -1,48 +1,41 @@
 package v1
 
-type DeployedObject struct {
-	Kind      string `json:"kind"`
-	Namespace string `json:"namespace"`
-}
-
-type DeployedObjectList []DeployedObject
-
 // remove a specific object from the
-func (dol DeployedObjectList) RemoveObject(kind, namespace string) DeployedObjectList {
+func Remove(list []DeployedObject, kind, namespace string) []DeployedObject {
 
-	if len(dol) == 0 {
-		return DeployedObjectList{}
+	if len(list) == 0 {
+		return []DeployedObject{}
 	}
 
 	var result []DeployedObject
-	for i := range dol {
+	for i := range list {
 
-		if dol[i].Kind == kind && dol[i].Namespace == namespace {
+		if list[i].Kind == kind && list[i].Namespace == namespace {
 			continue
 		}
 
-		result = append(result, dol[i])
+		result = append(result, list[i])
 	}
 
 	return result
 }
 
 // append a new status object
-func (do DeployedObjectList) Append(kind, namespace string) DeployedObjectList {
+func Append(list []DeployedObject, kind, namespace string) []DeployedObject {
 	if kind == "" || namespace == "" {
-		return do
+		return list
 	}
-	return append(do, DeployedObject{Kind: kind, Namespace: namespace})
+	return append(list, DeployedObject{Kind: kind, Namespace: namespace})
 }
 
 // check if a specific item is in the status object
-func (do DeployedObjectList) Contains(kind, namespace string) bool {
-	if len(do) == 0 {
+func Contains(list []DeployedObject, kind, namespace string) bool {
+	if len(list) == 0 {
 		return false
 	}
 
-	for i := range do {
-		if do[i].Kind == kind && do[i].Namespace == namespace {
+	for i := range list {
+		if list[i].Kind == kind && list[i].Namespace == namespace {
 			return true
 		}
 	}

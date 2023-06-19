@@ -67,7 +67,8 @@ func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context,
 		}
 
 		// create the new status from the original vaultrequest.Status
-		var newStatus = vr.Status.Deployed.RemoveObject(_do.Kind, _do.Namespace)
+		jnnkrdbdev1.Remove(vr.Status.Deployed, _do.Kind, _do.Namespace)
+		var newStatus = jnnkrdbdev1.Remove(vr.Status.Deployed, _do.Kind, _do.Namespace)
 
 		l.V(3).Info("new status object", "status", newStatus)
 

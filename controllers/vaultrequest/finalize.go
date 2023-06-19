@@ -107,7 +107,7 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 				}
 
 				// implement the status update
-				var newStatus = vr.Status.Deployed.RemoveObject(i.Kind, i.Namespace)
+				var newStatus = jnnkrdbdev1.Remove(vr.Status.Deployed, i.Kind, i.Namespace)
 				_log.V(3).Info("new status identified", "newStatus", newStatus)
 
 				// receive the new version of the updated vaultrequest
