@@ -2,6 +2,7 @@ package vaultrequest
 
 import (
 	"context"
+	"strings"
 
 	"github.com/go-logr/logr"
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
@@ -54,16 +55,18 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 
 			// remove all objects from the status.Deployed field
 			for _, obj := range vr.Status.Deployed {
-				var l = _log.V(3).WithValues("kind", obj.Kind, "namespace", obj.Namespace, "name", obj.Name)
+				var kind, namespace = strings.Split(obj, "/")[0], strings.Split(obj, "/")[1]
+
+				var l = _log.V(3).WithValues("kind", kind, "namespace", namespace, "name", vr.Name)
 				l.Info("finalizing object")
 
 				// get the kind of the object and remove the actual object
-				switch obj.Kind {
+				switch kind {
 
 				case "ConfigMap":
 					var cm = &v1.ConfigMap{}
 					// get the object from declarations
-					if err := c.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, cm); err != nil {
+					if err := c.Get(ctx, types.NamespacedName{Namespace: namespace, Name: vr.Name}, cm); err != nil {
 						// if the error is an "NotFound" error, then the configmap probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
@@ -83,7 +86,7 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 				case "Secret":
 					var scrt = &v1.Secret{}
 					// get the object from declarations
-					if err := c.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, scrt); err != nil {
+					if err := c.Get(ctx, types.NamespacedName{Namespace: namespace, Name: vr.Name}, scrt); err != nil {
 						// if the error is an "NotFound" error, then the secret probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {

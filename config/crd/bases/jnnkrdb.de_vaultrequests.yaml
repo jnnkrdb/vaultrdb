@@ -67,8 +67,6 @@ spec:
                     items:
                       type: string
                     type: array
-                  name:
-                    type: string
                   type:
                     default: Opaque
                     enum:
@@ -94,18 +92,7 @@ spec:
             properties:
               deployed:
                 items:
-                  properties:
-                    kind:
-                      type: string
-                    name:
-                      type: string
-                    namespace:
-                      type: string
-                  required:
-                  - kind
-                  - name
-                  - namespace
-                  type: object
+                  type: string
                 type: array
             type: object
         type: object

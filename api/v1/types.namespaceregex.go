@@ -12,9 +12,6 @@ import (
 // struct which contains the information about the namespace regex
 type NamespacesRegex struct {
 
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Name string `json:"name,omitempty"`
-
 	// +kubebuilder:default={}
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	MustAvoidRegex []string `json:"mustavoidregex"`
