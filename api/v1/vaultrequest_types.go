@@ -42,7 +42,7 @@ type VaultRequestStatus struct {
 
 	// +operator-sdk:csv:customresourcedefinitions:type=status
 
-	Deployed []string `json:"deployed,omitempty"`
+	Deployed DeployedObjects `json:"deployed,omitempty"`
 }
 
 //+kubebuilder:object:root=true

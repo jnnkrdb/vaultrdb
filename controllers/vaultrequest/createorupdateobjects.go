@@ -3,7 +3,6 @@ package vaultrequest
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -124,17 +123,10 @@ func CreateOrUpdateObjects(_log logr.Logger, ctx context.Context, c client.Clien
 			return true, ctrl.Result{Requeue: true}, err
 		}
 
-		var alreadyStatusObject bool = false
-		for _, o := range vr.Status.Deployed {
-			var parsed = strings.Split(o, "/")
-			if parsed[1] == obj.GetNamespace() && vr.Name == obj.GetName() {
-				alreadyStatusObject = true
-				break
-			}
-		}
+		if !vr.Status.Deployed.Contains(obj.GetObjectKind().GroupVersionKind().Kind, obj.GetNamespace()) {
 
-		if !alreadyStatusObject {
-			vr.Status.Deployed = append(vr.Status.Deployed, fmt.Sprintf("%s/%s", vr.Spec.Namespaces.Kind, matchList[i].Name))
+			vr.Status.Deployed = vr.Status.Deployed.Append(vr.Spec.Namespaces.Kind, matchList[i].Name)
+
 			if err = c.Status().Update(ctx, vr); err != nil {
 				l.V(0).Error(err, "could not update the status of the vaultrequest")
 				return true, ctrl.Result{Requeue: true}, err

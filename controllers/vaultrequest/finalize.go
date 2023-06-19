@@ -2,7 +2,6 @@ package vaultrequest
 
 import (
 	"context"
-	"strings"
 
 	"github.com/go-logr/logr"
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
@@ -54,11 +53,12 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 			_log.V(1).Info("finalizing vaultrequest")
 
 			// remove all objects from the status.Deployed field
-			for _, obj := range vr.Status.Deployed {
-				var kind, namespace = strings.Split(obj, "/")[0], strings.Split(obj, "/")[1]
+			for _, i := range vr.Status.Deployed {
+
+				var kind, namespace = vr.Status.Deployed.GetKindAndNamespace(i)
 
 				var l = _log.V(3).WithValues("kind", kind, "namespace", namespace, "name", vr.Name)
-				l.Info("finalizing object")
+				l.V(3).Info("finalizing object")
 
 				// get the kind of the object and remove the actual object
 				switch kind {
@@ -70,16 +70,16 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 						// if the error is an "NotFound" error, then the configmap probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
-							l.Info("object not found")
+							l.V(0).Info("object not found")
 							continue
 						}
 
-						l.Error(err, "error receiving object from namespace and name")
+						l.V(0).Error(err, "error receiving object from namespace and name")
 						return false, err
 					}
 					// remove the cached object from the cluster
 					if err := c.Delete(ctx, cm); err != nil {
-						l.Error(err, "error removing the object")
+						l.V(0).Error(err, "error removing the object")
 						return false, err
 					}
 
@@ -90,27 +90,41 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 						// if the error is an "NotFound" error, then the secret probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
-							l.Info("object not found")
+							l.V(3).Info("object not found")
 							continue
 						}
 
-						l.Error(err, "error receiving object from namespace and name")
+						l.V(0).Error(err, "error receiving object from namespace and name")
 						return false, err
 					}
 					// remove the cached object from the cluster
 					if err := c.Delete(ctx, scrt); err != nil {
-						l.Error(err, "error removing the object")
+						l.V(0).Error(err, "error removing the object")
 						return false, err
 					}
 
 				default:
-					l.Info("the kind is unknown... skipped")
+					l.V(3).Info("the kind is unknown... skipped")
 					continue
 				}
 
 				// implement the status update
+				var newStatus = vr.Status.Deployed.RemoveObject(kind, namespace)
+				_log.V(3).Info("new status identified", "newStatus", newStatus)
 
-				l.Info("object removed")
+				// receive the new version of the updated vaultrequest
+				if err := c.Get(ctx, types.NamespacedName{Namespace: vr.Namespace, Name: vr.Name}, vr); err != nil {
+					_log.V(0).Error(err, "error updating cached object")
+					return false, err
+				}
+
+				vr.Status.Deployed = newStatus
+				if err := c.Status().Update(ctx, vr); err != nil {
+					_log.V(0).Error(err, "error updating status from vaultrequest")
+					return false, err
+				}
+
+				l.V(3).Info("object removed")
 			}
 
 			_log.V(1).Info("finished finalizing vaultrequests")
