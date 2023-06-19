@@ -70,13 +70,6 @@ func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context,
 
 		// create the new status from the original vaultrequest.Status
 		var newStatus = append(append(make([]string, len(vr.Status.Deployed)-1), vr.Status.Deployed[:indexDeployed]...), vr.Status.Deployed[indexDeployed+1:]...)
-		var newStatus = append(
-			append(
-				make([]jnnkrdbdev1.DeployedObject, len(vr.Status.Deployed)-1),
-				vr.Status.Deployed[:indexDeployed]...,
-			),
-			vr.Status.Deployed[indexDeployed+1:]...,
-		)
 
 		l.V(3).Info("new status object", "status", newStatus)
 
