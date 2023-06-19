@@ -1,54 +1,48 @@
 package v1
 
-import (
-	"fmt"
-	"strings"
-)
-
-type DeployedObjects []string
-
-func fromNamespaceKind(kind, namespace string) string {
-	return fmt.Sprintf("%s/%s", kind, namespace)
+type DeployedObject struct {
+	Kind      string `json:"kind"`
+	Namespace string `json:"namespace"`
 }
 
-func (do DeployedObjects) GetKindAndNamespace(namespacekind string) (string, string) {
-	if len(namespacekind) == 0 {
-		return "", ""
-	}
-	var splitted = strings.Split(namespacekind, "/")
-	return splitted[0], splitted[1]
-}
+type deployedObjectList []DeployedObject
 
 // remove a specific object from the
-func (do DeployedObjects) RemoveObject(kind, namespace string) DeployedObjects {
+func (dol deployedObjectList) RemoveObject(kind, namespace string) deployedObjectList {
 
-	if len(do) == 0 {
-		return []string{}
+	if len(dol) == 0 {
+		return deployedObjectList{}
 	}
 
-	var result DeployedObjects
-	for i := range do {
-		if do[i] != fromNamespaceKind(kind, namespace) {
-			result = append(result, do[i])
+	var result []DeployedObject
+	for i := range dol {
+
+		if dol[i].Kind == kind && dol[i].Namespace == namespace {
+			continue
 		}
+
+		result = append(result, dol[i])
 	}
 
 	return result
 }
 
 // append a new status object
-func (do DeployedObjects) Append(kind, namespace string) DeployedObjects {
-	return append(do, fromNamespaceKind(kind, namespace))
+func (do deployedObjectList) Append(kind, namespace string) deployedObjectList {
+	if kind == "" || namespace == "" {
+		return do
+	}
+	return append(do, DeployedObject{Kind: kind, Namespace: namespace})
 }
 
 // check if a specific item is in the status object
-func (do DeployedObjects) Contains(kind, namespace string) bool {
+func (do deployedObjectList) Contains(kind, namespace string) bool {
 	if len(do) == 0 {
 		return false
 	}
 
 	for i := range do {
-		if do[i] == fromNamespaceKind(kind, namespace) {
+		if do[i].Kind == kind && do[i].Namespace == namespace {
 			return true
 		}
 	}

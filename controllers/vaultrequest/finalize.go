@@ -55,18 +55,16 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 			// remove all objects from the status.Deployed field
 			for _, i := range vr.Status.Deployed {
 
-				var kind, namespace = vr.Status.Deployed.GetKindAndNamespace(i)
-
-				var l = _log.V(3).WithValues("kind", kind, "namespace", namespace, "name", vr.Name)
+				var l = _log.V(3).WithValues("kind", i.Kind, "namespace", i.Namespace, "name", vr.Name)
 				l.V(3).Info("finalizing object")
 
 				// get the kind of the object and remove the actual object
-				switch kind {
+				switch i.Kind {
 
 				case "ConfigMap":
 					var cm = &v1.ConfigMap{}
 					// get the object from declarations
-					if err := c.Get(ctx, types.NamespacedName{Namespace: namespace, Name: vr.Name}, cm); err != nil {
+					if err := c.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: vr.Name}, cm); err != nil {
 						// if the error is an "NotFound" error, then the configmap probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
@@ -86,7 +84,7 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 				case "Secret":
 					var scrt = &v1.Secret{}
 					// get the object from declarations
-					if err := c.Get(ctx, types.NamespacedName{Namespace: namespace, Name: vr.Name}, scrt); err != nil {
+					if err := c.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: vr.Name}, scrt); err != nil {
 						// if the error is an "NotFound" error, then the secret probably was deleted
 						// returning no error
 						if errors.IsNotFound(err) {
@@ -109,7 +107,7 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 				}
 
 				// implement the status update
-				var newStatus = vr.Status.Deployed.RemoveObject(kind, namespace)
+				var newStatus = vr.Status.Deployed.RemoveObject(i.Kind, i.Namespace)
 				_log.V(3).Info("new status identified", "newStatus", newStatus)
 
 				// receive the new version of the updated vaultrequest

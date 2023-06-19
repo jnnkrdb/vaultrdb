@@ -2,7 +2,6 @@ package vaultrequest
 
 import (
 	"context"
-	"strings"
 
 	"github.com/go-logr/logr"
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
@@ -15,10 +14,9 @@ import (
 // remove secrets/configmaps from the cluster, which shouldn't exist anymore
 func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context, vr *jnnkrdbdev1.VaultRequest, avoidList []v1.Namespace) error {
 
-	for indexDeployed, _do := range vr.Status.Deployed {
-		var kind, namespace = strings.Split(_do, "/")[0], strings.Split(_do, "/")[1]
+	for _, _do := range vr.Status.Deployed {
 
-		var l = _l.WithValues("kind", kind, "namespace", namespace, "name", vr.Name)
+		var l = _l.WithValues("kind", _do.Kind, "namespace", _do.Namespace, "name", vr.Name)
 
 		var remove bool = false
 
@@ -26,7 +24,7 @@ func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context,
 		// if the avoidList contains the namespace of the deployed object,
 		// then remove the deployed object
 		for i := range avoidList {
-			if avoidList[i].Name != namespace {
+			if avoidList[i].Name != _do.Namespace {
 				remove = true
 				break
 			}
@@ -39,7 +37,7 @@ func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context,
 
 		var removeObject client.Object
 
-		switch kind {
+		switch _do.Kind {
 		case "ConfigMap":
 			removeObject = &v1.ConfigMap{}
 		case "Secret":
@@ -51,7 +49,7 @@ func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context,
 
 		// check if the object exists
 		if err := c.Get(ctx, types.NamespacedName{
-			Namespace: namespace,
+			Namespace: _do.Namespace,
 			Name:      vr.Name,
 		}, removeObject, &client.GetOptions{}); err != nil {
 			if errors.IsNotFound(err) {
@@ -69,7 +67,7 @@ func RemoveUnwantedObjects(_l logr.Logger, c client.Client, ctx context.Context,
 		}
 
 		// create the new status from the original vaultrequest.Status
-		var newStatus = append(append(make([]string, len(vr.Status.Deployed)-1), vr.Status.Deployed[:indexDeployed]...), vr.Status.Deployed[indexDeployed+1:]...)
+		var newStatus = vr.Status.Deployed.RemoveObject(_do.Kind, _do.Namespace)
 
 		l.V(3).Info("new status object", "status", newStatus)
 
