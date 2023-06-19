@@ -5,13 +5,13 @@ type DeployedObject struct {
 	Namespace string `json:"namespace"`
 }
 
-type deployedObjectList []DeployedObject
+type DeployedObjectList []DeployedObject
 
 // remove a specific object from the
-func (dol deployedObjectList) RemoveObject(kind, namespace string) deployedObjectList {
+func (dol DeployedObjectList) RemoveObject(kind, namespace string) DeployedObjectList {
 
 	if len(dol) == 0 {
-		return deployedObjectList{}
+		return DeployedObjectList{}
 	}
 
 	var result []DeployedObject
@@ -28,7 +28,7 @@ func (dol deployedObjectList) RemoveObject(kind, namespace string) deployedObjec
 }
 
 // append a new status object
-func (do deployedObjectList) Append(kind, namespace string) deployedObjectList {
+func (do DeployedObjectList) Append(kind, namespace string) DeployedObjectList {
 	if kind == "" || namespace == "" {
 		return do
 	}
@@ -36,7 +36,7 @@ func (do deployedObjectList) Append(kind, namespace string) deployedObjectList {
 }
 
 // check if a specific item is in the status object
-func (do deployedObjectList) Contains(kind, namespace string) bool {
+func (do DeployedObjectList) Contains(kind, namespace string) bool {
 	if len(do) == 0 {
 		return false
 	}
