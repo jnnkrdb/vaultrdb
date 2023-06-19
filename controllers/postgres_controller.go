@@ -42,7 +42,7 @@ func (r *PostgresReconciler) Reconcile(ctx context.Context, log logr.Logger) err
 		var configMapList = &v1.ConfigMapList{}
 		if err = r.List(ctx, configMapList, &client.ListOptions{
 			LabelSelector: labels.SelectorFromSet(labels.Set{
-				fmt.Sprintf("v1.vaultrequest.jnnkrdb.de/%s", psqlid): "validkey",
+				fmt.Sprintf("v1.vaultrequest.jnnkrdb.de_%s.key", psqlid): "validated",
 			}),
 		}); err != nil {
 			log.V(2).Info("error receiving list of affected configmaps", "err.message", err)
@@ -52,7 +52,7 @@ func (r *PostgresReconciler) Reconcile(ctx context.Context, log logr.Logger) err
 		var secretList = &v1.SecretList{}
 		if err = r.List(ctx, secretList, &client.ListOptions{
 			LabelSelector: labels.SelectorFromSet(labels.Set{
-				fmt.Sprintf("v1.vaultrequest.jnnkrdb.de/%s", psqlid): "validkey",
+				fmt.Sprintf("v1.vaultrequest.jnnkrdb.de_%s.key", psqlid): "validated",
 			}),
 		}); err != nil {
 			log.V(2).Info("error receiving list of affected secrets", "err.message", err)

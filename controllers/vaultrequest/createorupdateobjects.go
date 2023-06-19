@@ -39,7 +39,7 @@ func CreateOrUpdateObjects(_log logr.Logger, ctx context.Context, c client.Clien
 	// creating the validation labels
 	var lbls = make(map[string]string)
 	for k := range objectData {
-		lbls[fmt.Sprintf("v1.vaultrequest.jnnkrdb.de/%s", k)] = "validkey"
+		lbls[fmt.Sprintf("v1.vaultrequest.jnnkrdb.de_%s.key", k)] = "validated"
 	}
 
 	// set the annotation, to identify the source vaultrequest, if neccessary
