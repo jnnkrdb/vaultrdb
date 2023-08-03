@@ -132,6 +132,7 @@ func Finalize(_log logr.Logger, ctx context.Context, c client.Client, vr *jnnkrd
 				_log.V(0).Error(err, "error updating cached object")
 				return false, err
 			}
+
 			// remove the finalizer from the vaultrequest
 			controllerutil.RemoveFinalizer(vr, _finalizer)
 			if err := c.Update(ctx, vr); err != nil {
