@@ -2,4 +2,5 @@
 resources:
 - _v1_vaultrequest.yaml
 - core_v1_namespace.yaml
+- _v1alpha1_haconfig.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

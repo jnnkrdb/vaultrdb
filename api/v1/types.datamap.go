@@ -5,17 +5,17 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/jnnkrdb/vaultrdb/svc/postgres"
+	"github.com/jnnkrdb/vaultrdb/svc/sqlite3"
 )
 
 // struct which contains the information about the namespace regex
 
 type DataMap struct {
 
-	// The PSQLID field must contain a valid id, existing in the mounted postgres database
+	// The UID field must contain a valid string, existing in the mounted sql database
 
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	PSQLID string `json:"psqlid,omitempty"`
+	UID string `json:"uid,omitempty"`
 
 	// The Data field must an base64 encoded version of the required value
 
@@ -31,17 +31,16 @@ type DataMap struct {
 // run datafield validations, for all datafields int the datareference object
 func (dm DataMap) GetData(_log logr.Logger) (string, error) {
 
-	_log.V(3).Info("parsing data", "psqlid", dm.PSQLID, "data", dm.Data, "stringData", dm.StringData)
+	_log.V(3).Info("parsing data", "uid", dm.UID, "data", dm.Data, "stringData", dm.StringData)
 
 	var errors = [3]error{nil, nil, nil}
 
-	if len(dm.PSQLID) > 0 && postgres.USEPOSTGRES {
-		var data string
-		if err := postgres.PSQL.QueryRow("SELECT data FROM public.vault WHERE psqlid=$1;", dm.PSQLID).Scan(&data); err != nil {
-			_log.V(3).Info("couldn't get data from postgres", "error.message", err)
+	if len(dm.UID) > 0 {
+		if pair, err := sqlite3.SelectPairByUID(dm.UID); err != nil {
+			_log.V(3).Info("couldn't receive data from sql database", "uid", dm.UID, "error.message", err)
 			errors[0] = err
 		} else {
-			return data, nil
+			return pair.Value, nil
 		}
 	}
 
@@ -58,7 +57,7 @@ func (dm DataMap) GetData(_log logr.Logger) (string, error) {
 		return dm.Data, nil
 	} else {
 		_log.V(3).Info("data field is empty", "data", dm.Data)
-		errors[2] = fmt.Errorf("stringData field shouldn't be empty, when data and psqlid are not in use")
+		errors[2] = fmt.Errorf("stringData field shouldn't be empty, when data and uid are not in use")
 	}
 
 	return "", fmt.Errorf("errors[0]: %v | errors[1]: %v | errors[2]: %v", errors[0], errors[1], errors[2])
