@@ -28,7 +28,7 @@ func CreateOrUpdateObjects(_log logr.Logger, ctx context.Context, c client.Clien
 	// start processing the datamap fields
 	for dmKey, dmValue := range vr.Spec.DataMap {
 		// get the data for the key
-		if dat, err := dmValue.GetData(_log); err != nil {
+		if dat, err := dmValue.GetData(); err != nil {
 			_log.V(0).Error(err, "invalid datamap object", "datamapkey", dmKey)
 			return true, ctrl.Result{Requeue: true, RequeueAfter: 5 * time.Minute}, err
 		} else {

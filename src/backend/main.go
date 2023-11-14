@@ -34,6 +34,8 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
+	"github.com/jnnkrdb/vaultrdb/svc/http/frontend"
+	"github.com/jnnkrdb/vaultrdb/svc/http/restapi"
 	"github.com/jnnkrdb/vaultrdb/svc/sqlite3"
 	//+kubebuilder:scaffold:imports
 )
@@ -44,6 +46,8 @@ var (
 
 	disableLeaderElection bool
 	IsDevelopment         bool
+	enableUI              bool
+	restAPI               bool
 )
 
 func init() {
@@ -60,6 +64,12 @@ func main() {
 
 	// development mode
 	flag.BoolVar(&IsDevelopment, "is-development", false, "Activate Development mode.")
+
+	// development mode
+	flag.BoolVar(&frontend.EnableUI, "enable-ui", false, "Activate the Frontend.")
+
+	// development mode
+	flag.BoolVar(&restapi.EnableRest, "rest-api", false, "Activate the Rest API. Will be activated automatically, if Frontend is activated too.")
 
 	flag.Parse()
 
@@ -85,6 +95,15 @@ func main() {
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
+	}
+
+	if enableUI {
+		restAPI = true
+
+	}
+
+	if restAPI {
+
 	}
 
 	if err = (&controllers.VaultRequestReconciler{

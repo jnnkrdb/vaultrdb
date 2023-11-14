@@ -17,6 +17,10 @@ limitations under the License.
 package v1
 
 import (
+	"encoding/base64"
+	"fmt"
+
+	"github.com/jnnkrdb/vaultrdb/svc/sqlite3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -33,6 +37,51 @@ type VaultRequestSpec struct {
 
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Namespaces NamespacesRegex `json:"namespaces"`
+}
+
+// struct which contains the information about the namespace regex
+
+type DataMap struct {
+
+	// The UID field must contain a valid string, existing in the mounted sql database
+
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	UID string `json:"uid,omitempty"`
+
+	// The Data field must an base64 encoded version of the required value
+
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	Data string `json:"data,omitempty"`
+
+	// The StringData field must an unencoded version of the required value
+
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	StringData string `json:"stringData,omitempty"`
+}
+
+// run datafield validations, for all datafields int the datareference object
+func (dm DataMap) GetData() (string, error) {
+	if len(dm.UID) > 0 {
+		if pair, err := sqlite3.SelectPairByUID(dm.UID); err != nil {
+			return "", err
+		} else {
+			return pair.Value, nil
+		}
+	}
+
+	if len(dm.Data) > 0 {
+		if unenc, err := base64.StdEncoding.DecodeString(dm.Data); err != nil {
+			return "", err
+		} else {
+			return string(unenc), nil
+		}
+	}
+
+	if len(dm.StringData) > 0 {
+		return dm.Data, nil
+	} else {
+		return "", fmt.Errorf("no valid data found")
+	}
 }
 
 // VaultRequestStatus defines the observed state of VaultRequest
