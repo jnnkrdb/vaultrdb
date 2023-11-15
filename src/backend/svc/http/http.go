@@ -6,39 +6,47 @@ import (
 	hndlrs "github.com/jnnkrdb/gomw/handlers"
 	mw "github.com/jnnkrdb/gomw/middlewares"
 
-	"github.com/jnnkrdb/vaultrdb/svc/http/frontend"
-	"github.com/jnnkrdb/vaultrdb/svc/http/restapi"
+	"github.com/go-logr/logr"
+
+	"github.com/jnnkrdb/vaultrdb/svc/http/auth"
+	"github.com/jnnkrdb/vaultrdb/svc/http/crud"
+	"github.com/jnnkrdb/vaultrdb/svc/http/middlewares"
 )
 
-func BootHTTP() {
+var (
+	EnableSwaggerUI bool = false
+	EnableRest      bool = false
+	EnableUI        bool = false
+	EnableAuth      bool = false
+)
 
-	var funcArr = hndlrs.HttpFunctionSet{
-		hndlrs.HttpFunction{
-			Pattern: "/rest",
-			MainHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("RestAPI"))
-			}),
-			Middlewares: mw.New(
-				restapi.IsRESTApiEnabled,
-			),
-		},
-		hndlrs.HttpFunction{
-			Pattern: "/ui",
-			MainHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("Frontend"))
-			}),
-			Middlewares: mw.New(
-				frontend.IsUIEnabled,
-			),
-		},
-		hndlrs.HttpFunction{
-			Pattern: "/auth",
-			MainHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("AUTH"))
-			}),
-			Middlewares: mw.MiddleWareChain{},
-		},
+func BootHTTP(setupLog logr.Logger) {
+	var funcArr hndlrs.HttpFunctionSet
+
+	switch {
+
+	case EnableSwaggerUI:
+		funcArr = append(funcArr, hndlrs.HttpFunction{
+			Pattern:     "/swaggerui/",
+			MainHandler: http.StripPrefix("/swaggerui/", http.FileServer(http.Dir("/usr/share/vaultrdb/swaggerui"))),
+			Middlewares: mw.New(middlewares.OptionsResponse),
+		})
+
+	case EnableRest || EnableUI:
+		funcArr = append(funcArr, crud.Routes...)
+
+	case EnableUI:
+		funcArr = append(funcArr, hndlrs.HttpFunction{
+			Pattern:     "/ui/",
+			MainHandler: http.StripPrefix("/ui/", http.FileServer(http.Dir("/usr/share/vaultrdb/frontend"))),
+			Middlewares: mw.New(middlewares.OptionsResponse),
+		})
+
+	case EnableAuth || EnableUI || EnableRest:
+		funcArr = append(funcArr, auth.Routes...)
 	}
 
-	http.ListenAndServe(":80", hndlrs.GetHandler(funcArr))
+	if err := http.ListenAndServe(":80", hndlrs.GetHandler(funcArr)); err != nil {
+		setupLog.Error(err, "failed keeping up http server")
+	}
 }

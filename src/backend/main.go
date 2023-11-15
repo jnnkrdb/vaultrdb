@@ -34,8 +34,7 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
-	"github.com/jnnkrdb/vaultrdb/svc/http/frontend"
-	"github.com/jnnkrdb/vaultrdb/svc/http/restapi"
+	httpsrcv "github.com/jnnkrdb/vaultrdb/svc/http"
 	"github.com/jnnkrdb/vaultrdb/svc/sqlite3"
 	//+kubebuilder:scaffold:imports
 )
@@ -46,8 +45,6 @@ var (
 
 	disableLeaderElection bool
 	IsDevelopment         bool
-	enableUI              bool
-	restAPI               bool
 )
 
 func init() {
@@ -59,17 +56,12 @@ func init() {
 
 func main() {
 
-	// high availability
-	flag.BoolVar(&disableLeaderElection, "disable-leader-election", false, "If disabled, then the Controllers will not wait for a Lease to expire.")
-
-	// development mode
-	flag.BoolVar(&IsDevelopment, "is-development", false, "Activate Development mode.")
-
-	// development mode
-	flag.BoolVar(&frontend.EnableUI, "enable-ui", false, "Activate the Frontend.")
-
-	// development mode
-	flag.BoolVar(&restapi.EnableRest, "rest-api", false, "Activate the Rest API. Will be activated automatically, if Frontend is activated too.")
+	flag.BoolVar(&disableLeaderElection, "disable-leader-election", false, "If disabled, then the Controllers will not wait for a Lease to expire.")          // leader-election
+	flag.BoolVar(&IsDevelopment, "development", false, "Activate Development mode.")                                                                          // development mode
+	flag.BoolVar(&httpsrcv.EnableUI, "ui", false, "Activate the Frontend. Will activate RestAPI and Auth endpoint too.")                                      // enable frontend
+	flag.BoolVar(&httpsrcv.EnableRest, "rest-api", false, "Activate the Rest API. Will activate Auth endpoint too.")                                          // enable restapi
+	flag.BoolVar(&httpsrcv.EnableAuth, "auth", false, "Activate the Auth endpoint.")                                                                          // enable auth
+	flag.BoolVar(&httpsrcv.EnableSwaggerUI, "swaggerui", false, "Activate the SwaggerUI for API visualization. Will activate RestAPI and Auth endpoint too.") // enable swaggerui
 
 	flag.Parse()
 
@@ -97,14 +89,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if enableUI {
-		restAPI = true
-
-	}
-
-	if restAPI {
-
-	}
+	go httpsrcv.BootHTTP(setupLog)
 
 	if err = (&controllers.VaultRequestReconciler{
 		Client: mgr.GetClient(),
