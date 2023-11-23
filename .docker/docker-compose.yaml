@@ -1,8 +1,0 @@
-version: '3'
-services:
-  golang:
-    image: "docker.io/jnnkrdb/go-opsdk:v1.20-1"
-    restart: unless-stopped
-    volumes:
-      - "../:/app"
-    command: "tail -f /dev/null"
