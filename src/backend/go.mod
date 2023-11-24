@@ -3,7 +3,7 @@ module github.com/jnnkrdb/vaultrdb
 go 1.19
 
 require (
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.3.0
 	github.com/onsi/ginkgo/v2 v2.6.0
 	github.com/onsi/gomega v1.24.1
 	k8s.io/api v0.26.0
@@ -38,7 +38,6 @@ require (
 	github.com/jnnkrdb/gomw v0.0.4
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/lib/pq v1.10.9
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/matttproud/golang_protobuf_extensions v1.0.2 // indirect
