@@ -7,8 +7,8 @@ info:
 externalDocs:
   description: "Find out more about VaultRDB"
   url: "https://github.com/jnnkrdb/vaultrdb#readme"
-servers:
-  - url: "https://{{ENV_BASEDOMAIN}}/"
+#servers:
+#  - url: "https://{{ENV_BASEDOMAIN}}/"
 tags:
   - name: "Authentication"
     description: "Authentication Services"

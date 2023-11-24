@@ -42,7 +42,7 @@ RUN mkdir -p /usr/share/vaultrdb/{swaggerui,frontend}
 WORKDIR /usr/share/vaultrdb
 
 # Copy swaggerui files
-COPY swaggerui/ ./swaggerui/
+COPY swagger.yaml /usr/share/vaultrdb/swaggerui/swagger.yaml
 
 # Copy frontend files
 
