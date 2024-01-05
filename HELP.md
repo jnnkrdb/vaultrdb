@@ -8,10 +8,13 @@ operator-sdk init --domain jnnkrdb.de --repo github.com/jnnkrdb/vaultrdb
 
 ```bash
 operator-sdk create api --version v1 --kind VaultRequest --resource --controller
+operator-sdk create api --version v1 --kind VRDBSecret --resource --controller
+operator-sdk create api --version v1 --kind VRDBConfig --resource --controller
 ```
 
 ```bash
 operator-sdk create api --group="core" --version v1 --kind Namespace --resource=false --controller=true
+operator-sdk create webhook --group core --version v1 --kind Namespace --defaulting --programmatic-validation
 ```
 
 ## Install Operator SDK

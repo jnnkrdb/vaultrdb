@@ -1,0 +1,12 @@
+apiVersion: jnnkrdb.de/v1
+kind: VRDBConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: vrdbconfig
+    app.kubernetes.io/instance: vrdbconfig-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: vrdbconfig-sample
+spec:
+  # TODO(user): Add fields here
