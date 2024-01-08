@@ -3,4 +3,5 @@ resources:
 - _v1_vrdbconfig.yaml
 - _v1_vrdbsecret.yaml
 - _v1_vrdbrequest.yaml
+- core_v1_namespace.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

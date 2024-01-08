@@ -20,22 +20,24 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // VRDBRequestSpec defines the desired state of VRDBRequest
 type VRDBRequestSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of VRDBRequest. Edit vrdbrequest_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +kubebuilder:default={}
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	MustAvoidRegex []string `json:"mustavoidregex"`
+
+	// +kubebuilder:default={}
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	MustMatchRegex []string `json:"mustmatchregex"`
 }
 
-// VRDBRequestStatus defines the observed state of VRDBRequest
-type VRDBRequestStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+func (specs VRDBRequestSpec) GetAvoidingRegexList() []string {
+	return specs.MustAvoidRegex
+}
+
+func (specs VRDBRequestSpec) GetMatchingRegexList() []string {
+	return specs.MustMatchRegex
 }
 
 //+kubebuilder:object:root=true
@@ -46,8 +48,8 @@ type VRDBRequest struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   VRDBRequestSpec   `json:"spec,omitempty"`
-	Status VRDBRequestStatus `json:"status,omitempty"`
+	Spec   VRDBRequestSpec `json:"spec,omitempty"`
+	Status VRDBStatus      `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

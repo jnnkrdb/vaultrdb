@@ -19,10 +19,12 @@ package controllers
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 )
@@ -37,26 +39,35 @@ type VRDBRequestReconciler struct {
 //+kubebuilder:rbac:groups=jnnkrdb.de,resources=vrdbrequests/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=jnnkrdb.de,resources=vrdbrequests/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the VRDBRequest object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
 func (r *VRDBRequestReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	var _log = log.FromContext(ctx).WithName("vrdbrequest").WithValues("namespace", req.Namespace, "name", req.Name)
+	ctx = log.IntoContext(ctx, _log)
+	ctx = context.WithValue(ctx, jnnkrdbdev1.VRDBKey{}, req.NamespacedName)
 
-	// TODO(user): your logic here
+	var vrdbrequest = &jnnkrdbdev1.VRDBRequest{}
 
-	return ctrl.Result{}, nil
+	// checking the requested object
+	if err := r.Get(ctx, req.NamespacedName, vrdbrequest, &client.GetOptions{}); err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		_log.Error(err, "error reconciling vrdbrequest")
+		return ctrl.Result{}, err
+	}
+
+	// check finalization
+	if res, finalized, err := jnnkrdbdev1.Finalize(ctx, r.Client, vrdbrequest); err != nil || finalized {
+		return res, err
+	}
+
+	// reconcile
+	return vrdbrequest.Reconcile(log.IntoContext(ctx, _log))
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VRDBRequestReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&jnnkrdbdev1.VRDBRequest{}).
+		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		Complete(r)
 }
