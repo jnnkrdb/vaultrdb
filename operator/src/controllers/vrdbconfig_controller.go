@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -42,7 +43,7 @@ type VRDBConfigReconciler struct {
 func (r *VRDBConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	var _log = log.FromContext(ctx).WithName("vrdbconfig reconciler").WithValues("namespace", req.Namespace, "name", req.Name)
 	ctx = log.IntoContext(ctx, _log)
-	ctx = context.WithValue(ctx, jnnkrdbdev1.VRDBKey{}, req.NamespacedName)
+	ctx = context.WithValue(ctx, types.NamespacedName{}, req.NamespacedName)
 
 	var vrdbconfig = &jnnkrdbdev1.VRDBConfig{}
 
@@ -61,7 +62,7 @@ func (r *VRDBConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	}
 
 	// reconcile
-	return vrdbconfig.Reconcile(ctx)
+	return vrdbconfig.Reconcile(ctx, r.Client)
 }
 
 // SetupWithManager sets up the controller with the Manager.

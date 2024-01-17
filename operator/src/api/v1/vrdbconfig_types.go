@@ -20,29 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VRDBConfigSpec defines the desired state of VRDBConfig
-type VRDBConfigSpec struct {
-
-	// +kubebuilder:default={}
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	MustAvoidRegex []string `json:"mustavoidregex"`
-
-	// +kubebuilder:default={}
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	MustMatchRegex []string `json:"mustmatchregex"`
-
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Data map[string]string `json:"data,omitempty"`
-}
-
-func (specs VRDBConfigSpec) GetAvoidingRegexList() []string {
-	return specs.MustAvoidRegex
-}
-
-func (specs VRDBConfigSpec) GetMatchingRegexList() []string {
-	return specs.MustMatchRegex
-}
-
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
@@ -51,8 +28,10 @@ type VRDBConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   VRDBConfigSpec `json:"spec,omitempty"`
-	Status VRDBStatus     `json:"status,omitempty"`
+	NamespaceSelector VRDBNamespaceSelector `json:"namespaceSelector,omitempty"`
+	Data              map[string]string     `json:"data,omitempty"`
+
+	Status VRDBStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true

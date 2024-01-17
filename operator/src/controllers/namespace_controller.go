@@ -37,9 +37,7 @@ type NamespaceReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core,resources=namespaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core,resources=namespaces/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;
 
 func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	var _log = log.FromContext(ctx).WithName("namespace").WithValues("namespace", req.NamespacedName)
@@ -66,7 +64,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			errors = append(errors, err)
 		} else {
 			for _, item := range vrdbconfigs.Items {
-				if _, err := item.Reconcile(ctx); err != nil {
+				if _, err := item.Reconcile(ctx, r.Client); err != nil {
 					_log.Error(err, "error reconciling the vrdbconfigs")
 					errors = append(errors, err)
 				}
@@ -82,7 +80,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			errors = append(errors, err)
 		} else {
 			for _, item := range vrdbsecrets.Items {
-				if _, err := item.Reconcile(ctx); err != nil {
+				if _, err := item.Reconcile(ctx, r.Client); err != nil {
 					_log.Error(err, "error reconciling the vrdbsecrets")
 					errors = append(errors, err)
 				}
@@ -98,7 +96,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			errors = append(errors, err)
 		} else {
 			for _, item := range vrdbrequests.Items {
-				if _, err := item.Reconcile(ctx); err != nil {
+				if _, err := item.Reconcile(ctx, r.Client); err != nil {
 					_log.Error(err, "error reconciling the vrdbrequests")
 					errors = append(errors, err)
 				}

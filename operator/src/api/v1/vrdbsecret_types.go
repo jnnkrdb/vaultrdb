@@ -17,31 +17,11 @@ limitations under the License.
 package v1
 
 import (
+	"regexp"
+
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// VRDBSecretSpec defines the desired state of VRDBSecret
-type VRDBSecretSpec struct {
-
-	// +kubebuilder:default={}
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	MustAvoidRegex []string `json:"mustavoidregex"`
-
-	// +kubebuilder:default={}
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	MustMatchRegex []string `json:"mustmatchregex"`
-
-	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Data map[string]string `json:"data,omitempty"`
-}
-
-func (specs VRDBSecretSpec) GetAvoidingRegexList() []string {
-	return specs.MustAvoidRegex
-}
-
-func (specs VRDBSecretSpec) GetMatchingRegexList() []string {
-	return specs.MustMatchRegex
-}
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
@@ -51,8 +31,25 @@ type VRDBSecret struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   VRDBSecretSpec `json:"spec,omitempty"`
-	Status VRDBStatus     `json:"status,omitempty"`
+	NamespaceSelector VRDBNamespaceSelector `json:"namespaceSelector,omitempty"`
+	Data              map[string]string     `json:"data,omitempty"`
+
+	Type   v1.SecretType `json:"type,omitempty" protobuf:"bytes,3,opt,name=type,casttype=SecretType"`
+	Status VRDBStatus    `json:"status,omitempty"`
+}
+
+// returns false, if there is any non base64encoded string and returns the string
+func (v VRDBSecret) DataIsBase64() (bool, string) {
+
+	var rx = regexp.MustCompile(`^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$`)
+
+	for i := range v.Data {
+		if !rx.MatchString(v.Data[i]) {
+			return false, v.Data[i]
+		}
+	}
+
+	return true, ""
 }
 
 //+kubebuilder:object:root=true

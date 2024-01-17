@@ -16,17 +16,18 @@ func Update(ctx context.Context, c client.Client, statusUpdate bool, obj client.
 
 	_log.Info("updating object")
 
+	namespacedName, ok := ctx.Value(types.NamespacedName{}).(types.NamespacedName)
+	if !ok {
+		return fmt.Errorf("could not parse context into types.NamespacedName: %v", ctx.Value(types.NamespacedName{}))
+	}
+
 	// configuring the default retry option for the upüdate function, since there is
 	// the possibility, that updated objects, are already updated, since the last time they
 	// were cached in the function
 	if retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 
-		if v, ok := ctx.Value(VRDBKey{}).(types.NamespacedName); ok {
-			if err := c.Get(ctx, v, obj); err != nil {
-				return err
-			}
-		} else {
-			return fmt.Errorf("could not parse context into types.NamespacedName: %v", ctx.Value(VRDBKey{}))
+		if err := c.Get(ctx, namespacedName, obj); err != nil {
+			return err
 		}
 
 		if statusUpdate {
@@ -43,6 +44,11 @@ func Update(ctx context.Context, c client.Client, statusUpdate bool, obj client.
 	}); retryErr != nil {
 		_log.Error(retryErr, "failed to update object")
 		return retryErr
+	}
+
+	// update cached object
+	if err := c.Get(ctx, namespacedName, obj); err != nil {
+		return err
 	}
 
 	return nil

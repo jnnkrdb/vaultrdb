@@ -35,4 +35,7 @@ var (
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
-type VRDBKey struct{}
+const (
+	Annotation_SourceNamespace = "vrdb.jnnkrdb.de/src.namespace"
+	Annotation_SourceName      = "vrdb.jnnkrdb.de/src.name"
+)
