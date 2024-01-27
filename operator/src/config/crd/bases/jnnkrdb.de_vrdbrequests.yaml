@@ -25,6 +25,10 @@ spec:
               of an object. Servers should convert recognized schemas to the latest
               internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+          data:
+            additionalProperties:
+              type: string
+            type: object
           kind:
             description: 'Kind is a string value representing the REST resource this
               object represents. Servers may infer this from the endpoint the client
@@ -32,20 +36,21 @@ spec:
             type: string
           metadata:
             type: object
-          spec:
-            description: VRDBRequestSpec defines the desired state of VRDBRequest
+          namespaceSelector:
+            description: VRDBNamespaceSelector defines the Namespaces, the operator
+              should be looking for, while distributing the child objects to the cluster
             properties:
-              mustavoidregex:
+              rx.avoid:
                 items:
                   type: string
                 type: array
-              mustmatchregex:
+              rx.match:
                 items:
                   type: string
                 type: array
             required:
-            - mustavoidregex
-            - mustmatchregex
+            - rx.avoid
+            - rx.match
             type: object
           status:
             properties:

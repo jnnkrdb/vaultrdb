@@ -18,6 +18,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 
 	v1 "k8s.io/api/core/v1"
@@ -36,6 +37,23 @@ type VRDBNamespaceSelector struct {
 	// +kubebuilder:default={}
 	// +operator-sdk:csv:customresourcedefinitions:type=namespaceSelector
 	Match []string `json:"rx.match"`
+}
+
+// validate the namespace selector for valid regex'
+func (nselect VRDBNamespaceSelector) Validate() error {
+
+	for _, str := range append(nselect.Avoid, nselect.Match...) {
+
+		if len(str) == 0 {
+			return fmt.Errorf("regex cannot be empty")
+		}
+
+		if _, err := regexp.Compile(str); err != nil {
+			return fmt.Errorf("regex compilation error: %v", err)
+		}
+	}
+
+	return nil
 }
 
 // calculates two collections of namespaces, which should weither be avoided

@@ -46,3 +46,15 @@ type VRDBConfigList struct {
 func init() {
 	SchemeBuilder.Register(&VRDBConfig{}, &VRDBConfigList{})
 }
+
+// validate function
+func (r *VRDBConfig) validate() error {
+
+	// validate the namespace selector
+	if err := r.NamespaceSelector.Validate(); err != nil {
+		vrdbconfiglog.Error(err, "error validating vrdbconfig")
+		return err
+	}
+
+	return nil
+}

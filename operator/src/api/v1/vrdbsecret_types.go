@@ -17,6 +17,8 @@ limitations under the License.
 package v1
 
 import (
+	"encoding/base64"
+	"fmt"
 	"regexp"
 
 	v1 "k8s.io/api/core/v1"
@@ -33,23 +35,10 @@ type VRDBSecret struct {
 
 	NamespaceSelector VRDBNamespaceSelector `json:"namespaceSelector,omitempty"`
 	Data              map[string]string     `json:"data,omitempty"`
+	StringData        map[string]string     `json:"stringData,omitempty"`
 
 	Type   v1.SecretType `json:"type,omitempty" protobuf:"bytes,3,opt,name=type,casttype=SecretType"`
 	Status VRDBStatus    `json:"status,omitempty"`
-}
-
-// returns false, if there is any non base64encoded string and returns the string
-func (v VRDBSecret) DataIsBase64() (bool, string) {
-
-	var rx = regexp.MustCompile(`^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$`)
-
-	for i := range v.Data {
-		if !rx.MatchString(v.Data[i]) {
-			return false, v.Data[i]
-		}
-	}
-
-	return true, ""
 }
 
 //+kubebuilder:object:root=true
@@ -63,4 +52,47 @@ type VRDBSecretList struct {
 
 func init() {
 	SchemeBuilder.Register(&VRDBSecret{}, &VRDBSecretList{})
+}
+
+// validate function
+func (r *VRDBSecret) validate() error {
+
+	var base64rx = regexp.MustCompile(`^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$`)
+
+	// validate the namespace selector
+	if err := r.NamespaceSelector.Validate(); err != nil {
+		vrdbsecretlog.Error(err, "error validating vrdbsecret")
+		return err
+	}
+
+	// validating the base64 encoded fields
+	for k, v := range r.Data {
+
+		if len(k) == 0 {
+			err := fmt.Errorf("key cannot be nil")
+			vrdbsecretlog.Error(err, "error validating stringdata", "key", k)
+			return err
+		}
+
+		if !base64rx.MatchString(v) {
+			vrdbsecretlog.Error(fmt.Errorf("[%s] value contains forbidden character", k), "error validating base64 encoding", "key", k, "value", v)
+			return fmt.Errorf("unable to validate base64 encoding of key [%s]", k)
+		}
+
+		if _, err := base64.StdEncoding.DecodeString(v); err != nil {
+			vrdbsecretlog.Error(err, "error validating base64 encoding", "key", k, "value", v)
+			return fmt.Errorf("unable to validate base64 encoding of key [%s]: %v", k, err)
+		}
+	}
+
+	// validating the stringData fields
+	for k := range r.StringData {
+		if len(k) == 0 {
+			err := fmt.Errorf("key cannot be nil")
+			vrdbsecretlog.Error(err, "error validating stringdata", "key", k)
+			return err
+		}
+	}
+
+	return nil
 }

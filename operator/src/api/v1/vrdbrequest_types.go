@@ -46,3 +46,9 @@ type VRDBRequestList struct {
 func init() {
 	SchemeBuilder.Register(&VRDBRequest{}, &VRDBRequestList{})
 }
+
+// validate function
+func (r *VRDBRequest) validate() error {
+
+	return nil
+}

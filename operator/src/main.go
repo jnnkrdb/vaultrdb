@@ -41,10 +41,7 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 
 	// startup configs
-	disableVRDBConfigs    bool
-	disableVRDBSecrets    bool
 	disableVRDBRequests   bool
-	disableNamespaces     bool
 	disableLeaderElection bool
 )
 
@@ -57,10 +54,7 @@ func init() {
 
 func main() {
 
-	flag.BoolVar(&disableVRDBConfigs, "disable-vrdb-configs", false, "Disables the VRDBConfig Reconcilation.")
-	flag.BoolVar(&disableVRDBSecrets, "disable-vrdb-secrets", false, "Disables the VRDBSecret Reconcilation.")
 	flag.BoolVar(&disableVRDBRequests, "disable-vrdb-requests", false, "Disables the VRDBRequest Reconcilation.")
-	flag.BoolVar(&disableVRDBRequests, "disable-namespace-watcher", false, "Disables the Namespace Listener.")
 	flag.BoolVar(&disableLeaderElection, "disable-leader-election", false, "If disabled, then the Controllers will not wait for a Lease to expire.")
 
 	opts := zap.Options{
@@ -85,45 +79,60 @@ func main() {
 		os.Exit(1)
 	}
 
-	if !disableVRDBConfigs {
-		if err = (&controllers.VRDBConfigReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VRDBConfig")
-			os.Exit(1)
-		}
+	// vrdbconfig
+	if err = (&controllers.VRDBConfigReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "VRDBConfig")
+		os.Exit(1)
 	}
 
-	if !disableVRDBSecrets {
-		if err = (&controllers.VRDBSecretReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "VRDBSecret")
-			os.Exit(1)
-		}
+	if err = (&jnnkrdbdev1.VRDBConfig{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "VRDBConfig")
+		os.Exit(1)
+	}
+
+	// vrdbsecret
+	if err = (&controllers.VRDBSecretReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "VRDBSecret")
+		os.Exit(1)
+	}
+
+	if err = (&jnnkrdbdev1.VRDBSecret{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "VRDBSecret")
+		os.Exit(1)
 	}
 
 	// disabled because it is not finished
-	if !disableVRDBSecrets {
-		//	if err = (&controllers.VRDBRequestReconciler{
-		//		Client: mgr.GetClient(),
-		//		Scheme: mgr.GetScheme(),
-		//	}).SetupWithManager(mgr); err != nil {
-		//		setupLog.Error(err, "unable to create controller", "controller", "VRDBRequest")
-		//		os.Exit(1)
-		//	}
-	}
+	/*
+		if !disableVRDBSecrets {
 
-	if !disableNamespaces {
-		if err = (&controllers.NamespaceReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Namespace")
-			os.Exit(1)
+			if err = (&controllers.VRDBRequestReconciler{
+				Client: mgr.GetClient(),
+				Scheme: mgr.GetScheme(),
+			}).SetupWithManager(mgr); err != nil {
+				setupLog.Error(err, "unable to create controller", "controller", "VRDBRequest")
+				os.Exit(1)
+			}
+
+			if err = (&jnnkrdbdev1.VRDBRequest{}).SetupWebhookWithManager(mgr); err != nil {
+				setupLog.Error(err, "unable to create webhook", "webhook", "VRDBRequest")
+				os.Exit(1)
+			}
 		}
+	*/
+
+	// namespace
+	if err = (&controllers.NamespaceReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Namespace")
+		os.Exit(1)
 	}
 
 	//+kubebuilder:scaffold:builder
