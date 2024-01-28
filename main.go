@@ -17,7 +17,6 @@ limitations under the License.
 package main
 
 import (
-	"flag"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -33,16 +32,13 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
+	"github.com/jnnkrdb/vaultrdb/crud"
 	//+kubebuilder:scaffold:imports
 )
 
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
-
-	// startup configs
-	disableVRDBRequests   bool
-	disableLeaderElection bool
 )
 
 func init() {
@@ -52,16 +48,16 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
+// operator configs
+var (
+	disableVRDBRequests   bool
+	disableLeaderElection bool
+)
+
 func main() {
+	var opts zap.Options
 
-	flag.BoolVar(&disableVRDBRequests, "disable-vrdb-requests", false, "Disables the VRDBRequest Reconcilation.")
-	flag.BoolVar(&disableLeaderElection, "disable-leader-election", false, "If disabled, then the Controllers will not wait for a Lease to expire.")
-
-	opts := zap.Options{
-		Development: true,
-	}
-	opts.BindFlags(flag.CommandLine)
-	flag.Parse()
+	loadArgs(&opts)
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
@@ -136,6 +132,10 @@ func main() {
 	}
 
 	//+kubebuilder:scaffold:builder
+
+	(&crud.CRUDServer{
+		Client: mgr.GetClient(),
+	}).Start()
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

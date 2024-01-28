@@ -195,6 +195,13 @@ func (in *VRDBSecret) DeepCopyInto(out *VRDBSecret) {
 			(*out)[key] = val
 		}
 	}
+	if in.StringData != nil {
+		in, out := &in.StringData, &out.StringData
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	in.Status.DeepCopyInto(&out.Status)
 }
 

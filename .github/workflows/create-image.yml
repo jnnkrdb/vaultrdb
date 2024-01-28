@@ -29,60 +29,13 @@ jobs:
         useConfigFile: true
         configFilePath: .github/gitversion/GitVersion.yml
 
-  build_containers:
-    runs-on: ubuntu-latest
-    needs: [calculateversion]
-    strategy:
-      matrix:
-        path: [ operator ]
-    steps:
-    # write version into files
-    - name: bash-version
-      run: |
-        echo ${{ jobs.calculateversion.steps.gitversion.outputs.semVer }} > ${{ matrix.path }}/VERSION
-
-    # connect to container registry
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Login to Github Packages
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GHP_TOKEN }}
-  
-    # build image without pushing results
-    - name: Build Image Without Push
-      uses: docker/build-push-action@v4
-      if: github.event_name == 'pull_request'
-      with:
-        # relative path to the place where source code with Dockerfile is located
-        context: "./${{ matrix.path }}"
-        # build on feature branches, push only on main branch
-        push: false
-
-    # build image with pushing results
-    - name: Build Image With Push
-      uses: docker/build-push-action@v4
-      if: github.event_name != 'pull_request'
-      with:
-        # relative path to the place where source code with Dockerfile is located
-        context: "./${{ matrix.path }}"
-        tags: |
-          ghcr.io/jnnkrdb/vaultrdb:operator-${{ jobs.calculateversion.steps.gitversion.outputs.semVer }}
-        # build on feature branches, push only on main branch
-        push: true
-    
-
   build:
     runs-on: ubuntu-latest
     steps:
 
     - name: bash-version
       run: |
-        echo ${{ jobs.calculateversion.steps.gitversion.outputs.semVer }} > src/VERSION
+        echo ${{ jobs.calculateversion.steps.gitversion.outputs.semVer }} > ./VERSION
 
     - name: Set up Docker Buildx
       id: buildx
@@ -100,7 +53,7 @@ jobs:
       if: github.event_name == 'pull_request'
       with:
         # relative path to the place where source code with Dockerfile is located
-        context: "./src"
+        context: "./"
         tags: |
           ghcr.io/jnnkrdb/vaultrdb:${{ jobs.calculateversion.steps.gitversion.outputs.semVer }}
           ghcr.io/jnnkrdb/vaultrdb:latest
@@ -112,7 +65,7 @@ jobs:
       if: github.event_name != 'pull_request'
       with:
         # relative path to the place where source code with Dockerfile is located
-        context: "./src"
+        context: "./"
         tags: |
           ghcr.io/jnnkrdb/vaultrdb:${{ jobs.calculateversion.steps.gitversion.outputs.semVer }}
           ghcr.io/jnnkrdb/vaultrdb:latest

@@ -53,6 +53,8 @@ func (r *VRDBSecret) Default() {
 			r.Data[k] = base64.StdEncoding.EncodeToString([]byte(v))
 		}
 	}
+
+	r.StringData = nil
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
