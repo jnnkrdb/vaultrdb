@@ -33,3 +33,11 @@ grep operator-sdk_${OS}_${ARCH} checksums.txt | sha256sum -c -
 chmod +x operator-sdk_${OS}_${ARCH} && sudo mv operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
 operatos-sdk version
 ```
+
+## Create the CA Certificate for the Webhook Server
+```bash
+openssl req -nodes -new -x509 -keyout ca.key -out ca.crt -subj "/CN=Admission Controller Webhook VaultRDB CA"
+```
+```bash
+echo "$(openssl base64 -A <"ca.crt")" > ca.crt.b64
+```
