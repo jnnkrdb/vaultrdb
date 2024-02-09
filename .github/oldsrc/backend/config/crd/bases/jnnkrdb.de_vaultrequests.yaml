@@ -1,0 +1,110 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: vaultrequests.jnnkrdb.de
+spec:
+  group: jnnkrdb.de
+  names:
+    kind: VaultRequest
+    listKind: VaultRequestList
+    plural: vaultrequests
+    shortNames:
+    - vr
+    - vrs
+    singular: vaultrequest
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: VaultRequest is the Schema for the vaultrequests API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: VaultRequestSpec defines the desired state of VaultRequest
+            properties:
+              datamap:
+                additionalProperties:
+                  properties:
+                    data:
+                      type: string
+                    psqlid:
+                      type: string
+                    stringData:
+                      type: string
+                  type: object
+                type: object
+              namespaces:
+                description: struct which contains the information about the namespace
+                  regex
+                properties:
+                  kind:
+                    default: Secret
+                    enum:
+                    - Secret
+                    - ConfigMap
+                    type: string
+                  mustavoidregex:
+                    items:
+                      type: string
+                    type: array
+                  mustmatchregex:
+                    items:
+                      type: string
+                    type: array
+                  type:
+                    default: Opaque
+                    enum:
+                    - Opaque
+                    - kubernetes.io/service-account-token
+                    - kubernetes.io/dockercfg
+                    - kubernetes.io/dockerconfigjson
+                    - kubernetes.io/basic-auth
+                    - kubernetes.io/ssh-auth
+                    - kubernetes.io/tls
+                    - bootstrap.kubernetes.io/token
+                    type: string
+                required:
+                - mustavoidregex
+                - mustmatchregex
+                type: object
+            required:
+            - datamap
+            - namespaces
+            type: object
+          status:
+            description: VaultRequestStatus defines the observed state of VaultRequest
+            properties:
+              deployed:
+                items:
+                  properties:
+                    kind:
+                      type: string
+                    namespace:
+                      type: string
+                  required:
+                  - kind
+                  - namespace
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

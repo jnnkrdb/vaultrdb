@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vaultrdb-cr
+  labels:
+    jnnkrdb.de/service: vaultrdb
+rules:
+- apiGroups: [ "" ]
+  resources: [ namespaces ]
+  verbs: [ get, list, watch ]
+- apiGroups: [ jnnkrdb.de ]
+  resources: [ vrdbconfigs, vrdbrequests, vrdbsecrets ]
+  verbs: [ create, delete, get, list, patch, update, watch ]
+- apiGroups: [ jnnkrdb.de ]
+  resources: [ vrdbconfigs/finalizers, vrdbrequests/finalizers, vrdbsecrets/finalizers ]  verbs: [ update ]
+- apiGroups: [ jnnkrdb.de ]
+  resources: [ vrdbconfigs/status, vrdbrequests/status, vrdbsecrets/status ]
+  verbs: [ get, patch, update ]
+- apiGroups: [ "" ]
+  resources: [ configmaps, secrets ]
+  verbs: [ create, delete, get, list, patch, update, watch ]
+- apiGroups: [ coordination.k8s.io ]
+  resources: [ leases ]
+  verbs: [ create, delete, get, list, patch, update, watch ]  
+- apiGroups: [ "" ]
+  resources: [ events ]
+  verbs: [ create, patch ]

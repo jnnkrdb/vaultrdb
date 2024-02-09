@@ -1,0 +1,25 @@
+apiVersion: jnnkrdb.de/v1
+kind: VaultRequest
+metadata:
+  name: vaultrequest-sample
+spec:
+  datamap: 
+    testkey1:
+      psqlid: sdfsdwe
+      data: dG9sbGVkYXRlbnh5eg==
+      stringData: tolledatenxyz
+    testkey2:
+      psqlid: sdfsdwe
+      data: dG9sbGVkYXRlbnh5eg==
+      stringData: tolledatenxyz
+    testkey3:
+      psqlid: sdfsdwe
+      data: dG9sbGVkYXRlbnh5eg==
+      stringData: tolledatenxyz
+  namespaces:
+    name: name-unused
+    mustavoidregex: []
+    mustmatchregex: 
+    - default
+    kind: Secret
+    type: Opaque

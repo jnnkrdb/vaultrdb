@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vaultrdb
+  namespace: vaultrdb
+  labels:
+    jnnkrdb.de/service: vaultrdb
+spec:
+  selector:
+    matchLabels:
+      jnnkrdb.de/service: vaultrdb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        jnnkrdb.de/service: vaultrdb
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        image: ghcr.io/jnnkrdb/vaultrdb:latest
+        name: vaultrdb
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - "ALL"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+      serviceAccountName: vaultrdb-sa
+      terminationGracePeriodSeconds: 10

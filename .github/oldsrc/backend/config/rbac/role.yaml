@@ -1,0 +1,57 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - jnnkrdb.de
+  resources:
+  - vaultrequests
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - jnnkrdb.de
+  resources:
+  - vaultrequests/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - jnnkrdb.de
+  resources:
+  - vaultrequests/status
+  verbs:
+  - get
+  - patch
+  - update

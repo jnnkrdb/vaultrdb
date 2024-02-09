@@ -30,7 +30,8 @@ jobs:
         configFilePath: .github/gitversion/GitVersion.yml
 
     - name: bash-version
-      run: echo ${{ steps.gitversion.outputs.semVer }} > src/VERSION
+      run: |
+        echo ${{ steps.gitversion.outputs.semVer }} > ./vaultrdb/VERSION
 
     - name: Set up Docker Buildx
       id: buildx
@@ -48,7 +49,7 @@ jobs:
       if: github.event_name == 'pull_request'
       with:
         # relative path to the place where source code with Dockerfile is located
-        context: "./src"
+        context: "./"
         tags: |
           ghcr.io/jnnkrdb/vaultrdb:${{ steps.gitversion.outputs.semVer }}
           ghcr.io/jnnkrdb/vaultrdb:latest
@@ -60,7 +61,7 @@ jobs:
       if: github.event_name != 'pull_request'
       with:
         # relative path to the place where source code with Dockerfile is located
-        context: "./src"
+        context: "./"
         tags: |
           ghcr.io/jnnkrdb/vaultrdb:${{ steps.gitversion.outputs.semVer }}
           ghcr.io/jnnkrdb/vaultrdb:latest

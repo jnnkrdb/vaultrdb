@@ -1,0 +1,160 @@
+openapi: "3.0.3"
+info:
+  title: "VaultRDB"
+  description: |-
+    This container contains a kubernetes operator, and secret/configmap manager to handle multi-desired configs centralized. 
+  version: "{{VERSION}}"
+externalDocs:
+  description: "Find out more about VaultRDB"
+  url: "https://github.com/jnnkrdb/vaultrdb#readme"
+#servers:
+#  - url: "https://{{ENV_BASEDOMAIN}}/"
+tags:
+  - name: "Authentication"
+    description: "Authentication Services"
+  - name: "CRUD"
+    description: "Crud API v1"
+  - name: "Frontend"
+    description: "Frontend User Interface"
+  - name: "SwaggerUI"
+    description: "Swagger User Interface"
+paths:      
+  "/auth/login":
+    post:
+      tags:
+        - "Authentication"
+      summary: "Endpoint for the Authentication - Login."
+      operationId: "authloginpost"
+      responses:
+        '200':
+          description: "Successfully logged in."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "AUTH-LOGIN"
+                
+  "/auth/refresh":
+    post:
+      tags:
+        - "Authentication"
+      summary: "Endpoint for the Authentication - Refresh."
+      operationId: "authrefreshpost"
+      responses:
+        '200':
+          description: "Successfully refreshed token."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "AUTH-REFRESH"
+                
+  "/auth/logout":
+    post:
+      tags:
+        - "Authentication"
+      summary: "Endpoint for the Authentication - Logout."
+      operationId: "authlogoutpost"
+      responses:
+        '200':
+          description: "Successfully logged out."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "AUTH-LOGIN"
+
+  "/ui/":
+    get:
+      tags:
+        - "Frontend"
+      summary: "Frontend URL."
+      operationId: "getui"
+      responses:
+        '200':
+          description: "Successfully viewing the Frontend."
+          
+  "/swaggerui/":
+    get:
+      tags:
+        - "SwaggerUI"
+      summary: "SwaggerUI URL."
+      operationId: "getswaggerui"
+      responses:
+        '200':
+          description: "Successfully viewing the SwaggerUI."
+ 
+  "/crud":
+    get:
+      tags:
+        - "CRUD"
+      summary: "Endpoint for the Configs in the SQLite3 DataBase."
+      operationId: "read"
+      parameters: 
+      - name: "uid"
+        description: "Contains uid of the requested uid:value pair."
+        in: "query"
+        schema:
+          type: "string"
+        required: false
+      responses:
+        '200':
+          description: "Successfully received the requested object/s."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "CRUDAPI"
+    post:
+      tags:
+        - "CRUD"
+      summary: "Endpoint for the Configs in the SQLite3 DataBase."
+      operationId: "create"
+      responses:
+        '200':
+          description: "Successfully created the requested object."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "CRUDAPI"
+    put:
+      tags:
+        - "CRUD"
+      summary: "Endpoint for the Configs in the SQLite3 DataBase."
+      operationId: "update_put"
+      responses:
+        '200':
+          description: "Successfully updated the requested object."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "CRUDAPI"
+    patch:
+      tags:
+        - "CRUD"
+      summary: "Endpoint for the Configs in the SQLite3 DataBase."
+      operationId: "update_patch"
+      responses:
+        '200':
+          description: "Successfully updated the requested object."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "CRUDAPI"
+    delete:
+      tags:
+        - "CRUD"
+      summary: "Endpoint for the Configs in the SQLite3 DataBase."
+      operationId: "delete"
+      responses:
+        '200':
+          description: "Successfully deleted the requested object."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "CRUDAPI"
+  
