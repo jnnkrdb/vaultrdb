@@ -7,8 +7,8 @@ info:
 externalDocs:
   description: "Find out more about VaultRDB"
   url: "https://github.com/jnnkrdb/vaultrdb#readme"
-#servers:
-#  - url: "https://{{ENV_BASEDOMAIN}}/"
+servers:
+ - url: "https://{{FQDN}}/"
 tags:
   - name: "Authentication"
     description: "Authentication Services"
@@ -19,51 +19,6 @@ tags:
   - name: "SwaggerUI"
     description: "Swagger User Interface"
 paths:      
-  "/auth/login":
-    post:
-      tags:
-        - "Authentication"
-      summary: "Endpoint for the Authentication - Login."
-      operationId: "authloginpost"
-      responses:
-        '200':
-          description: "Successfully logged in."
-          content:
-            text/plain:
-              schema:
-                type: "string"
-                example: "AUTH-LOGIN"
-                
-  "/auth/refresh":
-    post:
-      tags:
-        - "Authentication"
-      summary: "Endpoint for the Authentication - Refresh."
-      operationId: "authrefreshpost"
-      responses:
-        '200':
-          description: "Successfully refreshed token."
-          content:
-            text/plain:
-              schema:
-                type: "string"
-                example: "AUTH-REFRESH"
-                
-  "/auth/logout":
-    post:
-      tags:
-        - "Authentication"
-      summary: "Endpoint for the Authentication - Logout."
-      operationId: "authlogoutpost"
-      responses:
-        '200':
-          description: "Successfully logged out."
-          content:
-            text/plain:
-              schema:
-                type: "string"
-                example: "AUTH-LOGIN"
-
   "/ui/":
     get:
       tags:
@@ -74,7 +29,7 @@ paths:
         '200':
           description: "Successfully viewing the Frontend."
           
-  "/swaggerui/":
+  "/swagger/":
     get:
       tags:
         - "SwaggerUI"
@@ -82,7 +37,7 @@ paths:
       operationId: "getswaggerui"
       responses:
         '200':
-          description: "Successfully viewing the SwaggerUI."
+          description: "Successfully viewing the SwaggerUI. Literally the Page you are seeing right now."
  
   "/crud":
     get:

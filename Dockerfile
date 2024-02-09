@@ -24,12 +24,14 @@ FROM alpine:3.10
 WORKDIR /
 # install neccessary binaries
 RUN apk add openssl
-# Copy Versions Information
+# Create the main vaultrdb working directory
 RUN mkdir -p /vaultrdb
 # Copy the VaultRDB Directory
 COPY vaultrdb/ /vaultrdb/
 # create other needed libraries
-RUN mkdir -p /vaultrdb/{ui,data}
+RUN mkdir /vaultrdb/ui
+RUN mkdir /vaultrdb/data
+RUN mkdir /vaultrdb/temp
 # Copy Operators Binary
 COPY --from=builder /vaultrdb /usr/local/bin/vaultrdb
 RUN chmod a+x /usr/local/bin/vaultrdb
@@ -39,6 +41,10 @@ RUN chown 65532:65532 /usr/local/bin/vaultrdb
 RUN chown 65532:65532 -R /vaultrdb
 # configure default env variables
 ENV SLEEP_BEFORE_SERVICE_START="0"
+ENV BASICAUTH_USER="vault"
+ENV BASICAUTH_PASS="vault"
+ENV ENABLE_SWAGGERUI="false"
+ENV FQDN="vaultrdb.kubernetes.docker.internal"
 # set the entrypoints
 USER 65532:65532
 ENTRYPOINT ["/vaultrdb/entrypoint.sh"]

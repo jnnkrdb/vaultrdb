@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    jnnkrdb.de/service: vaultrdb
+  name: vaultrdb
+  namespace: vaultrdb
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+  selector:
+    jnnkrdb.de/service: vaultrdb
