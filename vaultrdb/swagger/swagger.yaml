@@ -10,8 +10,6 @@ externalDocs:
 servers:
  - url: "https://{{FQDN}}/"
 tags:
-  - name: "Authentication"
-    description: "Authentication Services"
   - name: "CRUD"
     description: "Crud API v1"
   - name: "Frontend"

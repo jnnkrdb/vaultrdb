@@ -20,11 +20,11 @@ RUN go build -o /vaultrdb .
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 # FROM gcr.io/distroless/static:nonroot
-FROM alpine:3.10
+FROM alpine:3.19
 WORKDIR /
 # install neccessary binaries
 RUN apk add openssl
-# Create the main vaultrdb working directory
+# Create the main vaultrdb working direct
 RUN mkdir -p /vaultrdb
 # Copy the VaultRDB Directory
 COPY vaultrdb/ /vaultrdb/
@@ -41,10 +41,13 @@ RUN chown 65532:65532 /usr/local/bin/vaultrdb
 RUN chown 65532:65532 -R /vaultrdb
 # configure default env variables
 ENV SLEEP_BEFORE_SERVICE_START="0"
+ENV VAULTRDB_SERVICENAME=""
 ENV BASICAUTH_USER="vault"
 ENV BASICAUTH_PASS="vault"
 ENV ENABLE_SWAGGERUI="false"
 ENV FQDN="vaultrdb.kubernetes.docker.internal"
+ENV _TEMPDIR="/vaultrdb/temp"
+ENV _DEBUG=""
 # set the entrypoints
 USER 65532:65532
 ENTRYPOINT ["/vaultrdb/entrypoint.sh"]
