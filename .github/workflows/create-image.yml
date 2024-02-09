@@ -9,7 +9,7 @@ on:
       - master 
 
 jobs:
-  calculateversion:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -29,13 +29,9 @@ jobs:
         useConfigFile: true
         configFilePath: .github/gitversion/GitVersion.yml
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-
     - name: bash-version
       run: |
-        echo ${{ jobs.calculateversion.steps.gitversion.outputs.semVer }} > ./vaultrdb/VERSION
+        echo ${{ steps.gitversion.outputs.semVer }} > ./vaultrdb/VERSION
 
     - name: Set up Docker Buildx
       id: buildx
@@ -55,7 +51,7 @@ jobs:
         # relative path to the place where source code with Dockerfile is located
         context: "./"
         tags: |
-          ghcr.io/jnnkrdb/vaultrdb:${{ jobs.calculateversion.steps.gitversion.outputs.semVer }}
+          ghcr.io/jnnkrdb/vaultrdb:${{ steps.gitversion.outputs.semVer }}
           ghcr.io/jnnkrdb/vaultrdb:latest
         # build on feature branches, push only on main branch
         push: false
@@ -67,7 +63,7 @@ jobs:
         # relative path to the place where source code with Dockerfile is located
         context: "./"
         tags: |
-          ghcr.io/jnnkrdb/vaultrdb:${{ jobs.calculateversion.steps.gitversion.outputs.semVer }}
+          ghcr.io/jnnkrdb/vaultrdb:${{ steps.gitversion.outputs.semVer }}
           ghcr.io/jnnkrdb/vaultrdb:latest
         # build on feature branches, push only on main branch
         push: true
