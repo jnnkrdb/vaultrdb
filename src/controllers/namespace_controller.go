@@ -51,7 +51,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	_log.Info("namespace changed")
 
-	var vrdbconfigs *jnnkrdbdev1.VRDBConfigList
+	var vrdbconfigs = &jnnkrdbdev1.VRDBConfigList{}
 	if err := r.List(ctx, vrdbconfigs, &client.ListOptions{}); err != nil {
 		_log.Error(err, "error receiving list of vrdbconfigs")
 		return ctrl.Result{}, err
@@ -61,7 +61,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 
-	var vrdbsecrets *jnnkrdbdev1.VRDBSecretList
+	var vrdbsecrets = &jnnkrdbdev1.VRDBSecretList{}
 	if err := r.List(ctx, vrdbsecrets, &client.ListOptions{}); err != nil {
 		_log.Error(err, "error receiving list of vrdbsecrets")
 		return ctrl.Result{}, err
@@ -71,7 +71,7 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 
-	//var vrdbrequests *jnnkrdbdev1.VRDBRequestList
+	//var vrdbrequests = &jnnkrdbdev1.VRDBRequestList{}
 	//if err := r.List(ctx, vrdbrequests, &client.ListOptions{}); err != nil {
 	//	_log.Error(err, "error receiving list of vrdbrequests")
 	//	return ctrl.Result{}, err
