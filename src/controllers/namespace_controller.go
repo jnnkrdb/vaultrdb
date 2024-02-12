@@ -18,11 +18,8 @@ package controllers
 
 import (
 	"context"
-	"fmt"
-	"sync"
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
-	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,63 +51,35 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	_log.Info("namespace changed")
 
-	var errors []error
-	var waitGroup sync.WaitGroup
-	waitGroup.Add(3)
-
-	go func() {
-		var vrdbconfigs *jnnkrdbdev1.VRDBConfigList
-		if err := r.List(ctx, vrdbconfigs, &client.ListOptions{}); err != nil {
-			errors = append(errors, err)
-		} else {
-			for _, item := range vrdbconfigs.Items {
-				if _, err := item.Reconcile(ctx, r.Client); err != nil {
-					_log.Error(err, "error reconciling the vrdbconfigs")
-					errors = append(errors, err)
-				}
-			}
+	var vrdbconfigs *jnnkrdbdev1.VRDBConfigList
+	if err := r.List(ctx, vrdbconfigs, &client.ListOptions{}); err != nil {
+		_log.Error(err, "error receiving list of vrdbconfigs")
+		return ctrl.Result{}, err
+	} else {
+		for _, item := range vrdbconfigs.Items {
+			return item.Reconcile(ctx, r.Client)
 		}
-
-		waitGroup.Done()
-	}()
-
-	go func() {
-		var vrdbsecrets *jnnkrdbdev1.VRDBSecretList
-		if err := r.List(ctx, vrdbsecrets, &client.ListOptions{}); err != nil {
-			errors = append(errors, err)
-		} else {
-			for _, item := range vrdbsecrets.Items {
-				if _, err := item.Reconcile(ctx, r.Client); err != nil {
-					_log.Error(err, "error reconciling the vrdbsecrets")
-					errors = append(errors, err)
-				}
-			}
-		}
-
-		waitGroup.Done()
-	}()
-
-	go func() {
-		//	var vrdbrequests *jnnkrdbdev1.VRDBRequestList
-		//	if err := r.List(ctx, vrdbrequests, &client.ListOptions{}); err != nil {
-		//		errors = append(errors, err)
-		//	} else {
-		//		for _, item := range vrdbrequests.Items {
-		//			if _, err := item.Reconcile(ctx, r.Client); err != nil {
-		//				_log.Error(err, "error reconciling the vrdbrequests")
-		//				errors = append(errors, err)
-		//			}
-		//		}
-		//	}
-
-		waitGroup.Done()
-	}()
-
-	waitGroup.Wait()
-
-	if len(errors) > 0 {
-		return ctrl.Result{Requeue: true}, fmt.Errorf("errors occured: %+v", errors)
 	}
+
+	var vrdbsecrets *jnnkrdbdev1.VRDBSecretList
+	if err := r.List(ctx, vrdbsecrets, &client.ListOptions{}); err != nil {
+		_log.Error(err, "error receiving list of vrdbsecrets")
+		return ctrl.Result{}, err
+	} else {
+		for _, item := range vrdbsecrets.Items {
+			return item.Reconcile(ctx, r.Client)
+		}
+	}
+
+	//var vrdbrequests *jnnkrdbdev1.VRDBRequestList
+	//if err := r.List(ctx, vrdbrequests, &client.ListOptions{}); err != nil {
+	//	_log.Error(err, "error receiving list of vrdbrequests")
+	//	return ctrl.Result{}, err
+	//} else {
+	//	for _, item := range vrdbrequests.Items {
+	//		return item.Reconcile(ctx, r.Client)
+	//	}
+	//}
 
 	return ctrl.Result{}, nil
 }
@@ -118,6 +87,6 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 // SetupWithManager sets up the controller with the Manager.
 func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&corev1.Namespace{}).
+		For(&v1.Namespace{}).
 		Complete(r)
 }
