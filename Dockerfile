@@ -29,8 +29,6 @@ RUN mkdir -p /vaultrdb
 # Copy the VaultRDB Directory
 COPY vaultrdb/ /vaultrdb/
 # create other needed libraries
-RUN mkdir /vaultrdb/ui
-RUN mkdir /vaultrdb/data
 RUN mkdir /vaultrdb/temp
 # Copy Operators Binary
 COPY --from=builder /vaultrdb /usr/local/bin/vaultrdb
