@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"flag"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -55,9 +56,16 @@ var (
 )
 
 func main() {
-	var opts zap.Options
+	var opts = zap.Options{
+		Development: true,
+	}
 
-	loadArgs(&opts)
+	opts.BindFlags(flag.CommandLine)
+
+	flag.BoolVar(&disableVRDBRequests, "disable-vrdb-requests", false, "Disables the VRDBRequest Reconcilation.")
+	flag.BoolVar(&disableLeaderElection, "disable-leader-election", false, "If disabled, then the Controllers will not wait for a Lease to expire.")
+
+	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
