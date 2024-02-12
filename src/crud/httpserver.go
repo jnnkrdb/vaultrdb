@@ -26,14 +26,14 @@ func (csrv *CRUDServer) Start() {
 		var crudLog = ctrl.Log.WithName("crud")
 
 		// if the swaggerui environmentvariable is set to true, the swagger ui will
-		// be activated and can be accessed via http://localhost:80/swagger/
+		// be activated and can be accessed via http://localhost:9080/swagger/
 		if val, ok := os.LookupEnv("ENABLE_SWAGGERUI"); ok && val == "true" {
 			functionSet = append(functionSet, hndlrs.HttpFunction{
 				Pattern:     "/swagger/",
 				MainHandler: http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger"))),
 				Middlewares: mw.New(middlewares.OptionsResponse),
 			})
-			crudLog.Info("enabled swagger ui", "uri", "http://localhost:80/swagger/")
+			crudLog.Info("enabled swagger ui", "uri", "http://localhost:9080/swagger/")
 		}
 
 		// add the license to the http webserver
@@ -44,7 +44,7 @@ func (csrv *CRUDServer) Start() {
 			}),
 			Middlewares: mw.New(middlewares.OptionsResponse),
 		})
-		crudLog.Info("added license to http server", "uri", "http://localhost:80/license")
+		crudLog.Info("added license to http server", "uri", "http://localhost:9080/license")
 
 		// add the version to the http webserver
 		functionSet = append(functionSet, hndlrs.HttpFunction{
@@ -54,7 +54,7 @@ func (csrv *CRUDServer) Start() {
 			}),
 			Middlewares: mw.New(middlewares.OptionsResponse),
 		})
-		crudLog.Info("added version to http server", "uri", "http://localhost:80/version")
+		crudLog.Info("added version to http server", "uri", "http://localhost:9080/version")
 
 		// add the ui frontend to the httpserver
 		functionSet = append(functionSet, hndlrs.HttpFunction{
@@ -62,18 +62,18 @@ func (csrv *CRUDServer) Start() {
 			MainHandler: http.StripPrefix("/ui/", http.FileServer(http.Dir("/vaultrdb/ui"))),
 			Middlewares: mw.New(middlewares.OptionsResponse),
 		})
-		crudLog.Info("activated frontend ui", "uri", "localhost:80/ui/")
+		crudLog.Info("activated frontend ui", "uri", "localhost:9080/ui/")
 
 		// append the api functions to the http server with middleware
 		// configurations
 		functionSet = append(functionSet, api.ApiFunctionSet...)
-		crudLog.Info("activated crud api", "uri", "localhost:80/swagger/")
+		crudLog.Info("activated crud api", "uri", "localhost:9080/swagger/")
 
 		// set the global config for the kubernetes api client
 		// to receive the information from the api server
 		config.KClient = csrv.Client
 
-		if e := http.ListenAndServe(":80", hndlrs.GetHandler(functionSet)); e != nil {
+		if e := http.ListenAndServe(":9080", hndlrs.GetHandler(functionSet)); e != nil {
 			crudLog.Error(e, "error keeping up crud server")
 			os.Exit(1)
 		}

@@ -22,7 +22,7 @@ spec:
         image: ghcr.io/jnnkrdb/vaultrdb:latest
         imagePullPolicy: 'Always'
         ports:
-          - containerPort: 80 
+          - containerPort: 9080 
           - containerPort: 9443 
         env:
         - name: SLEEP_BEFORE_SERVICE_START
