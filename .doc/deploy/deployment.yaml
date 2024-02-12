@@ -18,8 +18,23 @@ spec:
       securityContext:
         runAsNonRoot: true
       containers:
+      - name: vaultrdb
         image: ghcr.io/jnnkrdb/vaultrdb:latest
-        name: vaultrdb
+        imagePullPolicy: 'Always'
+        ports:
+          - containerPort: 80 
+          - containerPort: 9443 
+        env:
+        - name: SLEEP_BEFORE_SERVICE_START
+          value: "0"
+        - name: VAULTRDB_SERVICENAME
+          value: "vaultrdb"
+        - name: ENABLE_SWAGGERUI
+          value: "true"
+        #- name: FQDN
+        #  value: ""
+        - name: _DEBUG
+          value: "true"
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

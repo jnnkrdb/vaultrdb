@@ -91,17 +91,17 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}()
 
 	go func() {
-		var vrdbrequests *jnnkrdbdev1.VRDBRequestList
-		if err := r.List(ctx, vrdbrequests, &client.ListOptions{}); err != nil {
-			errors = append(errors, err)
-		} else {
-			for _, item := range vrdbrequests.Items {
-				if _, err := item.Reconcile(ctx, r.Client); err != nil {
-					_log.Error(err, "error reconciling the vrdbrequests")
-					errors = append(errors, err)
-				}
-			}
-		}
+		//	var vrdbrequests *jnnkrdbdev1.VRDBRequestList
+		//	if err := r.List(ctx, vrdbrequests, &client.ListOptions{}); err != nil {
+		//		errors = append(errors, err)
+		//	} else {
+		//		for _, item := range vrdbrequests.Items {
+		//			if _, err := item.Reconcile(ctx, r.Client); err != nil {
+		//				_log.Error(err, "error reconciling the vrdbrequests")
+		//				errors = append(errors, err)
+		//			}
+		//		}
+		//	}
 
 		waitGroup.Done()
 	}()

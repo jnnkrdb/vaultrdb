@@ -7,8 +7,13 @@ metadata:
   namespace: vaultrdb
 spec:
   ports:
-    - port: 443
+    - name: webhook
+      port: 443
       protocol: TCP
       targetPort: 9443
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
   selector:
     jnnkrdb.de/service: vaultrdb
