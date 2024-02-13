@@ -34,19 +34,6 @@ func Start(c client.Client) {
 	// to receive the information from the api server
 	KClient = c
 
-	// start the rest api in another go routine
-	go func() {
-		if e := http.ListenAndServe(":9080", RESTSRV); e != nil {
-			CrudLog.Error(e, "error keeping up api server")
-			os.Exit(1)
-		}
-	}()
-}
-
-// initialize the http rest router, to enable it
-// with the default routes
-func init() {
-
 	// adding swagger ui to mux router
 	// if environment variable is configured
 	if val, ok := os.LookupEnv("ENABLE_SWAGGERUI"); ok && val == "true" {
@@ -66,4 +53,11 @@ func init() {
 	RESTSRV.Handle("/ui/", DefaultMW.Then(http.StripPrefix("/ui/", http.FileServer(http.Dir("/vaultrdb/ui")))))
 	CrudLog.Info("activated frontend ui", "uri", "localhost:9080/ui/")
 
+	// start the rest api in another go routine
+	go func() {
+		if e := http.ListenAndServe(":9080", RESTSRV); e != nil {
+			CrudLog.Error(e, "error keeping up api server")
+			os.Exit(1)
+		}
+	}()
 }
