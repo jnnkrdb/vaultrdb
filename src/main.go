@@ -33,7 +33,7 @@ import (
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	"github.com/jnnkrdb/vaultrdb/controllers"
-	"github.com/jnnkrdb/vaultrdb/crud"
+	"github.com/jnnkrdb/vaultrdb/crud/config"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -141,9 +141,7 @@ func main() {
 
 	//+kubebuilder:scaffold:builder
 
-	(&crud.CRUDServer{
-		Client: mgr.GetClient(),
-	}).Start()
+	config.Start(mgr.GetClient())
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
