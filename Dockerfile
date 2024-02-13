@@ -28,6 +28,7 @@ RUN apk add openssl
 RUN mkdir -p /vaultrdb
 # Copy the VaultRDB Directory
 COPY vaultrdb/ /vaultrdb/
+COPY LICENSE /vaultrdb/LICENSE
 # create other needed libraries
 RUN mkdir /vaultrdb/temp
 # Copy Operators Binary
