@@ -35,8 +35,8 @@ func Start(c client.Client) {
 	// adding swagger ui to mux router
 	// if environment variable is configured
 	if val, ok := os.LookupEnv("ENABLE_SWAGGERUI"); ok && val == "true" {
-		//RESTSRV.PathPrefix("/swagger/").Handler(DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
-		RESTSRV.Handle("/swagger/", DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
+		RESTSRV.PathPrefix("/swagger/").Handler(DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
+		//RESTSRV.Handle("/swagger/", DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
 		config.CrudLog.Info("enabled swagger ui", "uri", "http://localhost:9080/swagger/")
 	}
 
