@@ -12,7 +12,7 @@ env:
   HELM_EXPERIMENTAL_OCI: 1 #enable OCI support
 
 jobs:
-  build:
+  make:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -70,12 +70,6 @@ jobs:
           ghcr.io/jnnkrdb/vaultrdb:latest
         # build on feature branches, push only on main branch
         push: true
-  
-  helm:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      name: checkout repo
     
     - name: install helm
       uses: Azure/setup-helm@v1
