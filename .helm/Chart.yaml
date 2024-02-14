@@ -1,0 +1,6 @@
+apiVersion: v2
+name: vaultrdb
+description: Helm chart for self-hosted vaultrdb secrets/configs management.
+type: application
+version: '0.0.1'
+appVersion: 'latest'

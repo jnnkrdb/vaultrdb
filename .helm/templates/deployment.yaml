@@ -1,45 +1,55 @@
+{{- if .Values.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vaultrdb
-  namespace: vaultrdb
+  namespace: {{ .Values.namespace }}
   labels:
-    jnnkrdb.de/service: vaultrdb
+    {{- include "helmbase.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
       jnnkrdb.de/service: vaultrdb
+      jnnkrdb.de/type: pod
   replicas: 1
   template:
     metadata:
       labels:
         jnnkrdb.de/service: vaultrdb
+        jnnkrdb.de/type: pod
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
       - name: vaultrdb
-        image: ghcr.io/jnnkrdb/vaultrdb:latest
+        image: ghcr.io/jnnkrdb/vaultrdb:{{ .Values.tag | default .Chart.AppVersion }}"
         imagePullPolicy: 'Always'
         ports:
           - containerPort: 9080 
           - containerPort: 9443 
         env:
-        - name: SLEEP_BEFORE_SERVICE_START
-          value: "0"
+        - name: BASICAUTH_USER
+          value: "vault"
+        - name: BASICAUTH_PASS
+          value: "vault"
         - name: VAULTRDB_SERVICENAME
           value: "vaultrdb"
         - name: ENABLE_SWAGGERUI
-          value: "true"
-        #- name: FQDN
-        #  value: ""
+          value: {{ .Values.swaggerui | quote }}
         - name: _DEBUG
-          value: "true"
+          value: {{ .Values.debug | quote }}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
               - "ALL"
+        startupProbe:
+          httpGet:
+            path: /crud/alive
+            port: 9080
+          timeoutSeconds: 3
+          failureThreshold: 30
+          periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /healthz
@@ -61,3 +71,4 @@ spec:
             memory: 64Mi
       serviceAccountName: vaultrdb-sa
       terminationGracePeriodSeconds: 10
+{{- end }}
