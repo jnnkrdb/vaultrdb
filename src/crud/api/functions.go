@@ -36,7 +36,6 @@ func Start(c client.Client) {
 	// if environment variable is configured
 	if val, ok := os.LookupEnv("ENABLE_SWAGGERUI"); ok && val == "true" {
 		RESTSRV.PathPrefix("/swagger/").Handler(DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
-		//RESTSRV.Handle("/swagger/", DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
 		config.CrudLog.Info("enabled swagger ui", "uri", "http://localhost:9080/swagger/")
 	}
 
@@ -49,11 +48,15 @@ func Start(c client.Client) {
 	config.CrudLog.Info("added version to http server", "uri", "http://localhost:9080/version")
 
 	// serving the ui for the frontend
-	RESTSRV.Handle("/ui/", DefaultMW.Then(http.StripPrefix("/ui/", http.FileServer(http.Dir("/vaultrdb/ui")))))
+	RESTSRV.PathPrefix("/ui/").Handler(DefaultMW.Then(http.StripPrefix("/ui/", http.FileServer(http.Dir("/vaultrdb/ui")))))
 	config.CrudLog.Info("activated frontend ui", "uri", "localhost:9080/ui/")
 
 	// append basic auth handler to middlewares
 	var mw = DefaultMW.Append(middlewares.BasicAuth)
+
+	// serving the license of the container image
+	RESTSRV.Handle("/crud/alive", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("OK")) }))
+	config.CrudLog.Info("added health startup check to http server", "uri", "http://localhost:9080/crud/alive")
 
 	// generic functions listing
 	RESTSRV.Handle("/crud/v1/{kind}", mw.ThenFunc(v1.LIST_ALL)).Methods("GET")

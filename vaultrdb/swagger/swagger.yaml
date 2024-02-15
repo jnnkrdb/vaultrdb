@@ -8,7 +8,9 @@ externalDocs:
   description: "Find out more about VaultRDB"
   url: "https://github.com/jnnkrdb/vaultrdb#readme"
 servers:
- - url: "https://{{FQDN}}/"
+ - url: "/"
+ - url: "http://localhost:9080/"
+# - url: "https://{{FQDN}}/"
 tags:
   - name: "CRUD"
     description: "Crud API v1"

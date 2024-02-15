@@ -1,0 +1,21 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: vaultrdb
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "helmbase.labels" . | nindent 4 }}
+spec:
+  ports:
+    - name: webhook
+      port: 443
+      protocol: TCP
+      targetPort: 9443
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 9080
+  selector:
+    {{- include "helmbase.selectorLabels" . | nindent 4 }}
+{{- end }}
