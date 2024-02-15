@@ -65,8 +65,10 @@ echo "Preparing the Swagger UI"
 _SWAGGERDIR="/vaultrdb/swagger"
 
 # replace the server address fqdn in the $_SWAGGERDIR.yaml for the swaggerui tests
-sed -i -e "s/{{FQDN}}/${FQDN}/g" $_SWAGGERDIR/swagger.yaml 
+sed -i -e "s/{{BASE_URL}}/${BASE_URL}/g" $_SWAGGERDIR/swagger.yaml 
 sed -i -e "s/{{VERSION}}/$(cat '/vaultrdb/VERSION')/g" $_SWAGGERDIR/swagger.yaml 
+#sed -i -e "s/{{BASICAUTH_USER}}/${BASICAUTH_USER}/g" $_SWAGGERDIR/swagger-initializer.js 
+#sed -i -e "s/{{BASICAUTH_PASS}}/${BASICAUTH_PASS}/g" $_SWAGGERDIR/swagger-initializer.js
 if [ "$_DEBUG" = "true" ]; then 
   echo "------------------------------------------------------------------------"
   echo "$(cat "$_SWAGGERDIR/swagger.yaml")"
