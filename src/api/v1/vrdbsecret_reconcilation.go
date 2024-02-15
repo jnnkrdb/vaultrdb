@@ -61,10 +61,12 @@ func (v *VRDBSecret) Reconcile(ctx context.Context, c client.Client) (ctrl.Resul
 			}
 		}
 
-		// set the annotations if not set till now
+		// set the secret type
 		tempS.Type = v.Type
-		for key, value := range v.Data {
-			tempS.Data[key] = []byte(value)
+		// copy the data
+		tempS.Data = make(map[string][]byte)
+		for k, v := range v.Data {
+			tempS.Data[k] = []byte(v)
 		}
 
 		// update the existing secret

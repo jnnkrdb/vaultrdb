@@ -61,8 +61,11 @@ func (v *VRDBConfig) Reconcile(ctx context.Context, c client.Client) (ctrl.Resul
 			}
 		}
 
-		// set the annotations if not set till now
-		tempCM.Data = v.Data
+		// set copy the data
+		tempCM.Data = make(map[string]string)
+		for k, v := range v.Data {
+			tempCM.Data[k] = v
+		}
 
 		// update the existing configmap
 		if !create {
