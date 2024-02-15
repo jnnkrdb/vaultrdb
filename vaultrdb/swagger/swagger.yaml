@@ -8,58 +8,39 @@ externalDocs:
   description: "Find out more about VaultRDB"
   url: "https://github.com/jnnkrdb/vaultrdb#readme"
 servers:
- - url: "/"
- - url: "http://localhost:9080/"
-# - url: "https://{{FQDN}}/"
+#  - url: "/"
+#  - url: "http://localhost:9080/"
+#  - url: "https://{{BASE_URL}}/"
+  - url: "https://iqars.amotiq.net:30443/vaultrdb"
 tags:
-  - name: "CRUD"
+  - name: "CRUDv1"
     description: "Crud API v1"
   - name: "Frontend"
-    description: "Frontend User Interface"
-  - name: "SwaggerUI"
-    description: "Swagger User Interface"
-paths:      
-  "/ui/":
+    description: "Frontend User Interfaces"
+  - name: "Base"
+    description: "Base endpoints"
+paths:
+
+  "/crud/v1/{kind}":
     get:
       tags:
-        - "Frontend"
-      summary: "Frontend URL."
-      operationId: "getui"
+        - "CRUDv1"
+      summary: "Requesting a list of a specific kind, on the whole cluster."
+      operationId: "listAllKind"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
       responses:
         '200':
-          description: "Successfully viewing the Frontend."
+          description: "Successfully receive a list of the requested kind."
           
-  "/swagger/":
-    get:
-      tags:
-        - "SwaggerUI"
-      summary: "SwaggerUI URL."
-      operationId: "getswaggerui"
-      responses:
-        '200':
-          description: "Successfully viewing the SwaggerUI. Literally the Page you are seeing right now."
- 
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+        
+
+
   "/crud":
-    get:
-      tags:
-        - "CRUD"
-      summary: "Endpoint for the Configs in the SQLite3 DataBase."
-      operationId: "read"
-      parameters: 
-      - name: "uid"
-        description: "Contains uid of the requested uid:value pair."
-        in: "query"
-        schema:
-          type: "string"
-        required: false
-      responses:
-        '200':
-          description: "Successfully received the requested object/s."
-          content:
-            text/plain:
-              schema:
-                type: "string"
-                example: "CRUDAPI"
     post:
       tags:
         - "CRUD"
@@ -112,4 +93,72 @@ paths:
               schema:
                 type: "string"
                 example: "CRUDAPI"
-  
+
+  "/ui/":
+    get:
+      tags:
+        - "Frontend"
+      summary: "Frontend URL."
+      operationId: "getui"
+      responses:
+        '200':
+          description: "Successfully viewing the Frontend."
+
+  "/swagger/":
+    get:
+      tags:
+        - "Frontend"
+      summary: "SwaggerUI URL."
+      operationId: "getswaggerui"
+      responses:
+        '200':
+          description: "Successfully viewing the SwaggerUI. Literally the Page you are seeing right now."
+ 
+  "/license":
+    get:
+      tags:
+        - "Base"
+      summary: "Projects License"
+      operationId: "getLicense"
+      responses:
+        '200':
+          description: "Successfully receiving the license."
+              
+  "/version":
+    get:
+      tags:
+        - "Base"
+      summary: "Projects current Version"
+      operationId: "getVersion"
+      responses:
+        '200':
+          description: "Successfully receiving the current runtime version."
+          
+components: 
+  securitySchemes:
+    basicAuth:
+      type: "http"
+      scheme: "basic"
+  responses:
+    StatusUnauthorized:
+      description: "Unauthorized access to the endpoint."
+  parameters:
+    KIND:
+      name: "kind"
+      description: "The kind of the object, you want to receive a list of."
+      in: "path"
+      required: true
+      schema: 
+        type: "string"
+        enum:
+        - "vrdbconfigs"
+        - "vrdbsecrets"
+            
+            
+            
+            
+            
+            
+            
+            
+            

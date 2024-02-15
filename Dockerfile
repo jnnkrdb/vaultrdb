@@ -44,7 +44,7 @@ ENV VAULTRDB_SERVICENAME=""
 ENV BASICAUTH_USER="vault"
 ENV BASICAUTH_PASS="vault"
 ENV ENABLE_SWAGGERUI="false"
-ENV FQDN="vaultrdb.kubernetes.docker.internal"
+ENV BASE_URL="http://localhost:80/"
 ENV _TEMPDIR="/vaultrdb/temp"
 ENV _DEBUG=""
 # set the entrypoints

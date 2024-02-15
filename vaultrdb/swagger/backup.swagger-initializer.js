@@ -14,12 +14,6 @@ window.onload = function() {
       SwaggerUIBundle.plugins.DownloadUrl
     ],
     layout: "StandaloneLayout"
-    //requestInterceptor: (req) => {
-    //  if (!req.loadSpec) {
-    //    req.headers.Authorization = "Basic "+btoa("vault:vault");
-    //  }
-    //  return req;
-    //}
   });
 
   //</editor-fold>
