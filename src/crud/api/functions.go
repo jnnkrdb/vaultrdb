@@ -59,14 +59,14 @@ func Start(c client.Client) {
 	config.CrudLog.Info("added health startup check to http server", "uri", "http://localhost:9080/crud/alive")
 
 	// generic functions listing
-	RESTSRV.Handle("/crud/v1/{kind}", mw.ThenFunc(v1.LIST_ALL)).Methods("GET")
-	RESTSRV.Handle("/crud/v1/{kind}/{namespace}", mw.ThenFunc(v1.LIST_NAMESPACE)).Methods("GET")
+	RESTSRV.Handle("/crud/v1/{kind}", mw.ThenFunc(v1.LIST_ALL)).Methods("GET", "OPTIONS")
+	RESTSRV.Handle("/crud/v1/{kind}/{namespace}", mw.ThenFunc(v1.LIST_NAMESPACE)).Methods("GET", "OPTIONS")
 
 	// generic functions for one object
-	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.READ)).Methods("GET")
-	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.CREATE)).Methods("POST")
-	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.UPDATE)).Methods("PUT", "PATCH")
-	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.DELETE)).Methods("DELETE")
+	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.READ)).Methods("GET", "OPTIONS")
+	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.CREATE)).Methods("POST", "OPTIONS")
+	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.UPDATE)).Methods("PUT", "PATCH", "OPTIONS")
+	RESTSRV.Handle("/crud/v1/{kind}/{namespace}/{name}", mw.ThenFunc(v1.DELETE)).Methods("DELETE", "OPTIONS")
 
 	// start the rest api in another go routine
 	go func() {
