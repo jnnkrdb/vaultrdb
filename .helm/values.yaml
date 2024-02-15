@@ -1,5 +1,0 @@
-enabled: true
-namespace: vaultrdb
-tag: "latest"
-swaggerui: true
-debug: false

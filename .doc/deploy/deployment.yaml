@@ -1,11 +1,8 @@
-{{- if .Values.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vaultrdb
-  namespace: {{ .Values.namespace }}
-  labels:
-    {{- include "helmbase.labels" . | nindent 4 }}
+  namespace: vaultrdb
 spec:
   selector:
     matchLabels:
@@ -22,7 +19,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: vaultrdb
-        image: ghcr.io/jnnkrdb/vaultrdb:{{ .Values.tag | default .Chart.AppVersion }}"
+        image: ghcr.io/jnnkrdb/vaultrdb:latest
         imagePullPolicy: 'Always'
         ports:
           - containerPort: 9080 
@@ -35,9 +32,9 @@ spec:
         - name: VAULTRDB_SERVICENAME
           value: "vaultrdb"
         - name: ENABLE_SWAGGERUI
-          value: {{ .Values.swaggerui | quote }}
+          value: "true"
         - name: _DEBUG
-          value: {{ .Values.debug | quote }}
+          value: "false"
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -71,4 +68,3 @@ spec:
             memory: 64Mi
       serviceAccountName: vaultrdb-sa
       terminationGracePeriodSeconds: 10
-{{- end }}

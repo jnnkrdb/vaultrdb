@@ -70,25 +70,3 @@ jobs:
           ghcr.io/jnnkrdb/vaultrdb:latest
         # build on feature branches, push only on main branch
         push: true
-    
-    - name: Install helm
-      uses: Azure/setup-helm@v1
-      with:
-        version: 3.5.0
-    
-    - name: Login to GHCR using Helm
-      run: |
-        echo ${{ secrets.GHP_TOKEN }} | helm registry login ghcr.io/${{ github.repository_owner }}/vaultrdb --username ${{ github.actor }} --password-stdin
-
-    - name: Lint the Helm Chart
-      run: |
-        helm lint --debug ${{ github.workspace }}/.helm
-
-    - name: Save Helm Chart to local registry
-      run: |
-        helm chart save ${{ github.workspace }}/.helm/ ghcr.io/${{ github.repository_owner }}/vaultrdb:${{ steps.gitversion.outputs.semVer }}
-
-    - name: Publish Chart to GHCR
-      if: github.event_name != 'pull_request'
-      run: |
-        helm chart push ghcr.io/${{ github.repository_owner }}/vaultrdb:${{ steps.gitversion.outputs.semVer }}
