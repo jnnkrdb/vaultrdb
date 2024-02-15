@@ -1,11 +1,8 @@
-{{- if .Values.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: vaultrdb-crb
-  namespace: {{ .Values.namespace }}
-  labels:
-    {{- include "helmbase.labels" . | nindent 4 }}
+  namespace: vaultrdb
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -13,5 +10,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vaultrdb-sa
-  namespace: {{ .Values.namespace }}
-{{- end }}
+  namespace: vaultrdb
