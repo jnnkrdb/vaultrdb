@@ -18,6 +18,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -130,13 +131,28 @@ func Finalize(ctx context.Context, c client.Client, obj client.Object) (ctrl.Res
 
 		switch obj.GetObjectKind().GroupVersionKind().Kind {
 		case "VRDBConfig":
-			return findAndRemove(&v1.ConfigMap{}, &obj.(*VRDBConfig).Status)
+			if _, ok := obj.(*VRDBConfig); !ok {
+				_log.Error(fmt.Errorf("error parsing object"), "couldn't parse object into VRDBConfig")
+				return ctrl.Result{}, false, nil
+			} else {
+				return findAndRemove(&v1.ConfigMap{}, &obj.(*VRDBConfig).Status)
+			}
 
 		case "VRDBSecret":
-			return findAndRemove(&v1.Secret{}, &obj.(*VRDBSecret).Status)
+			if _, ok := obj.(*VRDBSecret); !ok {
+				_log.Error(fmt.Errorf("error parsing object"), "couldn't parse object into VRDBConfig")
+				return ctrl.Result{}, false, nil
+			} else {
+				return findAndRemove(&v1.ConfigMap{}, &obj.(*VRDBSecret).Status)
+			}
 
 		case "VRDBRequest":
-			return findAndRemove(&v1.Secret{}, &obj.(*VRDBRequest).Status)
+			if _, ok := obj.(*VRDBRequest); !ok {
+				_log.Error(fmt.Errorf("error parsing object"), "couldn't parse object into VRDBConfig")
+				return ctrl.Result{}, false, nil
+			} else {
+				return findAndRemove(&v1.ConfigMap{}, &obj.(*VRDBRequest).Status)
+			}
 		}
 	}
 

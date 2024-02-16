@@ -34,65 +34,168 @@ paths:
       responses:
         '200':
           description: "Successfully receive a list of the requested kind."
-          
         '401':
           $ref: '#/components/responses/StatusUnauthorized'
         
-
-
-  "/crud":
-    post:
+  "/crud/v1/{kind}/{namespace}":
+    get:
       tags:
-        - "CRUD"
-      summary: "Endpoint for the Configs in the SQLite3 DataBase."
-      operationId: "create"
+        - "CRUDv1"
+      summary: "Requesting a list of a specific kind, on the whole cluster."
+      operationId: "listAllKindNamespaced"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
+      - $ref: '#/components/parameters/NAMESPACE'
       responses:
         '200':
-          description: "Successfully created the requested object."
+          description: "Successfully receive a list of the requested kind, from a specific namespace."
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+
+  "/crud/v1/{kind}/{namespace}/{name}":
+    get:
+      tags:
+        - "CRUDv1"
+      summary: "Requesting a list of a specific kind, on the whole cluster."
+      operationId: "getKindNamespaced"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
+      - $ref: '#/components/parameters/NAMESPACE'
+      - $ref: '#/components/parameters/NAME'
+      responses:
+        '200':
+          description: "Successfully receive an object, of the requested kind, in the requested namespace:"
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+        '404':
+          $ref: '#/components/responses/StatusUnauthorized'
+          
+    post: 
+      tags:
+        - "CRUDv1"
+      summary: "Publish a new object to the cluster, in the specified namespace."
+      operationId: "postKindNamespaced"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
+      - $ref: '#/components/parameters/NAMESPACE'
+      - $ref: '#/components/parameters/NAME'
+      requestBody:
+        description: "The body contains the data, which will be send to the cluster."
+        required: true
+        content:
+          application/json:
+            schema:
+              anyOf: 
+                - $ref: '#/components/schemas/VRDBSecret'
+                - $ref: '#/components/schemas/VRDBConfig'
+      responses:
+        '200':
+          description: "Successfully integrated an object, of the requested kind, in the requested namespace, into the cluster."
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
-                example: "CRUDAPI"
+                anyOf: 
+                  - $ref: '#/components/schemas/VRDBSecret'
+                  - $ref: '#/components/schemas/VRDBConfig'
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+        '501':
+          $ref: '#/components/responses/StatusNotImplemented'
+          
     put:
       tags:
-        - "CRUD"
-      summary: "Endpoint for the Configs in the SQLite3 DataBase."
-      operationId: "update_put"
+        - "CRUDv1"
+      summary: "Update an existing object in the cluster, in the specified namespace."
+      operationId: "putKindNamespaced"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
+      - $ref: '#/components/parameters/NAMESPACE'
+      - $ref: '#/components/parameters/NAME'
+      requestBody:
+        description: "The body contains the data, which will be send to the cluster."
+        required: true
+        content:
+          application/json:
+            schema:
+              anyOf: 
+                - $ref: '#/components/schemas/VRDBSecret'
+                - $ref: '#/components/schemas/VRDBConfig'
       responses:
         '200':
-          description: "Successfully updated the requested object."
+          description: "Successfully integrated an object, of the requested kind, in the requested namespace, into the cluster."
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
-                example: "CRUDAPI"
+                anyOf: 
+                  - $ref: '#/components/schemas/VRDBSecret'
+                  - $ref: '#/components/schemas/VRDBConfig'
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+        '501':
+          $ref: '#/components/responses/StatusNotImplemented'
+                
+                
+                
     patch:
       tags:
-        - "CRUD"
-      summary: "Endpoint for the Configs in the SQLite3 DataBase."
-      operationId: "update_patch"
+        - "CRUDv1"
+      summary: "Update an existing object in the cluster, in the specified namespace."
+      operationId: "patchKindNamespaced"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
+      - $ref: '#/components/parameters/NAMESPACE'
+      - $ref: '#/components/parameters/NAME'
+      requestBody:
+        description: "The body contains the data, which will be send to the cluster."
+        required: true
+        content:
+          application/json:
+            schema:
+              anyOf: 
+                - $ref: '#/components/schemas/VRDBSecret'
+                - $ref: '#/components/schemas/VRDBConfig'
       responses:
         '200':
-          description: "Successfully updated the requested object."
+          description: "Successfully integrated an object, of the requested kind, in the requested namespace, into the cluster."
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
-                example: "CRUDAPI"
+                anyOf: 
+                  - $ref: '#/components/schemas/VRDBSecret'
+                  - $ref: '#/components/schemas/VRDBConfig'
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+        '501':
+          $ref: '#/components/responses/StatusNotImplemented'
+    
     delete:
       tags:
-        - "CRUD"
-      summary: "Endpoint for the Configs in the SQLite3 DataBase."
-      operationId: "delete"
+        - "CRUDv1"
+      summary: "Delete an existing object from the cluster, in the specified namespace."
+      operationId: "deleteKindNamespaced"
+      security:
+        - basicAuth: []
+      parameters:
+      - $ref: '#/components/parameters/KIND'
+      - $ref: '#/components/parameters/NAMESPACE'
+      - $ref: '#/components/parameters/NAME'
       responses:
         '200':
-          description: "Successfully deleted the requested object."
-          content:
-            text/plain:
-              schema:
-                type: "string"
-                example: "CRUDAPI"
+          description: "Successfully remoed an object, of the requested kind, in the requested namespace, from the cluster."
+        '401':
+          $ref: '#/components/responses/StatusUnauthorized'
+        '501':
+          $ref: '#/components/responses/StatusNotImplemented'
 
   "/ui/":
     get:
@@ -139,10 +242,16 @@ components:
     basicAuth:
       type: "http"
       scheme: "basic"
-  responses:
+  responses: # ------------------------------------------------------------------------------ responses
     StatusUnauthorized:
       description: "Unauthorized access to the endpoint."
-  parameters:
+    StatusNotFound:
+      description: "The requested object was not found"
+    StatusInternalServerError:
+      description: "The request could not be completed, something occured internally."
+    StatusNotImplemented:
+      description: "The Method is currently not implemented."
+  parameters: # ------------------------------------------------------------------------------ parameters
     KIND:
       name: "kind"
       description: "The kind of the object, you want to receive a list of."
@@ -153,7 +262,124 @@ components:
         enum:
         - "vrdbconfigs"
         - "vrdbsecrets"
-            
+    NAMESPACE:
+      name: "namespace"
+      description: "The namespace, in which you expect the object to be, or want to have."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+    NAME:
+      name: "name"
+      description: "The name of the object you want to receive information about, create, update or delete."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+  schemas: # ------------------------------------------------------------------------------ schemas
+    VRDBConfig:
+      title: "A possible json, for a VRDBConfig."
+      type: "object"
+      required:
+        - "kind"
+        - "apiVersion"
+        - "metadata"
+        - "namespaceSelector"
+        - "data"
+      properties: 
+        apiVersion: 
+          $ref: '#/components/schemas/ApiVersion'
+        kind: 
+          type: "string"
+          default: "VRDBConfig"
+        metadata:
+          $ref: '#/components/schemas/MetaData'
+        namespaceSelector:
+          $ref: '#/components/schemas/NamespaceSelector'
+        data:
+          $ref: '#/components/schemas/StringData'
+          
+          
+    VRDBSecret:
+      title: "A possible json, for a VRDBSecret."
+      type: "object"
+      required:
+        - "kind"
+        - "apiVersion"
+        - "metadata"
+        - "namespaceSelector"
+        - "type"
+      properties: 
+        apiVersion: 
+          $ref: '#/components/schemas/ApiVersion'
+        kind: 
+          type: "string"
+          default: "VRDBSecret"
+        metadata:
+          $ref: '#/components/schemas/MetaData'
+        namespaceSelector:
+          $ref: '#/components/schemas/NamespaceSelector'
+        data:
+          $ref: '#/components/schemas/Data'
+        stringData:
+          $ref: '#/components/schemas/StringData'
+        type: 
+          type: "string"
+    
+    # -----------------------
+    ApiVersion:
+      type: "string"
+      default: "jnnkrdb.de/v1"
+      
+    MetaData:
+      title: "MetaData of the object."
+      type: "object"
+      required:
+        - "name"
+        - "namespace"
+      properties:
+        name: 
+          type: "string"
+        namespace: 
+          type: "string"
+        annotations:
+          type: "object"
+          additionalProperties:
+            type: "string"
+        labels:
+          type: "object"
+          additionalProperties:
+            type: "string"
+          
+    NamespaceSelector:
+      title: "The namespace selector field."
+      type: "object"
+      required:
+        - "rx.avoid"
+        - "rx.match"
+      properties:
+        rx.avoid:
+          type: "array"
+          items: 
+            type: "string"
+        rx.match:
+          type: "array"
+          items: 
+            type: "string"
+    
+    Data:
+      title: "Contains the Data of the object as base64encoded byte-arrays."
+      type: "object"
+      additionalProperties:
+        type: "string"
+        format: "byte"
+    
+    StringData:
+      title: "Contains the Data of the object as raw strings."
+      type: "object"
+      additionalProperties:
+        type: "string"
+        
             
             
             
