@@ -19,7 +19,6 @@ package controllers
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -41,19 +40,15 @@ type VRDBConfigReconciler struct {
 //+kubebuilder:rbac:groups=jnnkrdb.de,resources=vrdbconfigs/finalizers,verbs=update
 
 func (r *VRDBConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	var _log = log.FromContext(ctx).WithName("vrdbconfig reconciler").WithValues("namespace", req.Namespace, "name", req.Name)
+	var _log = log.FromContext(ctx).WithName("vrdbconfig")
 	ctx = log.IntoContext(ctx, _log)
 	ctx = context.WithValue(ctx, types.NamespacedName{}, req.NamespacedName)
 
 	var vrdbconfig = &jnnkrdbdev1.VRDBConfig{}
 
 	// checking the requested object
-	if err := r.Get(ctx, req.NamespacedName, vrdbconfig, &client.GetOptions{}); err != nil {
-		if errors.IsNotFound(err) {
-			return ctrl.Result{}, nil
-		}
-		_log.Error(err, "error reconciling vrdbconfig")
-		return ctrl.Result{}, err
+	if res, err := jnnkrdbdev1.GetObjectFromCluster(ctx, r.Client, req, vrdbconfig, &client.GetOptions{}); err != nil {
+		return res, err
 	}
 
 	// check finalization

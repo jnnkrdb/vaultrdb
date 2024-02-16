@@ -58,37 +58,19 @@ func (nselect VRDBNamespaceSelector) Validate() error {
 
 // calculates two collections of namespaces, which should weither be avoided
 // or provided with the requested object
-func (namespaceSelector VRDBNamespaceSelector) CalculateCollections(ctx context.Context, c client.Client) ([]string, []string, error) {
+func (namespaceSelector VRDBNamespaceSelector) CalculateCollections(ctx context.Context, c client.Client) (avoids []string, matches []string, err error) {
 
 	var (
 		_log          = log.FromContext(ctx).WithValues("avoid", namespaceSelector.Avoid, "match", namespaceSelector.Match)
 		allNamespaces = &v1.NamespaceList{}
-		avoids        []string
-		matches       []string
 	)
 
 	_log.Info("calculating namespaces with privided namespace regex lists")
 
 	// request a list of all accessable namespaces, to calculate the matching regex from
-	if err := c.List(ctx, allNamespaces, &client.ListOptions{}); err != nil {
+	if err = c.List(ctx, allNamespaces, &client.ListOptions{}); err != nil {
 		_log.Error(err, "error requesting list of namespaces")
-		return nil, nil, err
-	}
-
-	// create the compare function
-	listContains := func(ns string, list []string, defaultIfError bool) bool {
-		for i := range list {
-			matched, err := regexp.MatchString(list[i], ns)
-			if err != nil {
-				_log.Error(err, "error comparing list of regexes with namespace", "namespace", ns, "regexp", list[i], "defaultIfError", defaultIfError)
-				return defaultIfError
-			}
-			if matched {
-				return true
-			}
-		}
-
-		return false
+		return
 	}
 
 	// parse through every namespace and compare the namespace
@@ -102,12 +84,12 @@ func (namespaceSelector VRDBNamespaceSelector) CalculateCollections(ctx context.
 	// the namespace will still be added to the avoids
 	for _, ns := range allNamespaces.Items {
 
-		if listContains(ns.Name, namespaceSelector.Avoid, true) {
+		if regexListContainsItem(ctx, ns.Name, namespaceSelector.Avoid, true) {
 			avoids = append(avoids, ns.Name)
 			continue
 		}
 
-		if listContains(ns.Name, namespaceSelector.Match, false) {
+		if regexListContainsItem(ctx, ns.Name, namespaceSelector.Match, false) {
 			matches = append(matches, ns.Name)
 			continue
 		}
@@ -115,5 +97,37 @@ func (namespaceSelector VRDBNamespaceSelector) CalculateCollections(ctx context.
 		avoids = append(avoids, ns.Name)
 	}
 
-	return avoids, matches, nil
+	return
+}
+
+// the actual filter function
+//
+// parses through the given list and returns true, if the
+// list contains a regex, which matches with the given namespace
+//
+// if an error occurs, it logs the error and returns the specifie
+// default return value
+func regexListContainsItem(ctx context.Context, namespace string, regexpList []string, defaultIfError bool) bool {
+	var _log = log.FromContext(ctx).WithValues("checkedNamespace", namespace, "defaultResponseIfError", defaultIfError)
+
+	// parse through the list of regexes and compile them, then
+	// check for matchings with the given namespace
+	for _, regExpression := range regexpList {
+
+		// if an error occurs, thats most likely, to a not compilable regexp
+		// even though they were checked, before creation
+		match, err := regexp.MatchString(regExpression, namespace)
+		if err != nil {
+			_log.Error(err, "error checking the namespace with the given regex, returning default response", "regex", regExpression)
+			return defaultIfError
+		}
+
+		// if the regexpression matches, the function will response with true
+		if match {
+			return true
+		}
+	}
+
+	// no regex from the list, does match the given namespace
+	return false
 }

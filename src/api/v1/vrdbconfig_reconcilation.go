@@ -35,7 +35,7 @@ func (v *VRDBConfig) Reconcile(ctx context.Context, c client.Client) (ctrl.Resul
 	_log.Info("reconciling vrdbconfig")
 
 	// calculate the neccessary namespace collections
-	toMatch, toAvoid, err := v.NamespaceSelector.CalculateCollections(ctx, c)
+	toAvoid, toMatch, err := v.NamespaceSelector.CalculateCollections(ctx, c)
 	if err != nil {
 		_log.Error(err, "error calculating the namespace collections")
 		return ctrl.Result{RequeueAfter: 5 * time.Minute}, err

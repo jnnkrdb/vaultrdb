@@ -18,10 +18,10 @@ package controllers
 
 import (
 	"context"
+	"time"
 
 	jnnkrdbdev1 "github.com/jnnkrdb/vaultrdb/api/v1"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -37,16 +37,13 @@ type NamespaceReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;
 
 func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	var _log = log.FromContext(ctx).WithName("namespace").WithValues("namespace", req.NamespacedName)
+	var _log = log.FromContext(ctx).WithName("namespace")
 	ctx = log.IntoContext(ctx, _log)
 	var namespace = &v1.Namespace{}
 
-	if err := r.Get(ctx, req.NamespacedName, namespace, &client.GetOptions{}); err != nil {
-		if errors.IsNotFound(err) {
-			return ctrl.Result{}, nil
-		}
-		_log.Error(err, "error reconciling vrdb types")
-		return ctrl.Result{}, err
+	// checking the requested object
+	if res, err := jnnkrdbdev1.GetObjectFromCluster(ctx, r.Client, req, namespace, &client.GetOptions{}); err != nil {
+		return res, err
 	}
 
 	_log.Info("namespace changed")
@@ -57,7 +54,9 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	} else {
 		for _, item := range vrdbconfigs.Items {
-			return item.Reconcile(ctx, r.Client)
+			if _, err := item.Reconcile(ctx, r.Client); err != nil {
+				return ctrl.Result{RequeueAfter: time.Minute}, err
+			}
 		}
 	}
 
@@ -67,7 +66,9 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	} else {
 		for _, item := range vrdbsecrets.Items {
-			return item.Reconcile(ctx, r.Client)
+			if _, err := item.Reconcile(ctx, r.Client); err != nil {
+				return ctrl.Result{RequeueAfter: time.Minute}, err
+			}
 		}
 	}
 
