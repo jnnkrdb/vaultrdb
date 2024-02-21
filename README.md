@@ -12,3 +12,4 @@ If you don't have an own certificate, you can create one with the following comm
 openssl req -nodes -new -x509 -keyout ca.key -out ca.crt -subj "/CN=Webhook Certification for VaultRDB"
 echo "$(openssl base64 -A <"ca.crt")"
 ```
+The `ca.crt` and `ca.key`, which are mounted into the container will be used to create the container webhook certificate. For more information see the `/vaultrdb/entrypoint.sh`-script.
