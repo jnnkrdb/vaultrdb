@@ -25,29 +25,18 @@ WORKDIR /
 # install neccessary binaries
 RUN apk add openssl
 # Create the main vaultrdb working direct
-RUN mkdir -p /vaultrdb
+RUN mkdir -p /opt/vaultrdb
 # Copy the VaultRDB Directory
-COPY vaultrdb/ /vaultrdb/
-COPY LICENSE /vaultrdb/LICENSE
-# create other needed libraries
-RUN mkdir /vaultrdb/temp
+COPY vaultrdb/ /opt/vaultrdb/
+COPY LICENSE /opt/vaultrdb/config/LICENSE
 # Copy Operators Binary
 COPY --from=builder /vaultrdb /usr/local/bin/vaultrdb
-RUN chmod a+x /usr/local/bin/vaultrdb
-RUN chmod a+x -R /vaultrdb
-# set the user and run the operator binaries
-RUN chown 65532:65532 /usr/local/bin/vaultrdb
-RUN chown 65532:65532 -R /vaultrdb
-# configure default env variables
-ENV SLEEP_BEFORE_SERVICE_START="0"
-ENV VAULTRDB_SERVICENAME=""
-ENV BASICAUTH_USER="vault"
-ENV BASICAUTH_PASS="vault"
-ENV ENABLE_SWAGGERUI="false"
-ENV BASE_URL="http://localhost:80/"
-ENV _TEMPDIR="/vaultrdb/temp"
-ENV _DEBUG=""
+# Set the user for the config and the operator binaries
+RUN chmod a+x /usr/local/bin/vaultrdb &&\
+    chmod a+x -R /opt/vaultrdb &&\
+    chown 65532:65532 /usr/local/bin/vaultrdb &&\
+    chown 65532:65532 -R /opt/vaultrdb
 # set the entrypoints
 USER 65532:65532
-ENTRYPOINT ["/vaultrdb/entrypoint.sh"]
+ENTRYPOINT ["/opt/vaultrdb/entrypoint.sh"]
 CMD [ "vaultrdb" ]

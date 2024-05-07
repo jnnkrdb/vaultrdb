@@ -34,7 +34,7 @@ jobs:
 
     - name: bash-version
       run: |
-        echo ${{ steps.gitversion.outputs.semVer }} > ./vaultrdb/VERSION
+        echo ${{ steps.gitversion.outputs.semVer }} > ./vaultrdb/config/VERSION
 
     - name: Set up Docker Buildx
       id: buildx

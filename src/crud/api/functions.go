@@ -9,6 +9,7 @@ import (
 	v1 "github.com/jnnkrdb/vaultrdb/crud/api/v1"
 	"github.com/jnnkrdb/vaultrdb/crud/config"
 	"github.com/jnnkrdb/vaultrdb/crud/middlewares"
+	"github.com/jnnkrdb/vaultrdb/vaultrdb"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,28 +35,34 @@ func Start(c client.Client) {
 
 	// adding swagger ui to mux router
 	// if environment variable is configured
-	if val, ok := os.LookupEnv("ENABLE_SWAGGERUI"); ok && val == "true" {
-		RESTSRV.PathPrefix("/swagger/").Handler(DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/vaultrdb/swagger")))))
+	if val, ok := os.LookupEnv("VRDB_ENABLE_SWAGGER"); ok && val == "true" {
+		RESTSRV.PathPrefix("/swagger/").Handler(DefaultMW.Then(http.StripPrefix("/swagger/", http.FileServer(http.Dir(vaultrdb.RootDir("/web/swagger"))))))
 		config.CrudLog.Info("enabled swagger ui", "uri", "http://localhost:9080/swagger/")
 	}
 
 	// serving the license of the container image
-	RESTSRV.Handle("/license", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "/vaultrdb/LICENSE") }))
+	RESTSRV.Handle("/license", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, vaultrdb.RootDir("/config/LICENSE"))
+	}))
 	config.CrudLog.Info("added license to http server", "uri", "http://localhost:9080/license")
 
 	// serving the version of the container image
-	RESTSRV.Handle("/version", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "/vaultrdb/VERSION") }))
+	RESTSRV.Handle("/version", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, vaultrdb.RootDir("/config/VERSION"))
+	}))
 	config.CrudLog.Info("added version to http server", "uri", "http://localhost:9080/version")
 
 	// serving the ui for the frontend
-	RESTSRV.PathPrefix("/ui/").Handler(DefaultMW.Then(http.StripPrefix("/ui/", http.FileServer(http.Dir("/vaultrdb/ui")))))
+	RESTSRV.PathPrefix("/ui/").Handler(DefaultMW.Then(http.StripPrefix("/ui/", http.FileServer(http.Dir(vaultrdb.RootDir("/web/ui"))))))
 	config.CrudLog.Info("activated frontend ui", "uri", "localhost:9080/ui/")
 
 	// append basic auth handler to middlewares
 	var mw = DefaultMW.Append(middlewares.BasicAuth)
 
 	// serving the license of the container image
-	RESTSRV.Handle("/crud/alive", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("OK")) }))
+	RESTSRV.Handle("/crud/alive", DefaultMW.ThenFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("OK"))
+	}))
 	config.CrudLog.Info("added health startup check to http server", "uri", "http://localhost:9080/crud/alive")
 
 	// generic functions listing
