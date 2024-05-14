@@ -3,7 +3,7 @@
 FROM golang:1.21.1 as builder
 WORKDIR /workspace
 # copy the code files
-COPY src/ /workspace/
+COPY operator/src/ /workspace/
 # set env vars
 ENV CGO_ENABLED=0
 ENV GOARCH=amd64
