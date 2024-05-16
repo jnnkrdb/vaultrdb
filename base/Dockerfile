@@ -7,7 +7,7 @@ FROM alpine:3.19
 
 WORKDIR /
 # install neccessary binaries
-RUN apk add openssl
+RUN apk add --no-cache --update openssl
 # Create the main vaultrdb working direct
 RUN mkdir -p /opt/vaultrdb &&\
     mkdir -p /opt/vaultrdb/config &&\
@@ -19,5 +19,6 @@ RUN mkdir -p /opt/vaultrdb &&\
 # Copy the VaultRDB Directory
 COPY vaultrdb/config/ /opt/vaultrdb/config/
 COPY vaultrdb/entrypoint.d/ /opt/vaultrdb/entrypoint.d/
+COPY vaultrdb/entrypoint.sh /opt/vaultrdb/entrypoint.sh
 # Set the Entrypoint Script
 ENTRYPOINT ["/opt/vaultrdb/entrypoint.sh"]

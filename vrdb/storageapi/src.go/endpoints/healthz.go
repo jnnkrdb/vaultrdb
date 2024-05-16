@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"net/http"
-	"vrdb-uiserver/server"
+	"vrdb-storage/server"
 
 	"github.com/gorilla/mux"
 	"vrdb.go/logging"

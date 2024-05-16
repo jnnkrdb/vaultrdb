@@ -1,9 +1,11 @@
 # ----------------------------------------------- 
 # Building the go binary
-FROM golang:1.21.1 as builder
-WORKDIR /workspace
+FROM golang:1.21-alpine as builder
+RUN apk add --no-cache --update gcc g++
+WORKDIR /workspace/src.go
 # copy the code files
-COPY storageapi/src/ /workspace/
+COPY vrdb.go/ /vrdb.go/
+COPY storageapi/src.go/ /workspace/src.go/
 # set env vars
 ENV CGO_ENABLED=1
 ENV GOARCH=amd64
@@ -25,5 +27,6 @@ RUN chmod a+x /usr/local/bin/vaultrdb-storageapi &&\
     chown 65532:65532 -R /opt/vaultrdb
 # set the entrypoints
 USER 65532:65532
+EXPOSE 8080
 # set the entrypoints
 CMD [ "vaultrdb-storageapi" ]

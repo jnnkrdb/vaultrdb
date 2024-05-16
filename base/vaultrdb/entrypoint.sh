@@ -19,5 +19,7 @@ if [ -d "$VRDB_DIRECTORY_ROOT/entrypoint.d" ]; then
   -exec /bin/sh -c "{}" \;
 fi
 
-echo "$(date +"%Y-%m-%d - %H:%M:%S") | finished entrypoint, starting vaulrdb-bin"
+echo "###########################"
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | finished entrypoint, starting vaulrdb-bin: $@"
 
+exec $@

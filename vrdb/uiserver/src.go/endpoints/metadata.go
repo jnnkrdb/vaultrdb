@@ -27,14 +27,14 @@ func EnableEndpoint_Metadata(r *mux.Router) {
 		return
 	}
 
-	logging.Log.V(3).Info("creating metadata endpoint under relative path [/metadata]")
+	logging.Log.Info("creating metadata endpoint under relative path [/metadata]")
 
 	// enable the metadata endpoint for meta informations
 	r.Methods(http.MethodGet).Path("/metadata").Handler(server.DefaultMiddleware.ThenFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 
 			// create the pseudo struct
-			logging.Log.V(5).Info("creating pseudo struct for meta info")
+			logging.Log.Info("creating pseudo struct for meta info")
 
 			var result = struct {
 				Version struct {
@@ -49,7 +49,7 @@ func EnableEndpoint_Metadata(r *mux.Router) {
 			)
 
 			if b, err = os.ReadFile(VERSION_FILE); err != nil {
-				logging.Log.V(2).Error(err, "error reading bytes from file", "file", VERSION_FILE)
+				logging.Log.Error(err, "error reading bytes from file", "file", VERSION_FILE)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
@@ -59,7 +59,7 @@ func EnableEndpoint_Metadata(r *mux.Router) {
 
 			// get the license content of the project
 			if b, err = os.ReadFile(LICENSE_FILE); err != nil {
-				logging.Log.V(2).Error(err, "error reading bytes from file", "file", VERSION_FILE)
+				logging.Log.Error(err, "error reading bytes from file", "file", VERSION_FILE)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
@@ -69,7 +69,7 @@ func EnableEndpoint_Metadata(r *mux.Router) {
 
 			// parse the result object into json and ship
 			if err := json.NewEncoder(w).Encode(result); err != nil {
-				logging.Log.V(1).Error(err, "error parsing result into json", "result", result)
+				logging.Log.Error(err, "error parsing result into json", "result", result)
 			}
 		}))
 }

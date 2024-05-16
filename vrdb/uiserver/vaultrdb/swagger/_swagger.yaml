@@ -10,8 +10,7 @@ externalDocs:
 servers:
   - url: "/"
 #  - url: "http://localhost:9080/"
-#  - url: "https://{{BASE_URL}}/"
-#  - url: "https://iqars.amotiq.net:30443/vaultrdb"
+#  - url: "{{BASE_URL}}"
 tags:
   - name: "CRUDv1"
     description: "Crud API v1"

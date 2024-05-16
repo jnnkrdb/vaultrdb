@@ -13,9 +13,10 @@ func main() {
 
 	flag.BoolVar(&endpoints.ENABLE_SWAGGER, "swagger", false, "Enables the swagger ui.")
 	flag.StringVar(&endpoints.STORAGEAPISERVER, "storageapi-address", "localhost:8080", "Sets the address of the storage api, without the scheme. Port only if neccessary.")
-	flag.Parse()
 
 	logging.InitLogger("ui-server")
+
+	flag.Parse()
 
 	server.StartFrontendUI(
 		endpoints.EnableEndpoint_Metadata,

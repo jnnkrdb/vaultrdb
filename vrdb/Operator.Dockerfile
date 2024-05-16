@@ -1,9 +1,10 @@
 # ----------------------------------------------- 
 # Building the go binary
 FROM golang:1.21.1 as builder
-WORKDIR /workspace
+WORKDIR /workspace/src.go
 # copy the code files
-COPY operator/src/ /workspace/
+COPY vrdb.go/ /vrdb.go/
+COPY uiserver/src.go/ /workspace/src.go/
 # set env vars
 ENV CGO_ENABLED=0
 ENV GOARCH=amd64

@@ -20,11 +20,11 @@ const ENABLE_UI bool = true
 func EnableEndpoint_UI(r *mux.Router) {
 
 	// if swagger shouldn't be enabled, then skip the insertion of the endpoint
-	if !ENABLE_SWAGGER {
+	if !ENABLE_UI {
 		return
 	}
 
-	logging.Log.V(3).Info("creating ui endpoint under relative path [/ui/...]")
+	logging.Log.Info("creating ui endpoint under relative path [/ui/...]")
 
 	// enable the metadata endpoint for meta informations
 	r.Methods(http.MethodGet).PathPrefix("/ui/").Handler(

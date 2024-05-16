@@ -1,0 +1,10 @@
+package secrets
+
+import (
+	"net/http"
+)
+
+func List(w http.ResponseWriter, r *http.Request) {
+
+	w.Write([]byte("OK"))
+}

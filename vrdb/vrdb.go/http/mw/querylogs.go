@@ -13,10 +13,10 @@ func QueryLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		var start = time.Now()
-		logging.Log.V(5).WithValues("request-url", r.URL.String(), "method", r.Method).Info("received request")
+		logging.Log.WithValues("request-url", r.URL.String(), "method", r.Method).Info("received request")
 
 		next.ServeHTTP(w, r)
 
-		logging.Log.V(5).WithValues("request-url", r.URL.String(), "method", r.Method).Info("finished request", "timeSince", time.Since(start))
+		logging.Log.WithValues("request-url", r.URL.String(), "method", r.Method).Info("finished request", "timeSince", time.Since(start))
 	})
 }

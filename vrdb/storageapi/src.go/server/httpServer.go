@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"os"
 
-	"vrdb.go/http/mw"
-	"vrdb.go/logging"
-
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/gomw/middlewares"
+	"vrdb.go/http/mw"
+	"vrdb.go/logging"
 )
 
 // middleware used by the frontend http server
@@ -19,7 +18,7 @@ var DefaultMiddleware middlewares.MiddleWareChain
 const _PORT int = 80
 
 // starting the Server
-func StartFrontendUI(fnc ...func(*mux.Router)) {
+func StartStorageAPI(fnc ...func(*mux.Router)) {
 
 	// initializing the middleware for the http server
 	logging.Log.Info("setting up the default middleware for http requests")
@@ -47,7 +46,7 @@ func StartFrontendUI(fnc ...func(*mux.Router)) {
 		Handler: router,
 	}).ListenAndServe(); e != nil {
 
-		logging.Log.Error(e, "error keeping up http frontend server")
+		logging.Log.Error(e, "error keeping up http storage api server")
 
 		os.Exit(1)
 	}

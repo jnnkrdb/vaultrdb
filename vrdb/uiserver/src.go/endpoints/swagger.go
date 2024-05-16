@@ -24,7 +24,7 @@ func EnableEndpoint_SwaggerUI(r *mux.Router) {
 		return
 	}
 
-	logging.Log.V(3).Info("creating swagger endpoint under relative path [/swagger]")
+	logging.Log.Info("creating swagger endpoint under relative path [/swagger]")
 
 	// enable the metadata endpoint for meta informations
 	r.Methods(http.MethodGet).PathPrefix("/swagger/").Handler(

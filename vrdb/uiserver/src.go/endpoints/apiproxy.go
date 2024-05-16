@@ -13,11 +13,9 @@ import (
 const ENABLE_APIPROXY bool = true
 
 var (
-	STORAGEAPISERVER     string   = ""
-	_storageApiServerUrl *url.URL = &url.URL{
-		Scheme: "http",
-		Host:   STORAGEAPISERVER,
-	}
+	STORAGEAPISERVER string = ""
+
+	_storageApiServerUrl *url.URL
 )
 
 // enables the proxy endpoint for the api
@@ -30,7 +28,12 @@ func EnableEndpoint_ApiProxy(r *mux.Router) {
 		return
 	}
 
-	logging.Log.V(3).Info("creating proxy endpoint under relative path [/storageapi/...]", "url", *_storageApiServerUrl)
+	_storageApiServerUrl = &url.URL{
+		Scheme: "http",
+		Host:   STORAGEAPISERVER,
+	}
+
+	logging.Log.Info("creating proxy endpoint under relative path [/storageapi/...]", "url", *_storageApiServerUrl)
 
 	// enable the proxy endpoint for proxying to storage api server
 	r.Methods(
@@ -49,18 +52,18 @@ func EnableEndpoint_ApiProxy(r *mux.Router) {
 			r.URL = &url.URL{
 				Scheme:      _storageApiServerUrl.Scheme,
 				Host:        _storageApiServerUrl.Host,
-				Path:        "/" + mux.Vars(r)["storageapi"],
+				Path:        "/api/" + mux.Vars(r)["storageapi"],
 				RawPath:     _storageApiServerUrl.RawPath,
 				RawQuery:    _storageApiServerUrl.RawQuery,
 				Fragment:    _storageApiServerUrl.Fragment,
 				RawFragment: _storageApiServerUrl.RawFragment,
 			}
 
-			logging.Log.V(5).Info("new request url", "url", *r.URL)
+			logging.Log.Info("new request url", "url", *r.URL)
 
 			resp, err := http.DefaultTransport.RoundTrip(r)
 			if err != nil {
-				logging.Log.V(5).Error(err, "error proxying the request", "response", *resp)
+				logging.Log.Error(err, "error proxying the request")
 				http.Error(w, err.Error(), http.StatusServiceUnavailable)
 				return
 			}
@@ -80,7 +83,7 @@ func EnableEndpoint_ApiProxy(r *mux.Router) {
 
 			// Logging the progress
 			defer func() {
-				logging.Log.V(5).WithValues(
+				logging.Log.WithValues(
 					"request_body", r.Body,
 					"request_url", r.URL.String(),
 					"request_headers", r.Header,

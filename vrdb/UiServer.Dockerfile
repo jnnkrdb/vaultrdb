@@ -1,9 +1,10 @@
 # ----------------------------------------------- 
 # Building the go binary
 FROM golang:1.21.1 as builder
-WORKDIR /workspace
+WORKDIR /workspace/src.go
 # copy the code files
-COPY uiserver/src.go/ /workspace/
+COPY vrdb.go/ /vrdb.go/
+COPY uiserver/src.go/ /workspace/src.go/
 # set env vars
 ENV CGO_ENABLED=0
 ENV GOARCH=amd64
@@ -28,5 +29,6 @@ RUN chmod a+x /usr/local/bin/vaultrdb-ui &&\
     chown 65532:65532 -R /opt/vaultrdb
 # set the entrypoints
 USER 65532:65532
+EXPOSE 80
 # set the entrypoints
 CMD [ "vaultrdb-ui" ]

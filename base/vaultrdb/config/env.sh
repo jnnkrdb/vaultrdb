@@ -3,7 +3,7 @@
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | setting the environment variables"
 
 # --------------------------------------------------------------------------- directory sets
-export VRDB_DIRECTORY_ROOT        ="/opt/vaultrdb"
+export VRDB_DIRECTORY_ROOT="/opt/vaultrdb"
 
 # --------------------------------------------------------------------------- dns configs
 if [ ! -f "/var/run/secrets/kubernetes.io/serviceaccount/namespace" ]; then

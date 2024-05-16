@@ -6,10 +6,19 @@ set -e
 
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | preparing the swagger ui"
 
-swagger_dir="$VRDB_DIRECTORY_ROOT/web/swagger"
+swagger_dir="$VRDB_DIRECTORY_ROOT/swagger"
+
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | configs:"
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | -- swagger directory: $swagger_dir"
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | ----------- base url: $VRDB_BASE_URL"
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | ------------ version: $VRDB_VERSION"
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | ----- basicauth user: $BASICAUTH_USER"
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | ----- basicauth pass: $BASICAUTH_PASS"
 
 # replace the server address fqdn in the $swagger_dir/swagger.yaml for the swaggerui tests
-sed -i -e "s/{{BASE_URL}}/$VRDB_BASE_URL/g" $swagger_dir/swagger.yaml 
-sed -i -e "s/{{VERSION}}/$VRDB_VERSION/g" $swagger_dir/swagger.yaml 
-#sed -i -e "s/{{BASICAUTH_USER}}/${BASICAUTH_USER}/g" $swagger_dir/swagger-initializer.js 
-#sed -i -e "s/{{BASICAUTH_PASS}}/${BASICAUTH_PASS}/g" $swagger_dir/swagger-initializer.js
+#sed -i "s|{{BASE_URL}}|$VRDB_BASE_URL|g" $swagger_dir/_swagger.yaml 
+sed -i "s|{{VERSION}}|$VRDB_VERSION|g" $swagger_dir/_swagger.yaml 
+#sed -i -e "s|{{BASICAUTH_USER}}|$BASICAUTH_USER|g" $swagger_dir/swagger-initializer.js 
+#sed -i -e "s|{{BASICAUTH_PASS}}|$BASICAUTH_PASS|g" $swagger_dir/swagger-initializer.js
+ 
+echo "$(date +"%Y-%m-%d - %H:%M:%S") | swagger ui prepared"
