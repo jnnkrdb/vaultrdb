@@ -1,7 +1,7 @@
 # ----------------------------------------------- 
 # Building the go binary
 FROM golang:1.21-alpine as builder
-RUN apk add --no-cache --update gcc g++
+RUN apk add --no-cache --update gcc musl-dev
 WORKDIR /workspace/src.go
 # copy the code files
 COPY vrdb.go/ /vrdb.go/
@@ -12,7 +12,7 @@ ENV GOARCH=amd64
 ENV GOOS=linux
 # START BUILD
 RUN go mod download
-RUN go build -o /vaultrdb-storageapi .
+RUN go build -ldflags='-s -w -extldflags "-static"' -o /vaultrdb-storageapi .
 # ----------------------------------------------- 
 # Finish the operator, api, ui, storage build with the final image
 FROM vaultrdbbase:latest as final

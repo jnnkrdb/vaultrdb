@@ -3,13 +3,16 @@ package server
 import (
 	"os"
 
-	"gorm.io/driver/sqlite" // Sqlite driver based on CGO
+	// Sqlite driver based on CGO
 	"vrdb.go/logging"
 
-	// "github.com/glebarez/sqlite" // Pure go SQLite driver, checkout https://github.com/glebarez/sqlite for details
-	// github.com/mattn/go-sqlite3
+	// "github.com/mattn/go-sqlite3"
+	"github.com/glebarez/sqlite"
+	//"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+// "github.com/glebarez/sqlite" // Pure go SQLite driver, checkout https://github.com/glebarez/sqlite for details
 
 var Database *gorm.DB
 

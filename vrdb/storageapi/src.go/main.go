@@ -4,6 +4,7 @@ import (
 	"flag"
 	"vrdb-storage/endpoints"
 	v1 "vrdb-storage/endpoints/v1"
+	"vrdb-storage/objects"
 	"vrdb-storage/server"
 
 	"vrdb.go/logging"
@@ -16,6 +17,8 @@ func main() {
 	flag.Parse()
 
 	server.ConnectToDatabase()
+
+	objects.Migrate()
 
 	server.StartStorageAPI(
 		endpoints.EnableEndpoint_Healthz,
