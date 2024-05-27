@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vrdb-uiserver
+  namespace: vaultrdb
+spec:
+  selector:
+    matchLabels:
+      jnnkrdb.de/service: vrdb
+      jnnkrdb.de/type: uiserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        jnnkrdb.de/service: vrdb
+        jnnkrdb.de/type: uiserver
+    spec:
+      serviceAccountName: vrdb-default
+      containers:
+        - name: vaultrdb-uiserver
+          #image: ghcr.io/jnnkrdb/vaultrdb:uiserver-latest
+          image: uiserver:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - vaultrdb-ui
+          args: 
+            - --swagger
+            - --storageapi-address=vrdb-storageapi-0.vrdb-storageapi.vaultrdb:80
+          ports:
+            - containerPort: 80
+              name: http
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            timeoutSeconds: 3
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 16Mi

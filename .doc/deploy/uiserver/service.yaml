@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vrdb-uiserver
+  namespace: vaultrdb
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    jnnkrdb.de/service: vrdb
+    jnnkrdb.de/type: uiserver

@@ -41,6 +41,10 @@ func (kvs *KeyValueSet) BeforeCreate(tx *gorm.DB) (err error) {
 
 			err = fmt.Errorf("keyvalueset already exists")
 		}
+
+	} else {
+
+		err = result.Error
 	}
 
 	return

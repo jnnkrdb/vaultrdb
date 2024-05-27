@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: vaultrdb
+  name: vrdb-operator
   namespace: vaultrdb
 spec:
   ports:
@@ -14,4 +14,5 @@ spec:
       protocol: TCP
       targetPort: 9080
   selector:
-    jnnkrdb.de/service: vaultrdb
+    jnnkrdb.de/service: vrdb
+    jnnkrdb.de/type: ops
