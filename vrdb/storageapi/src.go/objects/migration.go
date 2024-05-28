@@ -19,7 +19,6 @@ func Migrate() {
 		// contains the items, which schould be migrated into the database
 		listOfObjects = []interface{}{
 			&KeyValueSet{},
-			&ServiceConfig{},
 		}
 	)
 

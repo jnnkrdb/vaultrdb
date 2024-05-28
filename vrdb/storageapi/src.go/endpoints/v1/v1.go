@@ -31,6 +31,6 @@ func EnableEndpoint_StorageAPI_V1(r *mux.Router) {
 	r.Path("/api/v1/kvs/{key}").Methods(http.MethodPut, http.MethodPatch).Handler(server.DefaultMiddleware.ThenFunc(KVS_Update))
 	r.Path("/api/v1/kvs/{key}").Methods(http.MethodDelete).Handler(server.DefaultMiddleware.ThenFunc(KVS_Remove))
 
-	// appending the serviceconfig routes
-	r.Path("/api/v1/serviceconfigs").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(SC_List))
+	// appending the helperfunctions routes
+	r.Path("/api/v1/f/decrypt/{key}").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(DecryptValue))
 }
