@@ -2,6 +2,9 @@ package v1
 
 import (
 	"net/http"
+	"vrdb-storage/endpoints/v1/fx"
+	"vrdb-storage/endpoints/v1/internaldb"
+	"vrdb-storage/endpoints/v1/kvs"
 	"vrdb-storage/server"
 
 	"github.com/gorilla/mux"
@@ -12,9 +15,8 @@ const ENABLE_STORAGEAPI_V1 bool = true
 
 // enables the endpoint for the storage api version 1
 //
-// routes
-//
-// - http://<host>:<port>/api/v1
+// Routes:
+//   - http://<host>:<port>/api/v1
 func EnableEndpoint_StorageAPI_V1(r *mux.Router) {
 
 	// if storageapiv1 shouldn't be enabled, then skip the insertion of the endpoint
@@ -25,12 +27,16 @@ func EnableEndpoint_StorageAPI_V1(r *mux.Router) {
 	logging.Log.Info("creating storageapi endpoints", "version", "v1")
 
 	// appending the default routes for keyvaluesets -> crud like
-	r.Path("/api/v1/kvs").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(KVS_List))
-	r.Path("/api/v1/kvs/{key}").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(KVS_Find))
-	r.Path("/api/v1/kvs").Methods(http.MethodPost).Handler(server.DefaultMiddleware.ThenFunc(KVS_Insert))
-	r.Path("/api/v1/kvs/{key}").Methods(http.MethodPut, http.MethodPatch).Handler(server.DefaultMiddleware.ThenFunc(KVS_Update))
-	r.Path("/api/v1/kvs/{key}").Methods(http.MethodDelete).Handler(server.DefaultMiddleware.ThenFunc(KVS_Remove))
+	r.Path("/api/v1/storedb/kvs").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(kvs.List))
+	r.Path("/api/v1/storedb/kvs/{key}").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(kvs.Find))
+	r.Path("/api/v1/storedb/kvs").Methods(http.MethodPost).Handler(server.DefaultMiddleware.ThenFunc(kvs.Insert))
+	r.Path("/api/v1/storedb/kvs/{key}").Methods(http.MethodPut, http.MethodPatch).Handler(server.DefaultMiddleware.ThenFunc(kvs.Update))
+	r.Path("/api/v1/storedb/kvs/{key}").Methods(http.MethodDelete).Handler(server.DefaultMiddleware.ThenFunc(kvs.Remove))
+
+	// list the contents of the internaldb
+	r.Path("/api/v1/internaldb/buckets").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(internaldb.List_Buckets))
+	r.Path("/api/v1/internaldb/buckets/{bucket}/keys").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(internaldb.List_Keys))
 
 	// appending the helperfunctions routes
-	r.Path("/api/v1/f/decrypt/{key}").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(DecryptValue))
+	r.Path("/api/v1/f/decrypt/{key}").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(fx.DecryptValue))
 }

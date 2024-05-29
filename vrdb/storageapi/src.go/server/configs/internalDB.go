@@ -25,7 +25,6 @@ func InitInternalDB() {
 
 	// open the database, or create one, if not exists
 	logging.Log.Info("opening internal.db")
-
 	if _db, err := bbolt.Open(internalDB, 0600, nil); err != nil {
 
 		logging.Log.Info("error opening internal.db", "err", err)
@@ -40,18 +39,13 @@ func InitInternalDB() {
 	// create the required buckets for initialization
 	DB.Update(func(tx *bbolt.Tx) error {
 
-		var buckets = []string{
-			BucketVault,
-			BucketWebhooks,
-		}
+		logging.Log.Info("creating buckets in internal.db if neccessary", "buckets", Buckets)
 
-		logging.Log.Info("creating buckets in internal.db if neccessary", "buckets", buckets)
+		for i := range Buckets {
 
-		for i := range buckets {
+			if _, err := tx.CreateBucketIfNotExists([]byte(Buckets[i])); err != nil {
 
-			if _, err := tx.CreateBucketIfNotExists([]byte(buckets[i])); err != nil {
-
-				logging.Log.Info("error creating bucket", "bucket", buckets[i], "err", err)
+				logging.Log.Info("error creating bucket", "bucket", Buckets[i], "err", err)
 				os.Exit(1)
 			}
 		}

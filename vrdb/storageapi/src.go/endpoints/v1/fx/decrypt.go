@@ -1,4 +1,4 @@
-package v1
+package fx
 
 import (
 	"net/http"
@@ -10,9 +10,8 @@ import (
 	"vrdb.go/logging"
 )
 
-// list all results of the kvs table
-//
-// parameters will be handled in the future
+// load the kvs from the storedb with the given key
+// and reteurn the decrypted value
 func DecryptValue(w http.ResponseWriter, r *http.Request) {
 
 	if key, ok := mux.Vars(r)["key"]; !ok {

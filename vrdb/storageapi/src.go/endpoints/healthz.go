@@ -17,11 +17,9 @@ const (
 
 // enables the endpoint for healthz
 //
-// routes
-//
-// - http://<host>:<port>/healthz/liveness
-//
-// - http://<host>:<port>/healthz/readiness
+// Routes:
+//   - http://<host>:<port>/healthz/liveness
+//   - http://<host>:<port>/healthz/readiness
 func EnableEndpoint_Healthz(r *mux.Router) {
 
 	// if healthz shouldn't be enabled, then skip the insertion of the endpoint
