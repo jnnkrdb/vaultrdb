@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/gomw/middlewares"
+	"github.com/rs/cors"
 )
 
 // middleware used by the frontend http server
@@ -43,8 +44,23 @@ func StartFrontendUI(fnc ...func(*mux.Router)) {
 	logging.Log.Info("booting the server", "port", _PORT)
 
 	if e := (&http.Server{
-		Addr:    fmt.Sprintf(":%d", _PORT),
-		Handler: router,
+		Addr: fmt.Sprintf(":%d", _PORT),
+		// adding the cors options
+		Handler: cors.New(cors.Options{
+			AllowedMethods: []string{
+				http.MethodHead,
+				http.MethodOptions,
+				http.MethodGet,
+				http.MethodPost,
+				http.MethodPut,
+				http.MethodPatch,
+				http.MethodDelete,
+			},
+			AllowedOrigins: []string{
+				"*",
+			},
+			AllowCredentials: true,
+		}).Handler(router),
 	}).ListenAndServe(); e != nil {
 
 		logging.Log.Error(e, "error keeping up http frontend server")

@@ -4,7 +4,7 @@
       <img alt="VaultRDB Logo" src="../../assets/logo.png" height="30" width="30" style="margin-left: .5rem; margin-right: .5rem;">
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
-      <a v-ripple class="flex align-items-center" v-bind="props.action">
+      <a v-ripple class="flex align-items-center" :href="item.url" :target="item.target" v-bind="props.action">
         <span :class="item.icon" />
         <span class="ml-2">{{ item.label }}</span>
         <Badge v-if="item.badge" :class="{ 'ml-auto': !root, 'ml-2': root }" :value="item.badge"/>
@@ -27,40 +27,16 @@
 <script setup>
 import { ref } from "vue";
 const items = ref([
-  { 
-    label: "Vault"
-  },
-  { 
-    label: "InternalDB", 
-    disabled: true
-  },
+  { label: "Vault" },
+  { label: "InternalDB", disabled: true },
   { 
     label: "Help", 
     items: [
-      {
-        label: "GitHub",
-        url: "https://github.com/jnnkrdb/vaultrdb",
-        target: "_blank"
-      },
-      {
-        label: "Wiki",
-        url: "https://github.com/jnnkrdb/vaultrdb/wiki",
-        target: "_blank", 
-        disabled: true
-      },
-      {
-        label: "Swagger",
-        url: "/swagger/",
-        target: "_blank", 
-        disabled: true
-      }
-
+      { label: "GitHub", target: "_blank", url: "https://github.com/jnnkrdb/vaultrdb" },
+      { label: "Wiki", target: "_blank", url: "https://github.com/jnnkrdb/vaultrdb/wiki", disabled: true },
+      { label: "Swagger", target: "_blank", url: "/swagger/", disabled: true }
     ]
-  },
-  { 
-    label: "License", 
-    disabled: true 
-  },
+  }
 ])
 </script>
 
@@ -78,6 +54,12 @@ export default {
     Menubar,
     Badge,
     InputText,
+  },
+  mounted() {
+    this.$axios.get('/storageapi/v1/internaldb/buckets')
+      .then((response) => {
+        console.log(response.data)
+      })
   }
 }
 </script>
