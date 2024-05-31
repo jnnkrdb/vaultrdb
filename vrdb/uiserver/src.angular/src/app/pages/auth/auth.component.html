@@ -1,0 +1,30 @@
+<div style="text-align: center;">
+  <div mat-dialog-content>
+    <h2 >Basic Auth</h2>
+    <p>Log in with sour configured Basicauth Credentials.</p>
+  </div>
+  <div>
+    <mat-form-field class="example-full-width">
+      <mat-label>Username</mat-label>
+      <input matInput type="text" [(ngModel)]="username"/>
+      @if (username) {
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="username=''">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" [(ngModel)]="password"/>
+      @if (password) {
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="password=''">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close (click)="login()">Login</button>
+    <button mat-button mat-dialog-close cdkFocusInitial>Close</button>
+  </div>
+</div>

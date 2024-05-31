@@ -1,4 +1,15 @@
-<app-home></app-home>
+<div class="background"> 
+  <mat-toolbar color="primary">
+    <a class="companyName" routerLink="/">
+      <img src="tresor-50x50.png" alt="" style="margin-top: .5em;">
+    </a>
+    <a mat-button routerLinkActive="active" ariaCurrentWhenActive="page" routerLink="/vault">Vault</a>
+    <a mat-button routerLinkActive="active" ariaCurrentWhenActive="page" routerLink="/internalDB">InternalDB</a>
+    <a mat-button routerLinkActive="active" ariaCurrentWhenActive="page" routerLink="/help">Help</a>
+    <span class="example-spacer"></span>
+    <a mat-button (click)="openLoginPopup()">Login</a>
+  </mat-toolbar>
 
-
-<router-outlet />
+  <!-- #################################################################################################### -->
+  <router-outlet/> 
+</div>
