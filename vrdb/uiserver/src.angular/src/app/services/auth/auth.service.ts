@@ -1,12 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AuthComponent } from '../pages/auth/auth.component';
+import { AuthComponent } from '../../pages/auth/auth.component';
+import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 
 export class UserAuth {
   username?: string
   password?: string
   b64?: string
+}
+
+// http interceptor
+export function BasicAuth(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+  // add header with basic auth credentials if user is logged in and request is to the api url
+  const user = inject(AuthService).authValue;
+  if (user?.username && user?.password) {
+      request = request.clone({
+          setHeaders: { 
+              Authorization: `Basic ${user.b64}`
+          }
+      });
+  }
+  return next(request);
 }
 
 @Injectable({

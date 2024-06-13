@@ -1,0 +1,1 @@
+export const APIENDPOINT_V1 = "/storageapi/v1"

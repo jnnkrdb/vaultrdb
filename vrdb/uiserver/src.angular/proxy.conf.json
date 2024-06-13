@@ -1,0 +1,6 @@
+{
+  "/storageapi":{
+    "target": "http://localhost:30080",
+    "secure": false
+  }
+}

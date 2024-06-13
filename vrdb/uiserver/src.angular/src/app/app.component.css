@@ -6,3 +6,12 @@
   display: inline-block;
   text-align: center;
 }
+
+.maincontainer {
+  padding: 1rem;
+  margin: 1rem;
+  background-color: white;
+  opacity: 0.9;
+  border-radius: 1rem;
+  min-height: 86vh;
+}

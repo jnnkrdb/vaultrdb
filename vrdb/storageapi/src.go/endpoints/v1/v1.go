@@ -35,7 +35,7 @@ func EnableEndpoint_StorageAPI_V1(r *mux.Router) {
 
 	// list the contents of the internaldb
 	r.Path("/api/v1/internaldb/buckets").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(internaldb.List_Buckets))
-	r.Path("/api/v1/internaldb/buckets/{bucket}/keys").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(internaldb.List_Keys))
+	r.Path("/api/v1/internaldb/buckets/{bucket}/sink").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(internaldb.List_Keys))
 
 	// appending the helperfunctions routes
 	r.Path("/api/v1/f/decrypt/{key}").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(fx.DecryptValue))

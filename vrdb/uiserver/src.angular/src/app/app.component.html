@@ -5,11 +5,23 @@
     </a>
     <a mat-button routerLinkActive="active" ariaCurrentWhenActive="page" routerLink="/vault">Vault</a>
     <a mat-button routerLinkActive="active" ariaCurrentWhenActive="page" routerLink="/internalDB">InternalDB</a>
-    <a mat-button routerLinkActive="active" ariaCurrentWhenActive="page" routerLink="/help">Help</a>
-    <span class="example-spacer"></span>
-    <a mat-button (click)="openLoginPopup()">Login</a>
+    <button mat-button [matMenuTriggerFor]="help">Help</button>
+    <mat-menu #help="matMenu">
+      <a mat-menu-item href="https://github.com/jnnkrdb/vaultrdb" target="_blank">GitHub</a>
+      <a mat-menu-item href="https://github.com/jnnkrdb/vaultrdb/wiki" target="_blank">Wiki</a>
+      <a mat-menu-item href="https://github.com/jnnkrdb/vaultrdb/issues" target="_blank">Issues</a>
+      <a mat-menu-item href="https://github.com/jnnkrdb/vaultrdb/issues/new/choose" target="_blank">Create Issue</a>
+      <a mat-menu-item href="/swagger" target="_blank">SwaggerUI</a>
+    </mat-menu>
+
+    <span style="flex: 1 1 auto;" class="example-spacer"></span>
+
+    <a mat-button (click)="openLoginPopup()">Login</a>    
   </mat-toolbar>
 
   <!-- #################################################################################################### -->
-  <router-outlet/> 
+
+  <div class="maincontainer">
+    <router-outlet/> 
+  </div>
 </div>

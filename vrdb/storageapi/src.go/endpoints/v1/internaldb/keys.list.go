@@ -31,12 +31,18 @@ func List_Keys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type res struct {
+	type kv struct {
 		K string `json:"key"`
 		V string `json:"value"`
 	}
 
-	var result = []res{}
+	type bucketSink struct {
+		Sink []kv `json:"sink"`
+	}
+
+	var result = bucketSink{
+		Sink: []kv{},
+	}
 
 	// get all keyvalues from the required bucket
 	configs.DB.View(func(tx *bbolt.Tx) error {
@@ -45,7 +51,7 @@ func List_Keys(w http.ResponseWriter, r *http.Request) {
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 
-			result = append(result, res{K: string(k), V: string(v)})
+			result.Sink = append(result.Sink, kv{K: string(k), V: string(v)})
 		}
 
 		return nil
