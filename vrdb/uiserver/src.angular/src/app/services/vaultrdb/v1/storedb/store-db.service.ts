@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { APIENDPOINT_V1 } from '../endpoint';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateKvsFormComponent } from '../../../../pages/vault/create-kvs-form/create-kvs-form.component';
 
 // ----------------------------------------------
 // create the kvs object from the database
@@ -30,7 +32,10 @@ const baseRoute = APIENDPOINT_V1 + "/storedb/kvs"
 })
 export class StoreDBService {
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private dialog: MatDialog
+  ) { }
 
   KVS_List(): Observable<KeyValueSet[]> {
     return this.http.get<KeyValueSet[]>(baseRoute)
@@ -49,7 +54,7 @@ export class StoreDBService {
   }
 
   // : Observable<KeyValueSet>
-  KVS_Create(kvs: NewKeyValueSet) {
+  KVS_Create(kvs: NewKeyValueSet): Observable<NewKeyValueSet> {
     return this.http.post<NewKeyValueSet>(baseRoute, kvs)
       .pipe(map((resp) => {
         console.log(resp)
@@ -65,5 +70,11 @@ export class StoreDBService {
   KVS_Delete(key: string): Observable<KeyValueSet> {
 
     return new Observable<KeyValueSet>
+  }
+
+  // ----------------------------------------------------------------
+  // open the dialog for creating a new kvs
+  openDialog() {
+    this.dialog.open(CreateKvsFormComponent)
   }
 }

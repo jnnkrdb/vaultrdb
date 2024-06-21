@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { KeyValueSet, StoreDBService } from '../../services/vaultrdb/v1/storedb/store-db.service';
-import { CreateKvsFormComponent } from './create-kvs-form/create-kvs-form.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-vault',
   standalone: true,
   imports: [
-    CreateKvsFormComponent
+    MatButtonModule,
+    MatToolbarModule
   ],
   templateUrl: './vault.component.html',
   styleUrl: './vault.component.css'
@@ -24,4 +26,7 @@ export class VaultComponent {
     this.storedbService.KVS_List().subscribe(response => this.kvsList = response)
   }
 
+  openCreateKVSForm() {
+    this.storedbService.openDialog()
+  }  
 }

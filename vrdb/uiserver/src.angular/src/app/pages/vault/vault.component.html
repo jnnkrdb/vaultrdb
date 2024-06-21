@@ -1,6 +1,9 @@
-<app-create-kvs-form />
-
+<section>
+  <div class="example-button-row">
+    <button mat-stroked-button (click)="openCreateKVSForm()">Create KeyValueSet</button>
+  </div>
+</section>
 <p>vault works!</p>
 @for (kvs of kvsList; track kvs) {
-  <p>{{kvs}}</p>
+  <p>{{kvs.key}}:{{kvs.value}} - {{kvs.description}}</p>
 }

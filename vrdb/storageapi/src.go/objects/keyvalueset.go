@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"errors"
 	"fmt"
 	"time"
 	"vrdb-storage/server"
@@ -43,6 +44,10 @@ func (kvs *KeyValueSet) BeforeCreate(tx *gorm.DB) (err error) {
 		}
 
 	} else {
+
+		if errors.Is(gorm.ErrRecordNotFound, result.Error) {
+			return nil
+		}
 
 		err = result.Error
 	}
