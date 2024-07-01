@@ -75,6 +75,7 @@ export class StoreDBService {
   // ----------------------------------------------------------------
   // open the dialog for creating a new kvs
   openDialog() {
-    this.dialog.open(CreateKvsFormComponent)
+    const dialogRef = this.dialog.open(CreateKvsFormComponent)
+    return dialogRef.afterClosed()
   }
 }
