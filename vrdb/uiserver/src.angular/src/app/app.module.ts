@@ -8,10 +8,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { MatListModule } from '@angular/material/list';
+import { FormsModule } from '@angular/forms';
+import { SlicePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SlicePipe
   ],
   imports: [
     BrowserModule,
@@ -20,9 +23,12 @@ import { MatListModule } from '@angular/material/list';
     MatButtonModule,
     MatToolbarModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    FormsModule,
   ],
-  providers: [],
+  providers: [
+    SlicePipe
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

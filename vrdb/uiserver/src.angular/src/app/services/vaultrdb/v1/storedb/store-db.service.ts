@@ -40,7 +40,7 @@ export class StoreDBService {
   KVS_List(): Observable<KeyValueSet[]> {
     return this.http.get<KeyValueSet[]>(baseRoute)
       .pipe(map((kvsList: KeyValueSet[]) => {
-        console.log(kvsList)
+        console.log('received multiple', kvsList)
         return kvsList
       }))
   }
@@ -48,28 +48,34 @@ export class StoreDBService {
   KVS_Get(key: string): Observable<KeyValueSet> {
     return this.http.get<KeyValueSet>(baseRoute+"/"+key)
       .pipe(map((kvs: KeyValueSet) => {
-        console.log(kvs)
+        console.log('received', kvs)
         return kvs
       }))
   }
 
   // : Observable<KeyValueSet>
-  KVS_Create(kvs: NewKeyValueSet): Observable<NewKeyValueSet> {
-    return this.http.post<NewKeyValueSet>(baseRoute, kvs)
+  KVS_Create(kvs: NewKeyValueSet): Observable<KeyValueSet> {
+    return this.http.post<KeyValueSet>(baseRoute, kvs)
       .pipe(map((resp) => {
-        console.log(resp)
+        console.log('created', resp)
         return resp
       }))
   }
 
-  KVS_Update(kvs: KeyValueSet): Observable<KeyValueSet> {
-
-    return new Observable<KeyValueSet>
+  KVS_Update(kvs: NewKeyValueSet): Observable<KeyValueSet> {
+    return this.http.put<KeyValueSet>(baseRoute, kvs)
+      .pipe(map((resp) => {
+        console.log('updated', resp)
+        return resp
+      }))
   }
 
-  KVS_Delete(key: string): Observable<KeyValueSet> {
-
-    return new Observable<KeyValueSet>
+  KVS_Delete(key: string): Observable<string> {
+    return this.http.delete<string>(baseRoute+"/"+key)
+      .pipe(map((resp) => {
+        console.log('deleted', resp)
+        return resp
+      }))
   }
 
   // ----------------------------------------------------------------

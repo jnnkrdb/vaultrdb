@@ -1,0 +1,66 @@
+<div>
+
+  <!-- change the description of the given kvs -->
+  <div class="row">
+    <mat-form-field class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput rows="3" type="text" [(ngModel)]="kvs.description" [readonly]="!isEditable"></textarea>
+    </mat-form-field>
+  </div>
+
+  <!-- change the tags of the given kvs -->
+  <div class="row">
+    <mat-form-field class="full-width">
+      <mat-label>Tags</mat-label>
+      <mat-chip-grid #chipGrid aria-label="Enter tags">
+        @for (tag of devTags(); track tag) {
+          <mat-chip-row (removed)="remove(tag)" 
+                        [editable]="isEditable" 
+                        (edited)="edit(tag, $event)" 
+                        [aria-description]="'press enter to edit ' + tag">
+            {{tag}}
+            @if (isEditable) {
+              <button matChipRemove [attr.aria-label]="'remove ' + tag">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            }
+          </mat-chip-row>
+        }
+      </mat-chip-grid>
+      <input placeholder="New Tag..."
+             [readonly]="!isEditable"
+             [matChipInputFor]="chipGrid"
+             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+             [matChipInputAddOnBlur]="addOnBlur"
+             (matChipInputTokenEnd)="add($event)"/>
+    </mat-form-field>
+  </div>
+
+  <!-- change the value of the given kvs -->
+  <div class="row">
+    <mat-form-field class="full-width">
+      <mat-label>Value</mat-label>
+      <textarea matInput rows="7" type="text" [(ngModel)]="kvs.value" [readonly]="!isEditable"></textarea>
+    </mat-form-field>
+  </div>
+
+  <!-- meta infos of the given kvs -->
+  <div class="row">
+    <mat-form-field class="half-width">
+      <mat-label>Created At</mat-label>
+      <input matInput type="text" [(ngModel)]="kvs.created_at" readonly/>
+    </mat-form-field>
+    <mat-form-field class="half-width">
+      <mat-label>Last Updated At</mat-label>
+      <input matInput type="text" [(ngModel)]="kvs.updated_at" readonly/>
+    </mat-form-field>
+  </div>
+  
+  <!-- control for the kvs -->
+  <div class="row" style="margin-bottom: 1rem;">
+    <button class="options-btn" mat-stroked-button [style.color]="isEditable ? 'green' : ''" (click)="isEditable = !isEditable">Editable</button>
+    <button class="options-btn" mat-stroked-button (click)="saveKVS()">Submit</button>
+    <button class="options-btn" mat-stroked-button (click)="deleteKVS()">Delete</button>
+  </div>
+
+</div>
