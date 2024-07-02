@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { KeyValueSet, StoreDBService } from '../../services/vaultrdb/v1/storedb/store-db.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +22,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     MatInputModule,
     MatTableModule,
     MatIconModule,
+    MatSlideToggleModule,
     FormsModule
   ],
   templateUrl: './vault.component.html',

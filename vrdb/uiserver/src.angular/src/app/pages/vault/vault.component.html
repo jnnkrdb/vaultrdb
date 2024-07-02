@@ -25,11 +25,31 @@
     <ng-container matColumnDef="expandedDetail">
       <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
         <div class="element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-          <div> {{element.key}} - {{element.description}} </div>
-          <div>
-            <button mat-stroked-button (click)="saveKVS(element)">Submit</button>
-            <button mat-stroked-button (click)="deleteKVS(element)">Delete</button>
+          
+          <div class="container">
+            <div class="row">
+              <mat-form-field class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput rows="3" type="text" [(ngModel)]="element.description"></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="row">
+              <mat-form-field class="full-width">
+                <mat-label>Value</mat-label>
+                <textarea matInput rows="7" type="text" [(ngModel)]="element.value"></textarea>
+              </mat-form-field>
+            </div>
+            
+            <div class="row" style="margin-bottom: 1rem;">
+              <p style="width: 10rem; height: 3rem;">
+                <mat-slide-toggle>Slide me!</mat-slide-toggle>
+              </p>
+              <button style="width: 10rem; height: 3rem;" mat-stroked-button (click)="saveKVS(element)">Submit</button>
+              <button style="width: 10rem; height: 3rem;" mat-stroked-button (click)="deleteKVS(element)">Delete</button>
+            </div>
           </div>
+
         </div>    
       </td>
     </ng-container>
