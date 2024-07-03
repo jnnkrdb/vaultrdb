@@ -19,7 +19,7 @@ FROM vaultrdbbase:latest as final
 COPY uiserver/vaultrdb/entrypoint.d/ /opt/vaultrdb/entrypoint.d/
 COPY uiserver/vaultrdb/swagger/ /opt/vaultrdb/swagger/
 # copy html contents from frontend build
-COPY uiserver/src.html/ /opt/vaultrdb/web/
+#COPY uiserver/src.html/ /opt/vaultrdb/web/
 # Copy Operators Binary
 COPY --from=builder /vaultrdb-ui /usr/local/bin/vaultrdb-ui
 # Set the user for the config and the operator binaries

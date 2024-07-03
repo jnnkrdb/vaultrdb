@@ -33,9 +33,12 @@ import { SlicePipe } from '@angular/common';
 export class VaultComponent {
 
   // table content
-  displayedColumns = ['key', 'description'];
+  displayedColumns = ['key', 'description', 'function'];
   dataSource = new MatTableDataSource<KeyValueSet>([]);
   expandedElement!: KeyValueSet | null;
+
+  // list of tags which are already in use
+  possibleTags: string[] = [] // this has to be received from the backend, calculating all used tags for the autocomplete
 
   // constructor for the table
   // loads the kvs at startup
@@ -44,6 +47,15 @@ export class VaultComponent {
   ) {
     // load the buckets
     this.storedbService.KVS_List().subscribe(response => this.dataSource.data = response)
+  }
+
+  onChange(result: string, kvs: KeyValueSet) {
+    console.log('result:',result, 'kvs:', kvs.key)
+    if (result == 'deleted') {
+      const index = this.dataSource.data.indexOf(kvs);
+      this.dataSource.data.splice(index,1);
+      this.dataSource._updateChangeSubscription()
+    }
   }
 
   openCreateKVSForm() {

@@ -1,8 +1,8 @@
-import { Component, Input, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { KeyValueSet } from '../../../services/vaultrdb/v1/storedb/store-db.service';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { KeyValueSet, NewKeyValueSet, StoreDBService } from '../../../services/vaultrdb/v1/storedb/store-db.service';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
+import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import { MatChipInputEvent, MatChipEditedEvent, MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,6 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatChipsModule,
     MatInputModule,
     MatIconModule,
+    MatAutocompleteModule,
     FormsModule
   ],
   templateUrl: './detailed-kvs.component.html',
@@ -26,6 +27,11 @@ import { MatButtonModule } from '@angular/material/button';
 export class DetailedKVSComponent {
 
   @Input({ required: true }) kvs!: KeyValueSet;
+  @Output() changed: EventEmitter<string> = new EventEmitter();
+
+  constructor(
+    private storedbsvc: StoreDBService
+  ) { }
 
   // #####################################################  
   // enabled values for editing
@@ -34,15 +40,29 @@ export class DetailedKVSComponent {
   // #####################################################  
   saveKVS() {
     if (this.isEditable) {
-      console.log('saved element:',this.kvs)
+
+      const updated: NewKeyValueSet = {
+        key: this.kvs.key,
+        value: this.kvs.value,
+        description: this.kvs.description
+      }
+
+      this.storedbsvc.KVS_Update(updated)
+        .subscribe(result => {
+          console.log('saved element:',this.kvs.key)
+          this.kvs = result
+          this.changed.emit('updated')
+        })
+
     } else {
+      
       console.log('not editable element:',this.kvs)
     }
   }
 
   deleteKVS() {
     if (this.isEditable) {
-      console.log('deleted element:',this.kvs)
+      this.storedbsvc.KVS_Delete(this.kvs.key).subscribe(_ => this.changed.emit('deleted'))
     } else {
       console.log('not deletable element:',this.kvs)
     }
@@ -51,35 +71,27 @@ export class DetailedKVSComponent {
   
   // #####################################################  
   // testing tags
-  readonly addOnBlur = true;
   readonly separatorKeysCodes = [ ENTER, COMMA ] as const;
-  readonly devTags = signal<string[]>(['this', 'is', 'under', 'construction...']);
-  readonly announcer = inject(LiveAnnouncer);
+  @Input({ required: true }) possibleTags!: string[];
 
-  add(event: MatChipInputEvent): void {
-    const value = (event.value || '').trim();
+  add(tag: string): void {
+    const value = (tag || '').trim();
     // Add our tag
-    if (value) {
-      this.devTags.update(devTags => [...devTags, value]);
+    if (value && !this.kvs.tags.includes(value)) {
+      this.kvs.tags.push(value)
     }
-    // Clear the input value
-    event.chipInput!.clear();
   }
 
   remove(tag: string): void {
-    this.devTags.update(devTags => {
-      const index = devTags.indexOf(tag);
-      if (index < 0) {
-        return devTags;
-      }
-      devTags.splice(index, 1);
-      this.announcer.announce(`Removed ${tag}`);
-      return [...devTags];
-    });
+    const index = this.kvs.tags.indexOf(tag)
+    if (index > -1) {
+      this.kvs.tags.splice(index, 1)
+    }
   }
 
   edit(tag: string, event: MatChipEditedEvent) {
-    const value = event.value.trim();
+    const _value = event.value.trim();
+    const value = tag.trim();
 
     // Remove fruit if it no longer has a name
     if (!value) {
@@ -96,5 +108,11 @@ export class DetailedKVSComponent {
       }
       return devTags;
     });
+  }
+  
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.possibleTags.update(possibleTags => [...possibleTags, event.option.viewValue]);
+    this.currentFruit.set('');
+    event.option.deselect();
   }
 }

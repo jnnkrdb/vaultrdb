@@ -7,20 +7,21 @@ import { CreateKvsFormComponent } from '../../../../pages/vault/create-kvs-form/
 
 // ----------------------------------------------
 // create the kvs object from the database
-export class KeyValueSet {
-  id: number = NaN
-  key: string = ""
-  value: string = ""
-  description: string = ""
-  created_at: string = ""
-  updated_at: string = ""
+export interface KeyValueSet {
+  id: number 
+  key: string
+  value: string
+  tags: string[]
+  description: string
+  created_at: string
+  updated_at: string
 }
 
 // the *new* object cache
-export class NewKeyValueSet {
-  key: string = ""
-  value: string = ""
-  description: string = ""
+export interface NewKeyValueSet {
+  key: string
+  value: string
+  description: string
 }
 
 // ----------------------------------------------
@@ -63,19 +64,19 @@ export class StoreDBService {
   }
 
   KVS_Update(kvs: NewKeyValueSet): Observable<KeyValueSet> {
-    return this.http.put<KeyValueSet>(baseRoute, kvs)
+    return this.http.put<KeyValueSet>(baseRoute+"/"+kvs.key, kvs)
       .pipe(map((resp) => {
         console.log('updated', resp)
         return resp
       }))
   }
 
-  KVS_Delete(key: string): Observable<string> {
+  KVS_Delete(key: string): Observable<any> {
     return this.http.delete<string>(baseRoute+"/"+key)
-      .pipe(map((resp) => {
+      .pipe((resp) => {
         console.log('deleted', resp)
         return resp
-      }))
+      })
   }
 
   // ----------------------------------------------------------------

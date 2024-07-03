@@ -13,7 +13,7 @@
     <mat-form-field class="full-width">
       <mat-label>Tags</mat-label>
       <mat-chip-grid #chipGrid aria-label="Enter tags">
-        @for (tag of devTags(); track tag) {
+        @for (tag of kvs.tags; track tag) {
           <mat-chip-row (removed)="remove(tag)" 
                         [editable]="isEditable" 
                         (edited)="edit(tag, $event)" 
@@ -30,9 +30,16 @@
       <input placeholder="New Tag..."
              [readonly]="!isEditable"
              [matChipInputFor]="chipGrid"
+             [matAutocomplete]="auto"
              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-             [matChipInputAddOnBlur]="addOnBlur"
-             (matChipInputTokenEnd)="add($event)"/>
+             [matChipInputAddOnBlur]="true"
+             (matChipInputTokenEnd)="add(tag)"/>
+
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        @for (t of possibleTags; track t) {
+          <mat-option [value]="t">{{t}}</mat-option>
+        }
+      </mat-autocomplete>
     </mat-form-field>
   </div>
 
@@ -44,23 +51,22 @@
     </mat-form-field>
   </div>
 
-  <!-- meta infos of the given kvs -->
+  <!-- meta infos of the given kvs + controls -->
   <div class="row">
-    <mat-form-field class="half-width">
+    <mat-form-field class="quarter-width">
       <mat-label>Created At</mat-label>
       <input matInput type="text" [(ngModel)]="kvs.created_at" readonly/>
     </mat-form-field>
-    <mat-form-field class="half-width">
+    <mat-form-field class="quarter-width">
       <mat-label>Last Updated At</mat-label>
       <input matInput type="text" [(ngModel)]="kvs.updated_at" readonly/>
     </mat-form-field>
-  </div>
-  
-  <!-- control for the kvs -->
-  <div class="row" style="margin-bottom: 1rem;">
-    <button class="options-btn" mat-stroked-button [style.color]="isEditable ? 'green' : ''" (click)="isEditable = !isEditable">Editable</button>
-    <button class="options-btn" mat-stroked-button (click)="saveKVS()">Submit</button>
-    <button class="options-btn" mat-stroked-button (click)="deleteKVS()">Delete</button>
+
+    <div class="half-width">
+      <button class="options-btn" mat-stroked-button (click)="deleteKVS()">Delete</button>
+      <button class="options-btn" mat-stroked-button (click)="saveKVS()">Submit</button>
+      <button class="options-btn" mat-stroked-button [style.color]="isEditable ? 'green' : ''" (click)="isEditable = !isEditable">Editable</button>
+    </div>
   </div>
 
 </div>

@@ -1,6 +1,8 @@
 package kvs
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"vrdb-storage/objects"
 	"vrdb-storage/server"
@@ -41,7 +43,18 @@ func Remove(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
-	}
 
-	w.Write([]byte("Deleted"))
+		result := struct {
+			Message string `json:"message"`
+		}{
+			Message: fmt.Sprintf("removed object with key [%s]", key),
+		}
+
+		if err := json.NewEncoder(w).Encode(result); err != nil {
+
+			logging.Log.Info("error parsing result into json", "response-code", http.StatusInternalServerError, "result", result, "err", err)
+
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+	}
 }
