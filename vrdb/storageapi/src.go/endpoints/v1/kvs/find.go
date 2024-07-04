@@ -22,7 +22,7 @@ func Find(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 
-		var kvs objects.KeyValueSet
+		var kvs = objects.KeyValueSet{}
 
 		if result := server.Database.First(&kvs, "key = ?", key); result.Error != nil {
 

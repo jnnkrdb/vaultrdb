@@ -6,17 +6,19 @@ import (
 	"vrdb-storage/objects"
 	"vrdb-storage/server"
 
+	"github.com/lib/pq"
 	"vrdb.go/logging"
 )
 
 // updating the key/value set
 func Update(w http.ResponseWriter, r *http.Request) {
 
-	var obj struct {
-		Key         string `json:"key"`
-		Value       string `json:"value"`
-		Description string `json:"description"`
-	}
+	var obj = struct {
+		Key         string         `json:"key"`
+		Value       string         `json:"value"`
+		Tags        pq.StringArray `json:"tags"`
+		Description string         `json:"description"`
+	}{}
 
 	if err := json.NewDecoder(r.Body).Decode(&obj); err != nil {
 

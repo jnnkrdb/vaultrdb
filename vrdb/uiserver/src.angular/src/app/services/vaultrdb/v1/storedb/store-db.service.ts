@@ -7,21 +7,22 @@ import { CreateKvsFormComponent } from '../../../../pages/vault/create-kvs-form/
 
 // ----------------------------------------------
 // create the kvs object from the database
-export interface KeyValueSet {
-  id: number 
-  key: string
-  value: string
-  tags: string[]
-  description: string
-  created_at: string
-  updated_at: string
+export class KeyValueSet {
+  id: number = NaN
+  key: string = ''
+  value: string = ''
+  tags: string[] = []
+  description: string = ''
+  created_at: string = ''
+  updated_at: string = ''
 }
 
 // the *new* object cache
-export interface NewKeyValueSet {
-  key: string
-  value: string
-  description: string
+export class NewKeyValueSet {
+  key: string = ''
+  value: string = ''
+  tags: string[] = []
+  description: string = ''
 }
 
 // ----------------------------------------------

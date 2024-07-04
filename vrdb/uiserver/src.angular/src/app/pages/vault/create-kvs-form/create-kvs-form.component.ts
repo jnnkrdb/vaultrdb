@@ -36,6 +36,7 @@ export class CreateKvsFormComponent {
   public newKVS: NewKeyValueSet = {
     key: '',
     value: '',
+    tags: [],
     description: ''
   }
 

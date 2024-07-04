@@ -4,8 +4,20 @@
   <div class="row">
     <mat-form-field class="full-width">
       <mat-label>Description</mat-label>
-      <textarea matInput rows="3" type="text" [(ngModel)]="kvs.description" [readonly]="!isEditable"></textarea>
+      <textarea matInput 
+                rows="3" 
+                type="text" 
+                [(ngModel)]="kvs.description" 
+                [readonly]="!isEditable">
+      </textarea>
     </mat-form-field>
+  </div>
+
+  <!-- change the tags of the given kvs -->
+  <div class="row">
+    <div class="full-width">
+      <app-tags-input [isEditable]="isEditable"></app-tags-input>
+    </div>
   </div>
 
   <!-- change the tags of the given kvs -->
@@ -13,7 +25,7 @@
     <mat-form-field class="full-width">
       <mat-label>Tags</mat-label>
       <mat-chip-grid #chipGrid aria-label="Enter tags">
-        @for (tag of kvs.tags; track tag) {
+        @for (tag of currentSelectedTags(); track tag) {
           <mat-chip-row (removed)="remove(tag)" 
                         [editable]="isEditable" 
                         (edited)="edit(tag, $event)" 
@@ -28,15 +40,16 @@
         }
       </mat-chip-grid>
       <input placeholder="New Tag..."
+             (focus)="tagInput_onFocus()"
              [readonly]="!isEditable"
              [matChipInputFor]="chipGrid"
              [matAutocomplete]="auto"
              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
              [matChipInputAddOnBlur]="true"
-             (matChipInputTokenEnd)="add(tag)"/>
+             (matChipInputTokenEnd)="add($event)"/>
 
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-        @for (t of possibleTags; track t) {
+        @for (t of possibleTags(); track t) {
           <mat-option [value]="t">{{t}}</mat-option>
         }
       </mat-autocomplete>
@@ -47,7 +60,12 @@
   <div class="row">
     <mat-form-field class="full-width">
       <mat-label>Value</mat-label>
-      <textarea matInput rows="7" type="text" [(ngModel)]="kvs.value" [readonly]="!isEditable"></textarea>
+      <textarea matInput 
+                rows="7" 
+                type="text" 
+                [(ngModel)]="kvs.value"
+                [readonly]="!isEditable">
+      </textarea>
     </mat-form-field>
   </div>
 
@@ -63,9 +81,15 @@
     </mat-form-field>
 
     <div class="half-width">
-      <button class="options-btn" mat-stroked-button (click)="deleteKVS()">Delete</button>
-      <button class="options-btn" mat-stroked-button (click)="saveKVS()">Submit</button>
-      <button class="options-btn" mat-stroked-button [style.color]="isEditable ? 'green' : ''" (click)="isEditable = !isEditable">Editable</button>
+      <button class="options-btn" mat-stroked-button [style.color]="'red'" (click)="deleteKVS()">
+        Delete
+      </button>
+      <button class="options-btn" mat-stroked-button (click)="saveKVS()">
+        Submit
+      </button>
+      <button class="options-btn" mat-stroked-button [style.color]="isEditable ? 'green' : ''" (click)="isEditable = !isEditable">
+        Editable
+      </button>
     </div>
   </div>
 

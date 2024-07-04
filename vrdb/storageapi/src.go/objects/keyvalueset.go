@@ -16,14 +16,16 @@ import (
 //)
 
 type KeyValueSet struct {
-	ID    uint   `json:"id" gorm:"primaryKey,autoIncrement"`
-	Key   string `json:"key" gorm:"<-:create,unique"`
-	Value string `json:"value"`
-	//Type        string `json:"type" gorm:"<-:create"`
+	ID          uint   `json:"-" gorm:"primaryKey,autoIncrement"`
+	Key         string `json:"key" gorm:"<-:create,unique"`
+	Value       string `json:"value"`
 	Description string `json:"description"`
+	Tags        []Tag  `json:"tags" gorm:"many2many:keyvalueset_tags;"`
 
-	CreatedAt time.Time `json:"created_at" gorm:"<-:create"` // Automatically managed by GORM for creation time
-	UpdatedAt time.Time `json:"updated_at"`                  // Automatically managed by GORM for update time
+	// Automatically managed by GORM for creation time
+	CreatedAt time.Time `json:"created_at" gorm:"<-:create"`
+	// Automatically managed by GORM for update time
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // ------------------------------------------------

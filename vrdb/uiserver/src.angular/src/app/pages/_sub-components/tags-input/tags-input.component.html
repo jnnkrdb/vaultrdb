@@ -1,0 +1,32 @@
+<mat-form-field style="width: 100%">
+  <mat-label>Tags</mat-label>
+  <mat-chip-grid #chipGrid aria-label="Enter tags">
+    @for (tag of currentSelectedTags(); track tag) {
+      <mat-chip-row (removed)="remove(tag)" 
+                    [editable]="isEditable" 
+                    (edited)="edit(tag, $event)" 
+                    [aria-description]="'press enter to edit ' + tag">
+        {{tag}}
+        @if (isEditable) {
+          <button matChipRemove [attr.aria-label]="'remove ' + tag">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        }
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+  <input placeholder="New Tag..."
+        (focus)="tagInput_onFocus()"
+        [readonly]="!isEditable"
+        [matChipInputFor]="chipGrid"
+        [matAutocomplete]="auto"
+        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="add($event)"/>
+
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    @for (t of possibleTags(); track t) {
+      <mat-option [value]="t">{{t}}</mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>
