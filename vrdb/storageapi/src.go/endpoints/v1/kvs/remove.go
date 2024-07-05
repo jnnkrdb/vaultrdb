@@ -25,7 +25,7 @@ func Remove(w http.ResponseWriter, r *http.Request) {
 
 		// get the object id
 		var kvs = objects.KeyValueSet{}
-		if result := server.Database.First(&kvs, "key = ?", key); result.Error != nil {
+		if result := server.Database.Preload("Tags").First(&kvs, "key = ?", key); result.Error != nil {
 
 			logging.Log.Info("error finding kvs", "response-code", http.StatusInternalServerError, "kvs", kvs, "result.Error", result.Error)
 

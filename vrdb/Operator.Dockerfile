@@ -1,6 +1,6 @@
 # ----------------------------------------------- 
 # Building the go binary
-FROM golang:1.21.1 as builder
+FROM golang:1.21.1 AS builder
 WORKDIR /workspace/src.go
 # copy the code files
 COPY vrdb.go/ /vrdb.go/
@@ -14,7 +14,7 @@ RUN go mod download
 RUN go build -o /vaultrdb-operator .
 # ----------------------------------------------- 
 # Finish the operator, api, ui, storage build with the final image
-FROM vaultrdbbase:latest as final
+FROM vaultrdbbase:latest AS final
 # Copy the VaultRDB Directory Contents
 COPY operator/vaultrdb/entrypoint.d/ /opt/vaultrdb/entrypoint.d/
 # Copy Operators Binary

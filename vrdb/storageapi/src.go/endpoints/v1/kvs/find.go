@@ -24,7 +24,7 @@ func Find(w http.ResponseWriter, r *http.Request) {
 
 		var kvs = objects.KeyValueSet{}
 
-		if result := server.Database.First(&kvs, "key = ?", key); result.Error != nil {
+		if result := server.Database.Preload("Tags").First(&kvs, "key = ?", key); result.Error != nil {
 
 			logging.Log.Info("error receiving item of kvs", "response-code", http.StatusInternalServerError, "result.Error", result.Error)
 

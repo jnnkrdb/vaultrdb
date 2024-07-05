@@ -1,6 +1,6 @@
 # ----------------------------------------------- 
 # Building the go binary
-FROM golang:1.21.1 as builder
+FROM golang:1.21.1 AS builder
 WORKDIR /workspace/src.go
 # copy the code files
 COPY vrdb.go/ /vrdb.go/
@@ -14,7 +14,7 @@ RUN go mod download
 RUN go build -o /vaultrdb-ui .
 # ----------------------------------------------- 
 # Finish the operator, api, ui, storage build with the final image
-FROM vaultrdbbase:latest as final
+FROM vaultrdbbase:latest AS final
 # Copy the VaultRDB Directory Contents
 COPY uiserver/vaultrdb/entrypoint.d/ /opt/vaultrdb/entrypoint.d/
 COPY uiserver/vaultrdb/swagger/ /opt/vaultrdb/swagger/

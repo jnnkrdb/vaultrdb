@@ -15,7 +15,7 @@ import (
 func List(w http.ResponseWriter, r *http.Request) {
 
 	var kvs_list = []objects.KeyValueSet{}
-	if result := server.Database.Find(&kvs_list); result.Error != nil {
+	if result := server.Database.Preload("Tags").Find(&kvs_list); result.Error != nil {
 
 		logging.Log.Info("error receiving list of kvs", "response-code", http.StatusInternalServerError, "kvs_list", kvs_list, "result.Error", result.Error)
 

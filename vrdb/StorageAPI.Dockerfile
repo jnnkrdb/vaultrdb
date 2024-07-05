@@ -1,6 +1,6 @@
 # ----------------------------------------------- 
 # Building the go binary
-FROM golang:1.21-alpine as builder
+FROM golang:1.21-alpine AS builder
 RUN apk add --no-cache --update gcc musl-dev
 WORKDIR /workspace/src.go
 # copy the code files
@@ -15,7 +15,7 @@ RUN go mod download
 RUN go build -ldflags='-s -w -extldflags "-static"' -o /vaultrdb-storageapi .
 # ----------------------------------------------- 
 # Finish the operator, api, ui, storage build with the final image
-FROM vaultrdbbase:latest as final
+FROM vaultrdbbase:latest AS final
 # Copy the VaultRDB Directory Contents
 COPY storageapi/vaultrdb/entrypoint.d/ /opt/vaultrdb/entrypoint.d/
 # Copy Operators Binary

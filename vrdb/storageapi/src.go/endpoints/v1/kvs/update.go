@@ -6,7 +6,6 @@ import (
 	"vrdb-storage/objects"
 	"vrdb-storage/server"
 
-	"github.com/lib/pq"
 	"vrdb.go/logging"
 )
 
@@ -14,10 +13,10 @@ import (
 func Update(w http.ResponseWriter, r *http.Request) {
 
 	var obj = struct {
-		Key         string         `json:"key"`
-		Value       string         `json:"value"`
-		Tags        pq.StringArray `json:"tags"`
-		Description string         `json:"description"`
+		Key         string        `json:"key"`
+		Value       string        `json:"value"`
+		Tags        []objects.Tag `json:"tags"`
+		Description string        `json:"description"`
 	}{}
 
 	if err := json.NewDecoder(r.Body).Decode(&obj); err != nil {
@@ -31,7 +30,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 
 	// get the object id
 	var kvs = objects.KeyValueSet{}
-	if result := server.Database.First(&kvs, "key = ?", obj.Key); result.Error != nil {
+	if result := server.Database.Preload("Tags").First(&kvs, "key = ?", obj.Key); result.Error != nil {
 
 		logging.Log.Info("error finding kvs", "response-code", http.StatusInternalServerError, "kvs", kvs, "result.Error", result.Error)
 
@@ -41,6 +40,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	kvs.Value = obj.Value
+	kvs.Tags = obj.Tags
 	kvs.Description = obj.Description
 
 	// create object in database

@@ -3,6 +3,7 @@ package objects
 import (
 	"os"
 	"reflect"
+	"vrdb-storage/objects/tag"
 	"vrdb-storage/server"
 
 	"vrdb.go/logging"
@@ -18,16 +19,20 @@ func Migrate() {
 
 		// contains the items, which schould be migrated into the database
 		listOfObjects = []interface{}{
-			&Tag{},
+			&tag.Tag{},
 			&KeyValueSet{},
 		}
 	)
 
 	// parse through the list of migrate-objects and get their names, for the log
 	for _, t := range listOfObjects {
+
 		if o := reflect.TypeOf(t); o.Kind() == reflect.Ptr {
+
 			listOfObjectNames = append(listOfObjectNames, o.Elem().Name())
+
 		} else {
+
 			listOfObjectNames = append(listOfObjectNames, o.Name())
 		}
 	}
