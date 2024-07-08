@@ -1,8 +1,9 @@
-package tag
+package objects
 
 type Tag struct {
-	ID  uint   `json:"-" gorm:"primaryKey,autoIncrement"`
-	Tag string `json:"tag" gorm:"unique"`
+	ID           uint          `json:"-" gorm:"primaryKey,autoIncrement"`
+	Tag          string        `json:"tag" gorm:"unique"`
+	KeyValueSets []KeyValueSet `json:"-" gorm:"many2many:keyvalueset_tags;"`
 }
 
 // ------------------------------------------------

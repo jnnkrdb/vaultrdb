@@ -1,11 +1,9 @@
-package keyvalueset
+package objects
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
-	"vrdb-storage/objects/tag"
-
-	"context"
 
 	"vrdb.go/logging"
 )
@@ -17,25 +15,18 @@ import (
 // the acutal KeyValueSet fields with data, to be then integrated into the
 // database
 type NewKeyValueSet struct {
-	Key         string    `json:"key"`
-	Value       string    `json:"value"`
-	Tags        []tag.Tag `json:"tags"`
-	Description string    `json:"description"`
+	Key         string `json:"key"`
+	Value       string `json:"value"`
+	Tags        []Tag  `json:"tags"`
+	Description string `json:"description"`
 }
 
 // read the object from the http request as json
-func (nkvs *NewKeyValueSet) FromJSON(w http.ResponseWriter, r *http.Request) error {
-
-	if err := json.NewDecoder(r.Body).Decode(nkvs); err != nil {
-
+func (nkvs *NewKeyValueSet) FromJSON(w http.ResponseWriter, r *http.Request) (err error) {
+	if err = json.NewDecoder(r.Body).Decode(nkvs); err != nil {
 		logging.Log.Info("error parsing body into struct", "nkvs", nkvs, "err", err)
-
 		r = r.WithContext(context.WithValue(r.Context(), "code", http.StatusBadRequest))
-
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-
-		return err
 	}
-
-	return nil
+	return
 }

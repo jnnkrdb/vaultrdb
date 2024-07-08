@@ -6,58 +6,44 @@ import (
 	"vrdb-storage/objects"
 	"vrdb-storage/server"
 
+	"gorm.io/gorm"
 	"vrdb.go/logging"
 )
 
 // updating the key/value set
 func Update(w http.ResponseWriter, r *http.Request) {
 
-	var obj = struct {
-		Key         string        `json:"key"`
-		Value       string        `json:"value"`
-		Tags        []objects.Tag `json:"tags"`
-		Description string        `json:"description"`
-	}{}
-
-	if err := json.NewDecoder(r.Body).Decode(&obj); err != nil {
-
-		logging.Log.Info("error parsing body into struct", "response-code", http.StatusBadRequest, "obj", obj, "err", err)
-
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-
+	// receiving the required date of the keyvalueset, to update
+	// a specific dataset in the database and update the associations
+	var obj = objects.NewKeyValueSet{}
+	if err := obj.FromJSON(w, r); err != nil {
 		return
 	}
 
-	// get the object id
 	var kvs = objects.KeyValueSet{}
-	if result := server.Database.Preload("Tags").First(&kvs, "key = ?", obj.Key); result.Error != nil {
-
-		logging.Log.Info("error finding kvs", "response-code", http.StatusInternalServerError, "kvs", kvs, "result.Error", result.Error)
-
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-
+	// request the original from the database
+	if err := server.Database.Preload("Tags").First(&kvs, "key = ?", obj.Key).Error; err != nil {
+		logging.Log.Info("error finding original in database", "response-code", http.StatusNotFound, "obj", obj, "err", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	kvs.Value = obj.Value
+	// update the fields
 	kvs.Tags = obj.Tags
+	kvs.Value = obj.Value
 	kvs.Description = obj.Description
 
-	// create object in database
-	if result := server.Database.Save(&kvs); result.Error != nil {
-
-		logging.Log.Info("error creating object in database", "response-code", http.StatusInternalServerError, "obj", obj, "result.Error", result.Error)
-
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-
+	// save the object in database
+	if err := server.Database.Session(&gorm.Session{
+		FullSaveAssociations: true,
+	}).Updates(&kvs).Error; err != nil {
+		logging.Log.Info("error updating object in database", "kvs", kvs, "err", err)
 		return
 	}
 
 	// send result
 	if err := json.NewEncoder(w).Encode(kvs); err != nil {
-
 		logging.Log.Info("error parsing result into json", "response-code", http.StatusInternalServerError, "kvs", kvs, "err", err)
-
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
