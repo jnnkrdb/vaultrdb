@@ -41,6 +41,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// change the tags from the object
+	if err := server.Database.Model(&kvs).Association("Tags").Replace(obj.Tags); err != nil {
+		logging.Log.Info("error updating objects tags in database", "obj.Tags", obj.Tags, "err", err)
+		return
+	}
+
 	// send result
 	if err := json.NewEncoder(w).Encode(kvs); err != nil {
 		logging.Log.Info("error parsing result into json", "response-code", http.StatusInternalServerError, "kvs", kvs, "err", err)

@@ -5,6 +5,7 @@ import (
 	"vrdb-storage/endpoints/v1/fx"
 	"vrdb-storage/endpoints/v1/internaldb"
 	"vrdb-storage/endpoints/v1/kvs"
+	"vrdb-storage/endpoints/v1/tags"
 	"vrdb-storage/server"
 
 	"github.com/gorilla/mux"
@@ -32,6 +33,9 @@ func EnableEndpoint_StorageAPI_V1(r *mux.Router) {
 	r.Path("/api/v1/storedb/kvs").Methods(http.MethodPost).Handler(server.DefaultMiddleware.ThenFunc(kvs.Insert))
 	r.Path("/api/v1/storedb/kvs/{key}").Methods(http.MethodPut, http.MethodPatch).Handler(server.DefaultMiddleware.ThenFunc(kvs.Update))
 	r.Path("/api/v1/storedb/kvs/{key}").Methods(http.MethodDelete).Handler(server.DefaultMiddleware.ThenFunc(kvs.Remove))
+
+	// appending the default routes for tags -> crud like
+	r.Path("/api/v1/storedb/tags").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(tags.List))
 
 	// list the contents of the internaldb
 	r.Path("/api/v1/internaldb/buckets").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(internaldb.List_Buckets))

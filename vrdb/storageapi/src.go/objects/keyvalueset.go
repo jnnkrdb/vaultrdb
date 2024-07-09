@@ -16,7 +16,7 @@ type KeyValueSet struct {
 	Key         string `json:"key" gorm:"<-:create,unique"`
 	Value       string `json:"value"`
 	Description string `json:"description"`
-	Tags        []Tag  `json:"tags" gorm:"many2many:keyvalueset_tags;"`
+	Tags        []Tag  `json:"tags" gorm:"foreignkey:KvsID"`
 
 	// Automatically managed by GORM for creation time
 	CreatedAt time.Time `json:"created_at" gorm:"<-:create"`

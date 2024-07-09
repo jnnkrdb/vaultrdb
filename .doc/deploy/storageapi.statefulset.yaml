@@ -44,13 +44,11 @@ spec:
             httpGet:
               path: /healthz/live
               port: 80
-            initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /healthz/ready
               port: 80
-            initialDelaySeconds: 5
             periodSeconds: 10
           resources:
             limits:

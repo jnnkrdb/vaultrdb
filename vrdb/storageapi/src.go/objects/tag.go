@@ -1,9 +1,14 @@
 package objects
 
+import (
+	"gorm.io/gorm"
+	"vrdb.go/logging"
+)
+
 type Tag struct {
-	ID           uint          `json:"-" gorm:"primaryKey,autoIncrement"`
-	Tag          string        `json:"tag" gorm:"unique"`
-	KeyValueSets []KeyValueSet `json:"-" gorm:"many2many:keyvalueset_tags;"`
+	ID    uint   `json:"-" gorm:"primaryKey,autoIncrement"`
+	KvsID uint   `json:"-"`
+	Tag   string `json:"tag"`
 }
 
 // ------------------------------------------------
@@ -34,3 +39,15 @@ type Tag struct {
 //
 //	return
 //}
+
+func (tag *Tag) AfterCreate(tx *gorm.DB) (err error) {
+
+	logging.Log.Info("executing *Tag.AfterCreate(*gorm.DB)")
+
+	if err := tx.Delete(&Tag{}, "KvsID IS NULL").Error; err != nil {
+
+		logging.Log.Info("error removing unused tags")
+	}
+
+	return
+}
