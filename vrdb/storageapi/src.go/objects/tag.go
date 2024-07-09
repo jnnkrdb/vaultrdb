@@ -44,7 +44,7 @@ func (tag *Tag) AfterCreate(tx *gorm.DB) (err error) {
 
 	logging.Log.Info("executing *Tag.AfterCreate(*gorm.DB)")
 
-	if err := tx.Delete(&Tag{}, "KvsID IS NULL").Error; err != nil {
+	if err := tx.Delete(&Tag{}, "kvs_id IS NULL").Error; err != nil {
 
 		logging.Log.Info("error removing unused tags")
 	}
