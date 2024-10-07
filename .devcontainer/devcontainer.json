@@ -17,5 +17,6 @@
         "ms-azuretools.vscode-docker"
       ]
     }
-  }
+  },
+  "postCreateComand": "bash -i .devcontainer/install-dependencies.sh"
 }
