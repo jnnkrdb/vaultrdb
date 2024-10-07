@@ -1,0 +1,21 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/go:1": {},
+    "ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.Go",
+        "yy0931.vscode-sqlite3-editor",
+        "github.vscode-github-actions",
+        "GrapeCity.gc-excelviewer",
+        "cweijan.vscode-postgresql-client2",
+        "redhat.vscode-yaml",
+        "rangav.vscode-thunder-client",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}
