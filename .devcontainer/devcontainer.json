@@ -3,6 +3,7 @@
   "features": {
     "ghcr.io/devcontainers/features/go:1": {},
     "ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "customizations": {
