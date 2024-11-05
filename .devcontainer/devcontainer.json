@@ -22,5 +22,5 @@
       ]
     }
   },
-  "postCreateCommand": ["/bin/bash","-c",".devcontainer/install-dependencies.sh"]
+  "postCreateCommand": ["bash","-i",".devcontainer/install-dependencies.sh"]
 }
