@@ -3,7 +3,10 @@ window.onload = function() {
 
   // the following lines will be replaced by docker/configurator, when it runs in a docker-container
   window.ui = SwaggerUIBundle({
-    url: "./_swagger.yaml",
+    //url: "./_swagger.yaml",
+    urls: [
+      { url: "apidocs/swagger.yaml", name: "VaultRDB" },
+    ],
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [
@@ -14,13 +17,5 @@ window.onload = function() {
       SwaggerUIBundle.plugins.DownloadUrl
     ],
     layout: "StandaloneLayout"
-    //requestInterceptor: (req) => {
-    //  if (!req.loadSpec) {
-    //    req.headers.Authorization = "Basic "+btoa("vault:vault");
-    //  }
-    //  return req;
-    //}
   });
-
-  //</editor-fold>
 };
