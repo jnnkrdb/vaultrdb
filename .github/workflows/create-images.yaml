@@ -64,7 +64,7 @@ jobs:
       with:
         context: "."
         file: "Dockerfile"
-        tags: jnnkrdb/vaultrdb:dev-latest
+        tags: ghcr.io/jnnkrdb/vaultrdb:dev-latest
         push: true
 
     - name: Build Image With Push - Prod
@@ -73,7 +73,7 @@ jobs:
       with:
         context: "."
         file: "Dockerfile"
-        tags: jnnkrdb/vaultrdb:latest,jnnkrdb/vaultrdb:${{ steps.gitversion.outputs.semVer }}
+        tags: ghcr.io/jnnkrdb/vaultrdb:latest,ghcr.io/jnnkrdb/vaultrdb:${{ steps.gitversion.outputs.semVer }}
         push: true
 
 
