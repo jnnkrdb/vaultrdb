@@ -1,6 +1,6 @@
-# ----------------------------------------------- 
+# ---------------------------------------------------------------------------------------------- Golang
 # Building the go binary
-FROM golang:1.19.13 AS operator
+FROM golang:1.19 AS operator
 WORKDIR /workspace/src.go
 
 # copy the code files
@@ -14,18 +14,16 @@ ENV GOOS=linux
 # START BUILD
 RUN go mod download && go build -o /vaultrdb-operator .
 
-# ----------------------------------------------- 
+# ---------------------------------------------------------------------------------------------- Frontend
 # Building the go binary
 FROM node:latest AS frontend
-WORKDIR /workspace/src.angular
+WORKDIR /workspace/frontend
 # copy the code files
-COPY ui/ /workspace/src.angular
-
+COPY ui/vue/ /workspace/frontend
 RUN npm install 
-
 RUN npm run build
 
-# ----------------------------------------------- 
+# ---------------------------------------------------------------------------------------------- Final Alpine
 # Finish the operator, api, ui build with the final image
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
@@ -41,7 +39,7 @@ COPY vaultrdb/ /opt/vaultrdb
 
 # Copy Operators Binary and Frontend Files
 COPY --from=operator /vaultrdb-operator /usr/local/bin/vaultrdb-operator
-COPY --from=frontend /workspace/src.angular/dist/vaultrdb/ /opt/vaultrdb/web
+COPY --from=frontend /workspace/frontend/dist/ /opt/vaultrdb/web
 
 # Set the user for the config and the operator binaries
 RUN chmod a+x /usr/local/bin/vaultrdb-operator &&\
