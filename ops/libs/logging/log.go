@@ -17,5 +17,7 @@ func InitLogger(name string) {
 
 	opts.BindFlags(flag.CommandLine)
 
+	flag.Parse()
+
 	Log = zap.New(zap.UseFlagOptions(&opts)).WithName(name)
 }

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"vrdb.go/logging"
+	"github.com/jnnkrdb/vaultrdb/libs/logging"
 )
 
 // logging information for an http request

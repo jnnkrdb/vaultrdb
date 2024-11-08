@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"vrdb.go/logging"
+	"github.com/jnnkrdb/vaultrdb/libs/logging"
 )
 
 // the default encryption passphrase will be created from the ca-certificate.
