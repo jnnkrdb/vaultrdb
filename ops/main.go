@@ -23,8 +23,15 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	"github.com/gorilla/mux"
+	"github.com/jnnkrdb/vaultrdb/int/configstore"
 	"github.com/jnnkrdb/vaultrdb/int/server"
+	v1 "github.com/jnnkrdb/vaultrdb/int/server/endpoints/api/v1"
+	"github.com/jnnkrdb/vaultrdb/int/server/endpoints/healthz"
+	"github.com/jnnkrdb/vaultrdb/int/server/endpoints/metadata"
+	"github.com/jnnkrdb/vaultrdb/int/server/endpoints/swagger"
+	"github.com/jnnkrdb/vaultrdb/int/server/endpoints/ui"
 	"github.com/jnnkrdb/vaultrdb/libs/logging"
+	"github.com/jnnkrdb/vaultrdb/libs/termination"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -56,9 +63,9 @@ func main() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		MetricsBindAddress:     "", //":8080",
+		MetricsBindAddress:     "0", //":8080",
 		Port:                   9443,
-		HealthProbeBindAddress: "", //":8081",
+		HealthProbeBindAddress: "0", //":8081",
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "vaultrdb.jnnkrdb.de",
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
@@ -95,9 +102,18 @@ func main() {
 		}
 	*/
 
+	configstore.InitConfigStore()
+
 	logging.Log.Info("starting vaultrdb http backend async")
 	go func() {
-		var listFuncs = []func(*mux.Router){}
+		var listFuncs = []func(*mux.Router){
+			healthz.EnableEndpoint_Healthz,
+			metadata.EnableEndpoint_Metadata,
+			swagger.EnableEndpoint_Swagger,
+			ui.EnableEndpoint_UI,
+
+			v1.EnableEndpoint_ApiV1,
+		}
 
 		if err := server.StartHTTP(listFuncs...); err != nil {
 			logging.Log.Error(err, "error keeping up the http server")
@@ -106,9 +122,12 @@ func main() {
 	}()
 
 	logging.Log.Info("starting vaultrdb operator")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(termination.HandleTermination(
+		termination.Testfunc,
+		server.StopHTTP,
+		configstore.Close,
+	)); err != nil {
 		logging.Log.Error(err, "problem running vaultrdb")
-		server.StopHTTP()
 		os.Exit(1)
 	}
 }
