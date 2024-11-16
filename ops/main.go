@@ -24,6 +24,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/vaultrdb/int/configstore"
+	"github.com/jnnkrdb/vaultrdb/int/database"
 	"github.com/jnnkrdb/vaultrdb/int/server"
 	v1 "github.com/jnnkrdb/vaultrdb/int/server/endpoints/api/v1"
 	"github.com/jnnkrdb/vaultrdb/int/server/endpoints/healthz"
@@ -104,6 +105,8 @@ func main() {
 
 	configstore.InitConfigStore()
 
+	database.Connect()
+
 	logging.Log.Info("starting vaultrdb http backend async")
 	go func() {
 		var listFuncs = []func(*mux.Router){
@@ -125,6 +128,7 @@ func main() {
 	if err := mgr.Start(termination.HandleTermination(
 		termination.Testfunc,
 		server.StopHTTP,
+		database.Disconnect,
 		configstore.Close,
 	)); err != nil {
 		logging.Log.Error(err, "problem running vaultrdb")

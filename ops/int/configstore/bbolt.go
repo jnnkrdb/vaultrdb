@@ -10,13 +10,12 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-const (
-	internalDB string = "/opt/vaultrdb/data/internal.db"
-)
+// path of the internal database for configs
+const internalDB string = "/opt/vaultrdb/data/internal.db"
 
-var (
-	DB *bbolt.DB = nil
-)
+// internal config store
+// gets persisted in the data directory
+var DB *bbolt.DB = nil
 
 // initialize the configstore buckets
 func InitConfigStore() {
@@ -82,7 +81,7 @@ func InitConfigStore() {
 	}
 }
 
-// check health
+// close the internal database connection
 func Close() {
 	if err := DB.Close(); err != nil {
 		logging.Log.Info("error closing internal config db", "err", err)
