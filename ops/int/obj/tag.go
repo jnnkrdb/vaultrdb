@@ -1,8 +1,8 @@
-package objects
+package obj
 
 import (
+	"github.com/jnnkrdb/vaultrdb/libs/logging"
 	"gorm.io/gorm"
-	"vrdb.go/logging"
 )
 
 type Tag struct {

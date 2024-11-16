@@ -1,13 +1,13 @@
-package objects
+package obj
 
 import (
 	"errors"
 	"fmt"
 	"time"
-	"vrdb-storage/server"
 
+	"github.com/jnnkrdb/vaultrdb/int/database"
+	"github.com/jnnkrdb/vaultrdb/libs/logging"
 	"gorm.io/gorm"
-	"vrdb.go/logging"
 )
 
 // the actual object, that gets inserted into the database
@@ -27,19 +27,29 @@ type KeyValueSet struct {
 // ------------------------------------------------
 
 func (kvs *KeyValueSet) BeforeCreate(tx *gorm.DB) (err error) {
+
 	logging.Log.Info("executing *KeyValueSet.BeforeCreate(*gorm.DB)")
+
 	// does the keyvalueset already exist
 	var tmp = KeyValueSet{}
-	if result := server.Database.First(&tmp, "key = ?", kvs.Key); result.Error == nil {
+	if result := database.Database.First(&tmp, "key = ?", kvs.Key); result.Error == nil {
+
 		if result.RowsAffected != 0 {
+
 			logging.Log.Info("keyvalueset with given key already exists", "kvs", *kvs, "tmp", tmp)
+
 			err = fmt.Errorf("keyvalueset already exists")
 		}
+
 	} else {
+
 		if errors.Is(gorm.ErrRecordNotFound, result.Error) {
+
 			return nil
 		}
+
 		err = result.Error
 	}
+
 	return
 }

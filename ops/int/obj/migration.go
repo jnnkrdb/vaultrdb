@@ -1,11 +1,11 @@
-package objects
+package obj
 
 import (
 	"os"
 	"reflect"
-	"vrdb-storage/server"
 
-	"vrdb.go/logging"
+	"github.com/jnnkrdb/vaultrdb/int/database"
+	"github.com/jnnkrdb/vaultrdb/libs/logging"
 )
 
 // migrate predefined structs into the database
@@ -38,7 +38,7 @@ func Migrate() {
 
 	logging.Log.Info("migrating objects into database", "object-list", listOfObjectNames)
 
-	if err := server.Database.AutoMigrate(listOfObjects...); err != nil {
+	if err := database.Database.AutoMigrate(listOfObjects...); err != nil {
 
 		logging.Log.Error(err, "couldn't migrate objects into database")
 
