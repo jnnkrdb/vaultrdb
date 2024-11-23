@@ -6,6 +6,8 @@ WORKDIR /workspace
 # copy the code files
 COPY pkg/ /workspace/pkg
 COPY bin/vaultrdb/ /workspace/vaultrdb
+COPY go.mod /workspace/go.mod
+COPY go.sum /workspace/go.sum
 
 # set env vars
 ENV CGO_ENABLED=0
