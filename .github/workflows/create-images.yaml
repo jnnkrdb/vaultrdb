@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-vault
-      DOCKERFILE: vrdb-vault.Dockerfile
+      DOCKERFILE: ./vrdb-vault.Dockerfile
     steps:
       - name: bash-version
         run: |
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-injector
-      DOCKERFILE: vrdb-injector.Dockerfile
+      DOCKERFILE: ./vrdb-injector.Dockerfile
     steps:
       - name: bash-version
         run: |
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-operator
-      DOCKERFILE: vrdb-operator.Dockerfile
+      DOCKERFILE: ./vrdb-operator.Dockerfile
     steps:
       - name: bash-version
         run: |
