@@ -50,6 +50,11 @@ jobs:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-vault
       DOCKERFILE: ./vrdb-vault.Dockerfile
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: bash-version
         run: |
           echo $(cat './vaultrdb/config/VERSION')
@@ -95,6 +100,11 @@ jobs:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-injector
       DOCKERFILE: ./vrdb-injector.Dockerfile
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: bash-version
         run: |
           echo $(cat './vaultrdb/config/VERSION')
@@ -141,6 +151,11 @@ jobs:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-operator
       DOCKERFILE: ./vrdb-operator.Dockerfile
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: bash-version
         run: |
           echo $(cat './vaultrdb/config/VERSION')
