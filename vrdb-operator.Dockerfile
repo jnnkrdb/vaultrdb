@@ -5,7 +5,7 @@ WORKDIR /workspace
 
 # copy the code files
 COPY pkg/ /workspace/pkg
-COPY bin/vaultrdb-operator/ /workspace/vaultrdb-operator
+COPY bin/ /workspace/bin
 COPY go.mod /workspace/go.mod
 COPY go.sum /workspace/go.sum
 
@@ -15,7 +15,7 @@ ENV GOARCH=amd64
 ENV GOOS=linux
 
 # START BUILD
-RUN go mod download && go build -o /vaultrdb-operator ./vaultrdb-operator/main.go
+RUN go mod download && go build -o /vaultrdb-operator ./bin/vaultrdb-operator/main.go
 
 # ---------------------------------------------------------------------------------------------- Final Alpine
 FROM alpine:3.19

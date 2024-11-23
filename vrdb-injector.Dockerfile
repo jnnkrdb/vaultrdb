@@ -5,7 +5,7 @@ WORKDIR /workspace
 
 # copy the code files
 COPY pkg/ /workspace/pkg
-COPY bin/vaultrdb-injector/ /workspace/vaultrdb-injector
+COPY bin/ /workspace/bin
 COPY go.mod /workspace/go.mod
 COPY go.sum /workspace/go.sum
 
@@ -15,7 +15,7 @@ ENV GOARCH=amd64
 ENV GOOS=linux
 
 # START BUILD
-RUN go mod download && go build -o /vaultrdb-injector ./vaultrdb-injector/main.go
+RUN go mod download && go build -o /vaultrdb-injector ./bin/vaultrdb-injector/main.go
 
 # ---------------------------------------------------------------------------------------------- Final Alpine
 FROM alpine:3.19
