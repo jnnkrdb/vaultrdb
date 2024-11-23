@@ -34,11 +34,6 @@ jobs:
         with:
           useConfigFile: true
           configFilePath: .github/gitversion/GitVersion.yml
-
-      - name: bash-version
-        run: |
-          echo ${{ steps.gitversion.outputs.semVer }} > ./vaultrdb/config/VERSION
-          echo $(cat './vaultrdb/config/VERSION')
       
       - id: version
         run: echo "semver=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
@@ -57,6 +52,7 @@ jobs:
 
       - name: bash-version
         run: |
+          echo ${{ needs.version.outputs.semver }} > ./vaultrdb/config/VERSION
           echo $(cat './vaultrdb/config/VERSION')
 
       - name: Login to Github Packages
@@ -107,6 +103,7 @@ jobs:
 
       - name: bash-version
         run: |
+          echo ${{ needs.version.outputs.semver }} > ./vaultrdb/config/VERSION
           echo $(cat './vaultrdb/config/VERSION')
 
       - name: Login to Github Packages
@@ -157,6 +154,7 @@ jobs:
 
       - name: bash-version
         run: |
+          echo ${{ needs.version.outputs.semver }} > ./vaultrdb/config/VERSION
           echo $(cat './vaultrdb/config/VERSION')
 
       - name: Login to Github Packages
