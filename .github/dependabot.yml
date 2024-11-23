@@ -5,27 +5,18 @@
  
 version: 2
 updates:
-  # vrdb.go
-  - package-ecosystem: "gomod"
-    directory: "/vrdb/_vrdb.go"
+  # devcontainer
+  - package-ecosystem: "devcontainers"
+    directory: "/.devcontainer"
     schedule:
       interval: "weekly"
-  # uiserver
+  # golang
   - package-ecosystem: "gomod"
-    directory: "/vrdb/uiserver/src"
+    directory: "/"
     schedule:
       interval: "weekly"
-  # storage api
-  - package-ecosystem: "gomod"
-    directory: "/vrdb/storageapi/src"
+  # npm / vue
+  - package-ecosystem: "npm"
+    directory: "/ui/vue"
     schedule:
       interval: "weekly"
-  # operator
-  - package-ecosystem: "gomod"
-    directory: "/vrdb/operator/src"
-    schedule:
-      interval: "weekly"
-#  - package-ecosystem: "npm"
-#    directory: "/src/frontend"
-#    schedule:
-#      interval: "weekly"
