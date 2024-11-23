@@ -17,11 +17,10 @@ func QueryLog(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
-		logging.Log.WithValues(
+		logging.SLog.Info("finished request",
 			"request-url", r.URL.String(),
 			"request-method", r.Method,
-			"response-code", r.Context().Value("code"),
 			"time-since", time.Since(start),
-		).Info("finished request")
+		)
 	})
 }

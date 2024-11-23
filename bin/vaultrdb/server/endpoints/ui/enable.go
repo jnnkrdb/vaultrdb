@@ -19,10 +19,10 @@ const (
 //   - http://<host>:<port>/
 func EnableEndpoint_UI(r *mux.Router) {
 
-	logging.Log.WithValues(
+	logging.SLog.Info("creating ui endpoints",
 		"uri.ui", URI_UI,
 		"dir.ui", DIR_UI,
-	).Info("creating ui endpoints")
+	)
 
 	r.Methods(http.MethodGet).Path(URI_UI).Handler(server.DefaultMiddleware.Then(http.FileServer(http.Dir(DIR_UI))))
 }

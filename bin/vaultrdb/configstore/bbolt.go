@@ -21,10 +21,10 @@ var DB *bbolt.DB = nil
 func InitConfigStore() {
 
 	// open the database, or create one, if not exists
-	logging.Log.Info("opening configstore", "path", internalDB)
+	logging.SLog.Info("opening configstore", "path", internalDB)
 	if _db, err := bbolt.Open(internalDB, 0600, nil); err != nil {
 
-		logging.Log.Info("error opening internal.db", "err", err)
+		logging.SLog.Info("error opening internal.db", "err", err)
 		os.Exit(1)
 
 	} else {
@@ -35,13 +35,13 @@ func InitConfigStore() {
 	// create the required buckets for initialization
 	if DB.Update(func(tx *bbolt.Tx) error {
 
-		logging.Log.Info("creating buckets in internal.db if neccessary", "buckets", buckets.DefaultBuckets())
+		logging.SLog.Info("creating buckets in internal.db if neccessary", "buckets", buckets.DefaultBuckets())
 
 		for i := range buckets.DefaultBuckets() {
 
 			if _, err := tx.CreateBucketIfNotExists([]byte(buckets.DefaultBuckets()[i])); err != nil {
 
-				logging.Log.Info("error creating bucket", "bucket", buckets.DefaultBuckets()[i], "err", err)
+				logging.SLog.Info("error creating bucket", "bucket", buckets.DefaultBuckets()[i], "err", err)
 				return err
 			}
 		}
@@ -64,12 +64,10 @@ func InitConfigStore() {
 			encKey = cryptography.GetPassphraseFromCACertHASH()
 
 			// save the enckey to internal db
-			logging.Log.WithValues(
-				"vrdb-encryption-key", strings.Repeat("*", len(encKey)),
-			).Info("saving encKey in internaldb")
+			logging.SLog.Info("saving encKey in internaldb", "vrdb-encryption-key", strings.Repeat("*", len(encKey)))
 
 			if err := tx.Bucket([]byte(buckets.Vault)).Put([]byte("vrdb-encryption-key"), []byte(cryptography.GetPassphraseFromCACertHASH())); err != nil {
-				logging.Log.Info("error commiting vrdb-encryption-key to bucket", "err", err)
+				logging.SLog.Info("error commiting vrdb-encryption-key to bucket", "err", err)
 				return err
 			}
 		}
@@ -84,6 +82,6 @@ func InitConfigStore() {
 // close the internal database connection
 func Close() {
 	if err := DB.Close(); err != nil {
-		logging.Log.Info("error closing internal config db", "err", err)
+		logging.SLog.Info("error closing internal config db", "err", err)
 	}
 }

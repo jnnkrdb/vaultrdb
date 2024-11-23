@@ -23,16 +23,16 @@ const DATABASE_PATH string = "/opt/vaultrdb/data/store.db"
 // build a connection to the local database
 func Connect() {
 
-	logging.Log.Info("connecting to local datastore", "src", DATABASE_PATH)
+	logging.SLog.Info("connecting to local datastore", "src", DATABASE_PATH)
 
 	// creating database file, if not exists
 	if _, err := os.Stat(DATABASE_PATH); err != nil {
 
-		logging.Log.Info("couldn't find database -> creating", "destination", DATABASE_PATH)
+		logging.SLog.Info("couldn't find database -> creating", "destination", DATABASE_PATH)
 
 		if file, err := os.Create(DATABASE_PATH); err != nil {
 
-			logging.Log.Error(err, "couldn't create database file in specified destination", "destination", DATABASE_PATH)
+			logging.SLog.Error("couldn't create database file in specified destination", "destination", DATABASE_PATH, err)
 
 			termination.Shutdown()
 
@@ -45,7 +45,7 @@ func Connect() {
 	// connecting to the database
 	if db, err := gorm.Open(sqlite.Open(DATABASE_PATH), &gorm.Config{}); err != nil {
 
-		logging.Log.Error(err, "error connecting to database")
+		logging.SLog.Error("error connecting to database", err)
 
 		termination.Shutdown()
 
@@ -64,11 +64,11 @@ func Disconnect() {
 
 	if db, err := Database.DB(); err != nil {
 
-		logging.Log.Error(err, "error receiving database connection")
+		logging.SLog.Error("error receiving database connection", err)
 	} else {
 		if err := db.Close(); err != nil {
 
-			logging.Log.Error(err, "error closing database connection")
+			logging.SLog.Error("error closing database connection", err)
 		}
 	}
 }

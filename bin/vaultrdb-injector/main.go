@@ -1,11 +1,16 @@
 package main
 
-import "github.com/jnnkrdb/vaultrdb/pkg/logging"
+import (
+	"errors"
+
+	"github.com/jnnkrdb/vaultrdb/pkg/logging"
+)
 
 func main() {
 
-	logging.InitLogger("vaultrdb-injector")
+	logging.InitSLOG("Debug")
 
-	logging.Log.Info("starting injector sidecar for pod", "podname", "pod-xxxx-xxxx")
+	logging.SLog.Info("starting injector sidecar for pod", "podname", "pod-xxxx-xxxx")
 
+	logging.SLog.Error("starting vaultrdb sidecar not possible, no logic found, shutting down", errors.New("no sidecar logic"))
 }

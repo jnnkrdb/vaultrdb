@@ -8,10 +8,10 @@ import (
 
 func main() {
 
-	logging.InitLogger("vaultrdb-operator")
+	logging.InitSLOG("Debug")
 
 	// starting vaultrdb operator
-	logging.Log.Info("starting vaultrdb operator")
+	logging.SLog.Info("starting vaultrdb operator")
 
-	logging.Log.Error(errors.New("no operator logic"), "starting vaultrdb operator not possible, no logic found, shutting down")
+	logging.SLog.Error("starting vaultrdb operator not possible, no logic found, shutting down", errors.New("no operator logic"))
 }

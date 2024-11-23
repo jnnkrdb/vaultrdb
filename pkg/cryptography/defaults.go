@@ -28,7 +28,7 @@ func GetPassphraseFromCACertHASH() (result string) {
 	var err error
 	if cacrt_content, err = os.ReadFile(_passphraseSourceFile); err != nil {
 
-		logging.Log.Info("error creating passphrase from ca.crt, using random created passphrase", "err", err.Error())
+		logging.SLog.Info("error creating passphrase from ca.crt, using random created passphrase", "err", err.Error())
 
 		return
 	}
@@ -38,7 +38,7 @@ func GetPassphraseFromCACertHASH() (result string) {
 	hashGen.Write(cacrt_content)
 	result = hex.EncodeToString(hashGen.Sum(nil))
 
-	logging.Log.Info("created hash from ca.crt file", "source", _passphraseSourceFile)
+	logging.SLog.Info("created hash from ca.crt file", "source", _passphraseSourceFile)
 
 	return
 }

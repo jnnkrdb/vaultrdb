@@ -38,7 +38,7 @@ func HandleTermination(terminationFunctions ...func()) context.Context {
 
 		go func() {
 
-			logging.Log.Info("caught termination request, running termination processes", "signal", sig.String())
+			logging.SLog.Info("caught termination request, running termination processes", "signal", sig.String())
 
 			var termWaitGroup sync.WaitGroup
 			termWaitGroup.Add(len(terminationFunctions))
@@ -52,7 +52,7 @@ func HandleTermination(terminationFunctions ...func()) context.Context {
 			}
 
 			termWaitGroup.Wait()
-			logging.Log.Info("finished termination processes")
+			logging.SLog.Info("finished termination processes")
 			cancel()
 
 		}()

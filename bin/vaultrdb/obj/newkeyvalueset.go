@@ -25,7 +25,7 @@ func (nkvs *NewKeyValueSet) FromJSON(w http.ResponseWriter, r *http.Request) (er
 
 	if err = json.NewDecoder(r.Body).Decode(nkvs); err != nil {
 
-		logging.Log.Info("error parsing body into struct", "nkvs", nkvs, "err", err)
+		logging.SLog.Info("error parsing body into struct", "nkvs", nkvs, "err", err)
 
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}

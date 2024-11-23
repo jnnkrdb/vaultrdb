@@ -20,10 +20,10 @@ const (
 //   - http://<host>:<port>/healthz/readiness
 func EnableEndpoint_Healthz(r *mux.Router) {
 
-	logging.Log.WithValues(
+	logging.SLog.Info("creating healthz endpoints",
 		"uri.liveness", URI_Liveness,
 		"uri.readiness", URI_Readiness,
-	).Info("creating healthz endpoints")
+	)
 
 	r.Methods(http.MethodGet).Path(URI_Liveness).Handler(
 		server.DefaultMiddleware.ThenFunc(live))

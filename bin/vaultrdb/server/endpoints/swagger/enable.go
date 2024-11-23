@@ -19,9 +19,9 @@ const (
 //   - http://<host>:<port>/swagger/
 func EnableEndpoint_Swagger(r *mux.Router) {
 
-	logging.Log.WithValues(
+	logging.SLog.Info("creating swagger endpoints",
 		"uri.swagger", URI_Swagger,
-	).Info("creating swagger endpoints")
+	)
 
 	r.Methods(http.MethodGet).Path(URI_Swagger).Handler(server.DefaultMiddleware.Then(
 		http.StripPrefix("/swagger/", http.FileServer(http.Dir(DIR_Swagger)))))

@@ -10,9 +10,9 @@ import (
 // finishing the function
 func Testfunc() {
 
-	logging.Log.Info("running SIGTERM shutdown, waiting for 10 seconds")
+	logging.SLog.Info("running SIGTERM shutdown, waiting for 10 seconds")
 
 	time.Sleep(10 * time.Second)
 
-	logging.Log.Info("terminating service...")
+	logging.SLog.Info("terminating service...")
 }

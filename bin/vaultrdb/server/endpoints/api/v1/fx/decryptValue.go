@@ -19,7 +19,7 @@ func EncryptValue(w http.ResponseWriter, r *http.Request) {
 
 	res, err := crypt.Decrypt(body.Value)
 	if err != nil {
-		logging.Log.Info("couldn't decrypt body", "response-code", http.StatusBadRequest)
+		logging.SLog.Info("couldn't decrypt body", "response-code", http.StatusBadRequest)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}

@@ -36,11 +36,11 @@ func Migrate() {
 		}
 	}
 
-	logging.Log.Info("migrating objects into database", "object-list", listOfObjectNames)
+	logging.SLog.Info("migrating objects into database", "object-list", listOfObjectNames)
 
 	if err := database.Database.AutoMigrate(listOfObjects...); err != nil {
 
-		logging.Log.Error(err, "couldn't migrate objects into database")
+		logging.SLog.Error("couldn't migrate objects into database", err)
 
 		os.Exit(1)
 	}

@@ -24,7 +24,7 @@ var _SRV *http.Server
 func StartHTTP(fnc ...func(*mux.Router)) error {
 
 	// initializing the middleware for the http server
-	logging.Log.Info("defining default middlewares for http endpoints")
+	logging.SLog.Info("defining default middlewares for http endpoints")
 
 	DefaultMiddleware = middlewares.New(
 		mw.QueryLog,
@@ -34,7 +34,7 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 	var router *mux.Router = mux.NewRouter().StrictSlash(true)
 
 	// append the endpoints to the default router
-	logging.Log.Info("creating the server and adding the required endpoints")
+	logging.SLog.Info("creating the server and adding the required endpoints")
 
 	for _, f := range fnc {
 
@@ -42,7 +42,7 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 	}
 
 	// booting the frontend http server
-	logging.Log.Info("booting the server", "port", _PORT)
+	logging.SLog.Info("booting the server", "port", _PORT)
 
 	_SRV = &http.Server{
 		Addr: fmt.Sprintf(":%d", _PORT),
@@ -69,8 +69,8 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 
 // stop the http backend server
 func StopHTTP() {
-	logging.Log.Info("shutting down the server")
+	logging.SLog.Info("shutting down the server")
 	if err := _SRV.Shutdown(context.TODO()); err != nil {
-		logging.Log.Error(err, "error gracefully shutting down http server")
+		logging.SLog.Error("error gracefully shutting down http server", err)
 	}
 }

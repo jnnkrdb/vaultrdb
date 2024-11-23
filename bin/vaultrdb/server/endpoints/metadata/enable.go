@@ -15,10 +15,10 @@ import (
 //   - http://<host>:<port>/meta/license
 func EnableEndpoint_Metadata(r *mux.Router) {
 
-	logging.Log.WithValues(
+	logging.SLog.Info("creating metadata endpoints",
 		"uri.metadata.version", URI_Metadata_Version,
 		"uri.metadata.license", URI_Metadata_License,
-	).Info("creating metadata endpoints")
+	)
 
 	r.Methods(http.MethodGet).Path(URI_Metadata_Version).Handler(server.DefaultMiddleware.ThenFunc(version))
 	r.Methods(http.MethodGet).Path(URI_Metadata_License).Handler(server.DefaultMiddleware.ThenFunc(license))

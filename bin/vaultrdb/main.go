@@ -16,14 +16,14 @@ import (
 
 func main() {
 
-	logging.InitLogger("vaultrdb")
+	logging.InitSLOG("Debug")
 
 	configstore.InitConfigStore()
 
 	database.Connect()
 
 	// starting the http server for vaultrdb
-	logging.Log.Info("starting vaultrdb http backend async")
+	logging.SLog.Info("starting vaultrdb http backend async")
 	if err := server.StartHTTP(
 		healthz.EnableEndpoint_Healthz,
 		metadata.EnableEndpoint_Metadata,
@@ -32,7 +32,7 @@ func main() {
 
 		v1.EnableEndpoint_ApiV1,
 	); err != nil {
-		logging.Log.Error(err, "error keeping up the http server")
+		logging.SLog.Error("error keeping up the http server", err)
 		os.Exit(1)
 	}
 }
