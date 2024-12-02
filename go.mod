@@ -1,6 +1,8 @@
 module github.com/jnnkrdb/vaultrdb
 
-go 1.19
+go 1.22
+
+toolchain go1.23.2
 
 require gorm.io/gorm v1.25.12
 

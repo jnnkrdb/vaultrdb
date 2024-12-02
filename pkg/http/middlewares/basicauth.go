@@ -6,9 +6,10 @@ import (
 	"net/http"
 )
 
+// TODO: implement loading basicauth configs from external source, e.g. ENV Var or config.yaml
 var (
-	BASICAUTH_Username string = "" // os.Getenv("BASICAUTH_USER")
-	BASICAUTH_Password string = "" // os.Getenv("BASICAUTH_PASS")
+	expectedUsernameHash [32]byte = sha256.Sum256([]byte("admin")) // os.Getenv("BASICAUTH_USER")
+	expectedPasswordHash [32]byte = sha256.Sum256([]byte("admin")) // os.Getenv("BASICAUTH_PASS")
 )
 
 func BasicAuth(next http.Handler) http.Handler {
@@ -17,15 +18,15 @@ func BasicAuth(next http.Handler) http.Handler {
 		// check for basic auth
 		if user, pass, ok := r.BasicAuth(); ok {
 
-			usernameHash := sha256.Sum256([]byte(user))
-			passwordHash := sha256.Sum256([]byte(pass))
-			expectedUsernameHash := sha256.Sum256([]byte(BASICAUTH_Username))
-			expectedPasswordHash := sha256.Sum256([]byte(BASICAUTH_Password))
+			var (
+				usernameHash [32]byte = sha256.Sum256([]byte(user))
+				passwordHash [32]byte = sha256.Sum256([]byte(pass))
+			)
 
-			usernameMatch := (subtle.ConstantTimeCompare(usernameHash[:], expectedUsernameHash[:]) == 1)
-			passwordMatch := (subtle.ConstantTimeCompare(passwordHash[:], expectedPasswordHash[:]) == 1)
+			if (subtle.ConstantTimeCompare(usernameHash[:], expectedUsernameHash[:]) == 1) &&
+				(subtle.ConstantTimeCompare(passwordHash[:], expectedPasswordHash[:]) == 1) {
 
-			if usernameMatch && passwordMatch {
+				// serve next request step
 				next.ServeHTTP(w, r)
 				return
 			}

@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------------------------- Golang
 # Building the go binary
-FROM golang:1.19 AS operator
+#FROM golang:1.19 AS operator
+FROM golang:1.23 AS operator
 WORKDIR /workspace
 
 # copy the code files
