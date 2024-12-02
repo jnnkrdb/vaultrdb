@@ -6,6 +6,7 @@ window.onload = function() {
     //url: "./_swagger.yaml",
     urls: [
       { url: "apidocs/swagger.yaml", name: "VaultRDB" },
+      { url: "apidocs/metadata.swagger.yaml", name: "VaultRDB Metadata API" },
     ],
     dom_id: '#swagger-ui',
     deepLinking: true,

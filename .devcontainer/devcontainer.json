@@ -17,7 +17,8 @@
         "redhat.vscode-yaml",
         "rangav.vscode-thunder-client",
         "ms-azuretools.vscode-docker",
-        "Vue.volar"
+        "Vue.volar",
+        "42Crunch.vscode-openapi"
       ]
     }
   },
