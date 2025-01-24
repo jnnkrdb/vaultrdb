@@ -32,7 +32,7 @@ func Connect() {
 
 		if file, err := os.Create(DATABASE_PATH); err != nil {
 
-			logging.SLog.Error("couldn't create database file in specified destination", "destination", DATABASE_PATH, err)
+			logging.SLog.Error("couldn't create database file in specified destination", "destination", DATABASE_PATH, "error", err.Error())
 
 			termination.Shutdown()
 
@@ -45,7 +45,7 @@ func Connect() {
 	// connecting to the database
 	if db, err := gorm.Open(sqlite.Open(DATABASE_PATH), &gorm.Config{}); err != nil {
 
-		logging.SLog.Error("error connecting to database", err)
+		logging.SLog.Error("error connecting to database", "error", err.Error())
 
 		termination.Shutdown()
 
@@ -64,11 +64,11 @@ func Disconnect() {
 
 	if db, err := Database.DB(); err != nil {
 
-		logging.SLog.Error("error receiving database connection", err)
+		logging.SLog.Error("error receiving database connection", "error", err.Error())
 	} else {
 		if err := db.Close(); err != nil {
 
-			logging.SLog.Error("error closing database connection", err)
+			logging.SLog.Error("error closing database connection", "error", err.Error())
 		}
 	}
 }

@@ -71,6 +71,6 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 func StopHTTP() {
 	logging.SLog.Info("shutting down the server")
 	if err := _SRV.Shutdown(context.TODO()); err != nil {
-		logging.SLog.Error("error gracefully shutting down http server", err)
+		logging.SLog.Error("error gracefully shutting down http server", "error", err.Error())
 	}
 }

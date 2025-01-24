@@ -43,7 +43,7 @@ func (kvs *KeyValueSet) BeforeCreate(tx *gorm.DB) (err error) {
 
 	} else {
 
-		if errors.Is(gorm.ErrRecordNotFound, result.Error) {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 
 			return nil
 		}

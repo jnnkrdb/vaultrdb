@@ -68,7 +68,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 		}
 
 		if _, err := Read(tests[0].path, tests[0].key); err == nil {
-			t.Fatalf("error: estimated [%s:%s] to be gone: %s", tests[0].path, tests[0].key, err.Error())
+			t.Fatalf("error: estimated [%s:%s] to be gone", tests[0].path, tests[0].key)
 		}
 	})
 
@@ -81,7 +81,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 		}
 
 		if _, err := Read(tests[1].path, tests[1].key); err == nil {
-			t.Fatalf("error: estimated [%s:%s] to be gone: %s", tests[1].path, tests[1].key, err.Error())
+			t.Fatalf("error: estimated [%s:%s] to be gone", tests[1].path, tests[1].key)
 		}
 	})
 
@@ -96,7 +96,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 		}
 
 		if _, err := Read(tests[4].path, tests[4].key); err == nil {
-			t.Fatalf("error: estimated [%s:%s] to be gone: %s", tests[4].path, tests[4].key, err.Error())
+			t.Fatalf("error: estimated [%s:%s] to be gone", tests[4].path, tests[4].key)
 		}
 	})
 
@@ -111,7 +111,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 		}
 
 		if _, err := Read("test/asdf/vKey", "test"); err == nil {
-			t.Fatalf("error: estimated [%s:%s] to be gone: %s", tests[3].path, tests[3].key, err.Error())
+			t.Fatalf("error: estimated [%s:%s] to be gone", tests[3].path, tests[3].key)
 		}
 	})
 }
