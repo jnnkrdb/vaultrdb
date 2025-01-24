@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var SLog *slog.Logger
+var SLog *slog.Logger = slog.Default()
 
 // init the default logging instance
 // can be initialized with following levels:

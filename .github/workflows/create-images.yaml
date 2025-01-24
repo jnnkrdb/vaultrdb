@@ -38,6 +38,28 @@ jobs:
       - id: version
         run: echo "semver=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
 
+  test-go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup GO
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      
+      - name: Install Deps
+        run: go mod download
+
+      - name: Test pkg/
+        run: go test ./pkg/... -v
+        
+      - name: Test bin/
+        run: go test ./bin/... -v
+
   build-vault:
     needs: version
     runs-on: ubuntu-latest

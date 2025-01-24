@@ -32,7 +32,7 @@ func main() {
 
 		v1.EnableEndpoint_ApiV1,
 	); err != nil {
-		logging.SLog.Error("error keeping up the http server", err)
+		logging.SLog.Error("error keeping up the http server", "err", err.Error())
 		os.Exit(1)
 	}
 }
