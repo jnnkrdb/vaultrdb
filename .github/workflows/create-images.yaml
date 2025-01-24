@@ -61,7 +61,7 @@ jobs:
         run: go test ./bin/... -v
 
   build-vault:
-    needs: version
+    needs: [version, test-go]
     runs-on: ubuntu-latest
     env:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-vault
@@ -112,7 +112,7 @@ jobs:
           push: true
 
   build-injector:
-    needs: version
+    needs: [version, test-go]
     runs-on: ubuntu-latest
     env:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-injector
@@ -162,8 +162,8 @@ jobs:
           tags: ${{ env.REPOSITORY }}:latest,${{ env.REPOSITORY }}:${{ needs.version.outputs.semver }}
           push: true
 
-  build-operator:
-    needs: version
+  build-operator: 
+    needs: [version, test-go]
     runs-on: ubuntu-latest
     env:
       REPOSITORY: ghcr.io/jnnkrdb/vaultrdb/vrdb-operator
