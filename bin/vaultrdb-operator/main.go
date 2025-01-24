@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
@@ -13,5 +13,5 @@ func main() {
 	// starting vaultrdb operator
 	logging.SLog.Info("starting vaultrdb operator")
 
-	logging.SLog.Error("starting vaultrdb operator not possible, no logic found, shutting down", errors.New("no operator logic"))
+	logging.SLog.Error("starting vaultrdb operator not possible, no logic found, shutting down", "error", fmt.Errorf("no operator logic"))
 }
