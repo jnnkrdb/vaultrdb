@@ -10,9 +10,9 @@ import (
 func Test_ReadWriteDelete(t *testing.T) {
 
 	var tempDB = fmt.Sprintf("%s/test.db", t.TempDir())
-	OpenDB(tempDB, 5*time.Second)
+	OpenDB(tempDB, 5*time.Second, false)
 	defer CloseDB()
-	t.Logf("using db: %s", DB.Path())
+	t.Logf("using db: %s", db.db.Path())
 
 	// prepare a bunch of key/value pairs in different
 	var tests = []struct {
@@ -31,7 +31,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 	// insert into the db
 	for _, i := range tests {
 		t.Run(fmt.Sprintf("create-%s", i.name), func(t *testing.T) {
-			if Write(i.path, i.key, i.value) != nil {
+			if WriteKey(i.path, i.key, i.value) != nil {
 				t.Fatalf("error writing testvalue to database")
 			}
 		})
@@ -39,11 +39,11 @@ func Test_ReadWriteDelete(t *testing.T) {
 
 	// closing the database connection and reopen it
 	CloseDB()
-	OpenDB(tempDB, 5*time.Second)
+	OpenDB(tempDB, 5*time.Second, false)
 
 	for _, i := range tests {
 		t.Run(fmt.Sprintf("read-%s", i.name), func(t *testing.T) {
-			result, err := Read(i.path, i.key)
+			result, err := ReadKey(i.path, i.key)
 			t.Logf("path: [%s:%s] estimated: %s - testResult: %v", i.path, i.key, i.value, result)
 			if err != nil {
 				t.Fatalf("error reading [%s:%s] from tempDB: %s", i.path, i.key, err.Error())
@@ -56,7 +56,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 
 	// closing the database connection and reopen it
 	CloseDB()
-	OpenDB(tempDB, 5*time.Second)
+	OpenDB(tempDB, 5*time.Second, false)
 
 	// remove the created objects
 	t.Run("delete-key-1", func(t *testing.T) {
@@ -67,7 +67,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 			t.Fatalf("error removing key[%s:%s] from database: %s", tests[0].path, tests[0].key, err.Error())
 		}
 
-		if _, err := Read(tests[0].path, tests[0].key); err == nil {
+		if _, err := ReadKey(tests[0].path, tests[0].key); err == nil {
 			t.Fatalf("error: estimated [%s:%s] to be gone", tests[0].path, tests[0].key)
 		}
 	})
@@ -80,7 +80,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 			t.Fatalf("error removing key[%s:%s] from database: %s", tests[1].path, tests[1].key, err.Error())
 		}
 
-		if _, err := Read(tests[1].path, tests[1].key); err == nil {
+		if _, err := ReadKey(tests[1].path, tests[1].key); err == nil {
 			t.Fatalf("error: estimated [%s:%s] to be gone", tests[1].path, tests[1].key)
 		}
 	})
@@ -95,7 +95,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 			t.Fatalf("error removing bucket[%s:%s] from database: %s", path, bucket, err.Error())
 		}
 
-		if _, err := Read(tests[4].path, tests[4].key); err == nil {
+		if _, err := ReadKey(tests[4].path, tests[4].key); err == nil {
 			t.Fatalf("error: estimated [%s:%s] to be gone", tests[4].path, tests[4].key)
 		}
 	})
@@ -110,7 +110,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 			t.Fatalf("error removing bucket[%s:%s] from database: %s", path, bucket, err.Error())
 		}
 
-		if _, err := Read("test/asdf/vKey", "test"); err == nil {
+		if _, err := ReadKey("test/asdf/vKey", "test"); err == nil {
 			t.Fatalf("error: estimated [%s:%s] to be gone", tests[3].path, tests[3].key)
 		}
 	})

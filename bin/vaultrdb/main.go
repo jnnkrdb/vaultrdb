@@ -3,8 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/configstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/authstore"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server"
 	v1 "github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/api/v1"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/healthz"
@@ -12,13 +14,20 @@ import (
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/swagger"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/ui"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
+	"github.com/jnnkrdb/vaultrdb/pkg/termination"
 )
 
 func main() {
 
 	logging.InitSLOG("Debug")
 
-	configstore.InitConfigStore()
+	// initialize the needed stores
+	configstore.InitDB()
+	vaultrdbstore.InitDB()
+	authstore.InitDB()
+
+	// set the termination methods
+	termination.HandleTermination()
 
 	database.Connect()
 
