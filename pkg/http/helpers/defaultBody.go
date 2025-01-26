@@ -8,7 +8,7 @@ import (
 )
 
 type StringValueJson struct {
-	Value string `json:"value"`
+	Value interface{} `json:"value"`
 }
 
 // receive a struct from a http request
