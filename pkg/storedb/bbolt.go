@@ -63,20 +63,20 @@ func calculateBucketsFromPath(path string) []string {
 	path = strings.ReplaceAll(path, " ", "")
 
 	// replace // with /, as long as there are //
-	for replace_doubleslash := true; replace_doubleslash; replace_doubleslash = strings.Contains(path, "//") {
-		path = strings.ReplaceAll(path, "//", "/")
+	for replace_doubleslash := true; replace_doubleslash; replace_doubleslash = strings.Contains(path, "..") {
+		path = strings.ReplaceAll(path, "..", ".")
 	}
 
 	// if path is empty or single / return nil
-	if path == "" || path == "/" {
+	if path == "" || path == "." {
 		return nil
 	}
 
 	// removing prefix or suffix /
-	path, _ = strings.CutPrefix(path, "/")
-	path, _ = strings.CutSuffix(path, "/")
+	path, _ = strings.CutPrefix(path, ".")
+	path, _ = strings.CutSuffix(path, ".")
 
-	return strings.Split(path, "/")
+	return strings.Split(path, ".")
 }
 
 // read buckets

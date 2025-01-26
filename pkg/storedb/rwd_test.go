@@ -22,10 +22,10 @@ func Test_ReadWriteDelete(t *testing.T) {
 		value string
 	}{
 		{name: "test-1", path: "test", key: "firstKey", value: "First Test Value"},
-		{name: "test-2", path: "test/asdf", key: "firstKey", value: "THIS IS REALLY GREAT!"},
-		{name: "test-3", path: "test/asdf", key: "secondKey", value: "LOREM IPSUM..."},
-		{name: "test-4", path: "test/asdf/1234", key: "vKey", value: "First Test Value"},
-		{name: "test-5", path: "abcd/fghj/aaaaaa", key: "puschel", value: "VaultRDB is the best"},
+		{name: "test-2", path: "test.asdf", key: "firstKey", value: "THIS IS REALLY GREAT!"},
+		{name: "test-3", path: "test.asdf", key: "secondKey", value: "LOREM IPSUM..."},
+		{name: "test-4", path: "test.asdf.1234", key: "vKey", value: "First Test Value"},
+		{name: "test-5", path: "abcd.fghj.aaaaaa", key: "puschel", value: "VaultRDB is the best"},
 	}
 
 	// insert into the db
@@ -87,7 +87,7 @@ func Test_ReadWriteDelete(t *testing.T) {
 
 	t.Run("delete-bucket-1", func(t *testing.T) {
 
-		var path, bucket string = strings.Split(tests[4].path, "/")[0], strings.Split(tests[4].path, "/")[1]
+		var path, bucket string = strings.Split(tests[4].path, ".")[0], strings.Split(tests[4].path, ".")[1]
 
 		t.Logf("removing bucket [%s:%s]", path, bucket)
 

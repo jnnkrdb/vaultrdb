@@ -16,30 +16,30 @@ func Test_calculateBucketsFromPath(t *testing.T) {
 
 		{"no level bucket", "", nil},
 		{"no level bucket, with space", " ", nil},
-		{"no level bucket, with /", "/", nil},
-		{"no level bucket, with / and spaces", " /  ", nil},
+		{"no level bucket, with .", ".", nil},
+		{"no level bucket, with . and spaces", " .  ", nil},
 
 		{"single level bucket", "singlelevelpath", []string{"singlelevelpath"}},
-		{"single level bucket, with prefix /", "/singlelevelpath", []string{"singlelevelpath"}},
-		{"single level bucket, with suffix /", "singlelevelpath/", []string{"singlelevelpath"}},
-		{"single level bucket, with prefix and suffix /", "/singlelevelpath/", []string{"singlelevelpath"}},
+		{"single level bucket, with prefix .", ".singlelevelpath", []string{"singlelevelpath"}},
+		{"single level bucket, with suffix .", "singlelevelpath.", []string{"singlelevelpath"}},
+		{"single level bucket, with prefix and suffix .", ".singlelevelpath.", []string{"singlelevelpath"}},
 
-		{"multi level bucket", "multi/level/path", []string{"multi", "level", "path"}},
-		{"multi level bucket, with prefix /", "/multi/level/path", []string{"multi", "level", "path"}},
-		{"multi level bucket, with suffix /", "multi/level/path/", []string{"multi", "level", "path"}},
-		{"multi level bucket, with prefix and suffix /", "/multi/level/path/", []string{"multi", "level", "path"}},
+		{"multi level bucket", "multi.level.path", []string{"multi", "level", "path"}},
+		{"multi level bucket, with prefix .", ".multi.level.path", []string{"multi", "level", "path"}},
+		{"multi level bucket, with suffix .", "multi.level.path.", []string{"multi", "level", "path"}},
+		{"multi level bucket, with prefix and suffix .", ".multi.level.path.", []string{"multi", "level", "path"}},
 
 		{"single level bucket, with whitespaces before bucketname", " singlelevelpath", []string{"singlelevelpath"}},
 		{"single level bucket, with whitespaces in bucketname", "single levelpath", []string{"singlelevelpath"}},
 		{"single level bucket, with whitespaces after bucketname", "singlelevelpath ", []string{"singlelevelpath"}},
 		{"single level bucket, with whitespaces everywhere", " single  level  path ", []string{"singlelevelpath"}},
 
-		{"multi level bucket, with whitespaces before /", "multi /level /path", []string{"multi", "level", "path"}},
-		{"multi level bucket, with whitespaces around /", "multi / level / path", []string{"multi", "level", "path"}},
-		{"multi level bucket, with whitespaces after /", "multi/ level/ path", []string{"multi", "level", "path"}},
-		{"multi level bucket, with whitespaces before first /", " /multi/level/path", []string{"multi", "level", "path"}},
-		{"multi level bucket, with whitespaces after last /", "/multi/level/path/ ", []string{"multi", "level", "path"}},
-		{"multi level bucket, with whitespaces before first and after last /", " /multi/level/path/ ", []string{"multi", "level", "path"}},
+		{"multi level bucket, with whitespaces before .", "multi .level .path", []string{"multi", "level", "path"}},
+		{"multi level bucket, with whitespaces around .", "multi . level . path", []string{"multi", "level", "path"}},
+		{"multi level bucket, with whitespaces after .", "multi. level. path", []string{"multi", "level", "path"}},
+		{"multi level bucket, with whitespaces before first .", " .multi.level.path", []string{"multi", "level", "path"}},
+		{"multi level bucket, with whitespaces after last .", ".multi.level.path. ", []string{"multi", "level", "path"}},
+		{"multi level bucket, with whitespaces before first and after last .", " .multi.level.path. ", []string{"multi", "level", "path"}},
 	}
 
 	// running the tests

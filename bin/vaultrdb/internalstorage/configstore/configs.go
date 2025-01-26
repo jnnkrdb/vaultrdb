@@ -32,10 +32,10 @@ func GetConfig(c Config) string {
 }
 
 // TODO: implement auto bucket creation for desired buckets
-var buckets = []string{
+var Buckets = []string{
 	"webhooks",
 }
 
 const (
-	EncryptionPassphrase Config = "security/encryption:passphrase"
+	EncryptionPassphrase Config = "security.encryption:passphrase"
 )
