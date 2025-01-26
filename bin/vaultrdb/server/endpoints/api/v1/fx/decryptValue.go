@@ -3,7 +3,7 @@ package api_v1_fx
 import (
 	"net/http"
 
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/configstore/buckets/vault"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore"
 	"github.com/jnnkrdb/vaultrdb/pkg/cryptography"
 	"github.com/jnnkrdb/vaultrdb/pkg/http/helpers"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
@@ -18,7 +18,7 @@ func EncryptValue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := cryptography.Decrypt(vault.GetConfigByKey(vault.EncryptionKey), body.Value)
+	res, err := cryptography.Decrypt(configstore.GetConfig(configstore.EncryptionPassphrase), body.Value)
 	if err != nil {
 		logging.SLog.Info("couldn't decrypt body", "response-code", http.StatusBadRequest)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)

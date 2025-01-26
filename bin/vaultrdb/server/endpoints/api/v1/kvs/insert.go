@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/obj"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database/obj"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
@@ -22,7 +22,6 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	// translate into db object
 	var kvs = obj.KeyValueSet{
 		Key:         newKVS.Key,
-		Tags:        newKVS.Tags,
 		Description: newKVS.Description,
 		Value:       newKVS.Value,
 	}

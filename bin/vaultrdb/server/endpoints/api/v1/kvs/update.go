@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/obj"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database/obj"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 	"gorm.io/gorm"
 )
@@ -33,7 +33,6 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// update the fields
-	kvs.Tags = newKVS.Tags
 	kvs.Value = newKVS.Value
 	kvs.Description = newKVS.Description
 
@@ -43,15 +42,6 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}).Updates(&kvs).Error; err != nil {
 		logging.SLog.Info("error updating object in database",
 			"kvs", kvs,
-			"err", err,
-		)
-		return
-	}
-
-	// change the tags from the object
-	if err := database.Database.Model(&kvs).Association("Tags").Replace(newKVS.Tags); err != nil {
-		logging.SLog.Info("error updating objects tags in database",
-			"obj.Tags", newKVS.Tags,
 			"err", err,
 		)
 		return

@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/authstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore/initialconfigs"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server"
 	v1 "github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/api/v1"
@@ -26,10 +26,20 @@ func main() {
 	vaultrdbstore.InitDB()
 	authstore.InitDB()
 
-	// set the termination methods
-	termination.HandleTermination()
+	// set the initial configs, if not already set
+	if err := initialconfigs.SetInitialConfigsIfNotConfiguredAlready(); err != nil {
+		logging.SLog.Error("starting vaultrdb http backend async", "error", err.Error())
+		os.Exit(1)
+	}
 
-	database.Connect()
+	// set the termination methods
+	termination.HandleTermination(
+
+		// shut down the internal databases
+		func() { authstore.DB.CloseDB() },
+		func() { configstore.DB.CloseDB() },
+		func() { vaultrdbstore.DB.CloseDB() },
+	)
 
 	// starting the http server for vaultrdb
 	logging.SLog.Info("starting vaultrdb http backend async")
@@ -42,6 +52,6 @@ func main() {
 		v1.EnableEndpoint_ApiV1,
 	); err != nil {
 		logging.SLog.Error("error keeping up the http server", "err", err.Error())
-		os.Exit(1)
+		termination.Shutdown()
 	}
 }

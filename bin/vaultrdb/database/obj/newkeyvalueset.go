@@ -16,7 +16,6 @@ import (
 type NewKeyValueSet struct {
 	Key         string `json:"key"`
 	Value       string `json:"value"`
-	Tags        []Tag  `json:"tags"`
 	Description string `json:"description"`
 }
 

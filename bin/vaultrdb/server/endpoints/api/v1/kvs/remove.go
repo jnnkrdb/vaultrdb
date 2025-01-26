@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/obj"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/database/obj"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
