@@ -61,7 +61,7 @@ func calculateBucketsFromPath(path string) []string {
 
 	// if the pathes first char is not @ then the path is wrong
 	// @ marks the root
-	if 
+	//if
 
 	// replacing spaces with ""
 	path = strings.ReplaceAll(path, " ", "")
