@@ -11,10 +11,10 @@ import (
 
 // receive a specific value via POST and send an encrypted version of it
 // as a response
-func EncryptValue(w http.ResponseWriter, r *http.Request) {
+func DecryptValue(w http.ResponseWriter, r *http.Request) {
 
 	var body helpers.StringValueJson
-	if body.Receive(w, r) != nil {
+	if body.Receive(w, r.Body) != nil {
 		return
 	}
 

@@ -21,7 +21,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := vaultrdbstore.DB.WriteBucket(bucketpath); err != nil {
-		logging.SLog.Error("creating bucket failed",
+		logging.SLog.Error("error creating bucket",
+			"bucket", bucketpath,
 			"response-code", http.StatusInternalServerError,
 			"error", err.Error(),
 		)

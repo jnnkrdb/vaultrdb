@@ -2,26 +2,31 @@ package helpers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
 type StringValueJson struct {
-	Value interface{} `json:"value"`
+	Value  string   `json:"value"`
+	Values []string `json:"values"`
 }
 
 // receive a struct from a http request
-func (svj *StringValueJson) Receive(w http.ResponseWriter, r *http.Request) error {
+func (svj *StringValueJson) Receive(w http.ResponseWriter, body io.ReadCloser) error {
 
-	if err := json.NewDecoder(r.Body).Decode(svj); err != nil {
+	if err := json.NewDecoder(body).Decode(svj); err != nil {
 
-		logging.SLog.Info("couldn't parse body into struct",
-			"response-code", http.StatusBadRequest,
-			"string-value-json", *svj,
-		)
+		if w != nil {
 
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			logging.SLog.Info("couldn't parse body into struct",
+				"response-code", http.StatusBadRequest,
+				"string-value-json", *svj,
+			)
+
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
 
 		return err
 	}

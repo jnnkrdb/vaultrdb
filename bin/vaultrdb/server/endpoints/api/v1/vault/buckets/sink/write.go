@@ -5,10 +5,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
+	"github.com/jnnkrdb/vaultrdb/pkg/http/helpers"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request) {
+func Write(w http.ResponseWriter, r *http.Request) {
 
 	bucketpath, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
@@ -30,8 +31,13 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := vaultrdbstore.DB.DeleteKey(bucketpath, key); err != nil {
-		logging.SLog.Error("error removing key from bucket",
+	var body helpers.StringValueJson
+	if body.Receive(w, r.Body) != nil {
+		return
+	}
+
+	if err := vaultrdbstore.DB.WriteKey(bucketpath, key, body.Value); err != nil {
+		logging.SLog.Error("error receiving key from bucket",
 			"bucket", bucketpath,
 			"key", key,
 			"response-code", http.StatusInternalServerError,

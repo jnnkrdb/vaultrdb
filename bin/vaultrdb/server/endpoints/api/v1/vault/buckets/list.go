@@ -1,14 +1,15 @@
-package api_v1_buckets_sink
+package api_v1_buckets
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
+	"github.com/jnnkrdb/vaultrdb/pkg/http/helpers"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request) {
+func List(w http.ResponseWriter, r *http.Request) {
 
 	bucketpath, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
@@ -20,26 +21,21 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key, ok := mux.Vars(r)["key"]
-	if !ok {
-		logging.SLog.Warn("key in query is missing",
-			"response-code", http.StatusBadRequest,
-			"query", mux.Vars(r),
-		)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
+	logging.SLog.Warn("bucketpath in query is the following",
+		"bucketpath", bucketpath,
+		"query", mux.Vars(r),
+	)
 
-	if err := vaultrdbstore.DB.DeleteKey(bucketpath, key); err != nil {
-		logging.SLog.Error("error removing key from bucket",
+	res, err := vaultrdbstore.DB.ReadBuckets(bucketpath)
+	if err != nil {
+		logging.SLog.Error("error reading bucket from path",
 			"bucket", bucketpath,
-			"key", key,
 			"response-code", http.StatusInternalServerError,
-			"err", err,
+			"error", err.Error(),
 		)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	w.Write([]byte("OK"))
+	helpers.StringValueJson{Values: res}.Send(w)
 }

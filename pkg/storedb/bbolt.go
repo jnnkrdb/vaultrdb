@@ -59,6 +59,10 @@ func CloseDB() error {
 // calculate the correct bucket walking path
 func calculateBucketsFromPath(path string) []string {
 
+	// if the pathes first char is not @ then the path is wrong
+	// @ marks the root
+	if 
+
 	// replacing spaces with ""
 	path = strings.ReplaceAll(path, " ", "")
 

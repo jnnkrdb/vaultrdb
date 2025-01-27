@@ -1,7 +1,6 @@
 package api_v1_buckets_sink
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -32,12 +31,5 @@ func List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = json.NewEncoder(w).Encode(helpers.StringValueJson{Value: list}); err != nil {
-		logging.SLog.Error("error parsing result into json",
-			"response-code", http.StatusInternalServerError,
-			"err", err,
-		)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	helpers.StringValueJson{Values: list}.Send(w)
 }
