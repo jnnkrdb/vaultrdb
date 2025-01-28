@@ -5,32 +5,11 @@ on:
     branches:
       - master
       - dev
+    paths:
+      - '.devcontainer/**'
 
 jobs:
-  version:
-    runs-on: ubuntu-latest
-    outputs:
-      semver: ${{ steps.gitversion.outputs.semVer }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0
-        with:
-          versionSpec: '5.x'
-          
-      - name: Determine Version
-        id:   gitversion # id to later be referenced
-        uses: gittools/actions/gitversion/execute@v0
-        with:
-          useConfigFile: true
-          configFilePath: .github/gitversion/GitVersion.yml
-
   build:
-    needs: version
     runs-on: ubuntu-latest
     steps:
 
@@ -48,7 +27,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           # Change this to point to your image name
-          imageName: ghcr.io/jnnkrdb/vaultrdb-devcontainer::${{ needs.version.outputs.semver }}
+          imageName: ghcr.io/jnnkrdb/vaultrdb-devcontainer
           # Change this to be your CI task/script
           runCmd: |
             # Add multiple commands to run if needed
