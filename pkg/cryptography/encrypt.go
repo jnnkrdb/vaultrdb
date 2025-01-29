@@ -18,27 +18,20 @@ func Encrypt(passphrase, text string) (string, error) {
 
 	plaintext := []byte(text)
 
-	if block, err := aes.NewCipher([]byte(passphrase)); err != nil {
-
+	block, err := aes.NewCipher([]byte(passphrase))
+	if err != nil {
 		return "", err
-
-	} else {
-
-		ciphertext := make([]byte, aes.BlockSize+len(plaintext))
-
-		iv := ciphertext[:aes.BlockSize]
-
-		if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-
-			return "", err
-
-		} else {
-
-			stream := cipher.NewCFBEncrypter(block, iv)
-
-			stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
-
-			return base64.URLEncoding.EncodeToString(ciphertext), nil
-		}
 	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+
+	_, err = io.ReadFull(rand.Reader, iv)
+	if err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }

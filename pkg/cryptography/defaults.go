@@ -36,7 +36,7 @@ func GetPassphraseFromCACertHASH() (result string) {
 	// create a hash from the content of the ca.crt
 	var hashGen = sha1.New()
 	hashGen.Write(cacrt_content)
-	result = hex.EncodeToString(hashGen.Sum(nil))
+	result = hex.EncodeToString(hashGen.Sum(nil)[:32])
 
 	logging.SLog.Info("created hash from ca.crt file", "source", _passphraseSourceFile)
 
