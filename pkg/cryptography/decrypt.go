@@ -15,30 +15,28 @@ import (
 //   - `text` : string > contains the text to decrypt
 func Decrypt(_passphrase, text string) (string, error) {
 
-	if ciphertext, err := base64.URLEncoding.DecodeString(text); err != nil {
+	ciphertext, err := base64.URLEncoding.DecodeString(text)
+	if err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher([]byte(_passphrase))
+	if err != nil {
 
 		return "", err
 
-	} else {
-
-		if block, err := aes.NewCipher([]byte(_passphrase)); err != nil {
-
-			return "", err
-
-		} else {
-
-			if len(ciphertext) < aes.BlockSize {
-				return "", errors.New("ciphertext to short")
-			}
-
-			iv := ciphertext[:aes.BlockSize]
-			ciphertext = ciphertext[aes.BlockSize:]
-
-			stream := cipher.NewCFBDecrypter(block, iv)
-
-			stream.XORKeyStream(ciphertext, ciphertext)
-
-			return string(ciphertext), nil
-		}
 	}
+
+	if len(ciphertext) < aes.BlockSize {
+		return "", errors.New("ciphertext to short")
+	}
+
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+
+	stream.XORKeyStream(ciphertext, ciphertext)
+
+	return string(ciphertext), nil
 }
