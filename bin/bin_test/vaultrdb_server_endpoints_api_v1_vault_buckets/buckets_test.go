@@ -1,4 +1,4 @@
-package api_v1_buckets
+package vaultrdbserverendpointsapiv1vaultbuckets_test
 
 import (
 	"fmt"
@@ -8,13 +8,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
+	api_v1_buckets "github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/api/v1/vault/buckets"
 	"github.com/jnnkrdb/vaultrdb/pkg/http/helpers"
-	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
 func prep(t *testing.T) *http.Server {
-
-	logging.InitSLOG("debug")
 
 	// preparing the server
 	if err := vaultrdbstore.DB.OpenDB(t.TempDir()+"/tmp.vault.db", nil); err != nil {
@@ -24,9 +22,9 @@ func prep(t *testing.T) *http.Server {
 	// create server
 	var router *mux.Router = mux.NewRouter().StrictSlash(true)
 
-	router.Path("/list/{bucketpath}").Methods(http.MethodGet).HandlerFunc(List)
-	router.Path("/create/{bucketpath}").Methods(http.MethodPost).HandlerFunc(Create)
-	router.Path("/delete/{bucketpath}/bucket/{bucket}").Methods(http.MethodDelete).HandlerFunc(Delete)
+	router.Path("/list/{bucketpath}").Methods(http.MethodGet).HandlerFunc(api_v1_buckets.List)
+	router.Path("/create/{bucketpath}").Methods(http.MethodPost).HandlerFunc(api_v1_buckets.Create)
+	router.Path("/delete/{bucketpath}/bucket/{bucket}").Methods(http.MethodDelete).HandlerFunc(api_v1_buckets.Delete)
 
 	var srv = (&http.Server{
 		Addr:    "localhost:9000",
