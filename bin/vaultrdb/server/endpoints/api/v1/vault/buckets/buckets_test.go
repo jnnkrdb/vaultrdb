@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
@@ -11,7 +12,7 @@ import (
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
-func Test_CreateListDelete(t *testing.T) {
+func prep(t *testing.T) *http.Server {
 
 	logging.InitSLOG("debug")
 
@@ -33,15 +34,22 @@ func Test_CreateListDelete(t *testing.T) {
 	})
 
 	go func() {
-		srv.ListenAndServe()
+		err := srv.ListenAndServe()
 
-		t.Logf("hosting shttp server: %s", srv.Addr)
+		t.Logf("hosting http server: %s", srv.Addr)
 
 		t.Cleanup(func() {
 			srv.Close()
+			t.Errorf("error with httpserv: %s", err.Error())
 		})
 	}()
 
+	return srv
+}
+
+func Test_CreateListDelete(t *testing.T) {
+
+	srv := prep(t)
 	// preparing the tests
 
 	var list = []struct {
@@ -49,7 +57,7 @@ func Test_CreateListDelete(t *testing.T) {
 		bucketpath      string
 		estimatedbucket string
 	}{
-		{path: "single", bucketpath: ".", estimatedbucket: "single"},
+		{path: "single", bucketpath: "@", estimatedbucket: "single"},
 		{path: "multi.level", bucketpath: "multi", estimatedbucket: "level"},
 		{path: "multi.level1", bucketpath: "multi", estimatedbucket: "level1"},
 		{path: "multi2.level1", bucketpath: "multi2", estimatedbucket: "level1"},
@@ -58,9 +66,11 @@ func Test_CreateListDelete(t *testing.T) {
 		{path: "multi3.level.asdf.ghnb", bucketpath: "multi3.level.asdf", estimatedbucket: "ghnb"},
 	}
 
-	// running the tests
+	time.Sleep(time.Second)
 
+	// running the tests
 	for _, ll := range list {
+
 		t.Run(fmt.Sprintf("testing-create_%s", ll.path), func(t *testing.T) {
 
 			var url string = fmt.Sprintf("http://%s/create/%s", srv.Addr, ll.path)

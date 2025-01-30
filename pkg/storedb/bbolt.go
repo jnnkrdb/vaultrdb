@@ -59,21 +59,34 @@ func CloseDB() error {
 // calculate the correct bucket walking path
 func calculateBucketsFromPath(path string) []string {
 
-	// if the pathes first char is not @ then the path is wrong
-	// @ marks the root
-	//if
-
-	// replacing spaces with ""
-	path = strings.ReplaceAll(path, " ", "")
-
-	// replace // with /, as long as there are //
-	for replace_doubleslash := true; replace_doubleslash; replace_doubleslash = strings.Contains(path, "..") {
-		path = strings.ReplaceAll(path, "..", ".")
+	// default answers for often used shorts and possible errors, if
+	// given path equals any object from the list, then send default answer
+	for _, def := range []struct {
+		path   string
+		answer []string
+	}{
+		{path: "", answer: nil},
+		{path: "@", answer: nil},
+	} {
+		if path == def.path {
+			return def.answer
+		}
 	}
 
-	// if path is empty or single / return nil
-	if path == "" || path == "." {
-		return nil
+	// replace substrings with replacements
+	for _, replacement := range []struct {
+		substr string
+		replc  string
+	}{
+		{substr: " ", replc: ""}, // replacing spaces with ""
+		{substr: "@", replc: ""}, // replacing @ with "", since @ is only needed/allowed for root
+		{substr: "..", replc: "."},
+	} {
+		if strings.Contains(path, replacement.substr) {
+			for r := true; r; r = strings.Contains(path, replacement.substr) {
+				path = strings.ReplaceAll(path, replacement.substr, replacement.replc)
+			}
+		}
 	}
 
 	// removing prefix or suffix /
