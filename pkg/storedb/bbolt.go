@@ -59,6 +59,13 @@ func CloseDB() error {
 // calculate the correct bucket walking path
 func calculateBucketsFromPath(path string) []string {
 
+	// first kill all whitespaces
+	path = strings.ReplaceAll(path, " ", "")
+
+	// removing prefix or suffix .
+	path, _ = strings.CutPrefix(path, ".")
+	path, _ = strings.CutSuffix(path, ".")
+
 	// default answers for often used shorts and possible errors, if
 	// given path equals any object from the list, then send default answer
 	for _, def := range []struct {
@@ -78,7 +85,6 @@ func calculateBucketsFromPath(path string) []string {
 		substr string
 		replc  string
 	}{
-		{substr: " ", replc: ""}, // replacing spaces with ""
 		{substr: "@", replc: ""}, // replacing @ with "", since @ is only needed/allowed for root
 		{substr: "..", replc: "."},
 	} {
@@ -88,10 +94,6 @@ func calculateBucketsFromPath(path string) []string {
 			}
 		}
 	}
-
-	// removing prefix or suffix /
-	path, _ = strings.CutPrefix(path, ".")
-	path, _ = strings.CutSuffix(path, ".")
 
 	return strings.Split(path, ".")
 }

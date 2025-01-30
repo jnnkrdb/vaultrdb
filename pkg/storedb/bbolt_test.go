@@ -48,7 +48,7 @@ func Test_calculateBucketsFromPath(t *testing.T) {
 
 			testResult := calculateBucketsFromPath(tt.input)
 
-			t.Logf("path: [%s] estimatedResult: %v - testResult: %v", tt.input, tt.estimated, testResult)
+			t.Logf("path: [%s] estimatedResult: (%v) - testResult: (%v)", tt.input, tt.estimated, testResult)
 
 			// check if the length of the arrays are the same
 			if len(testResult) != len(tt.estimated) {
