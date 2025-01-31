@@ -73,11 +73,13 @@ func (a AuthorizationRegistration) HasAccess(path, key, accesslevel string) bool
 		}
 
 		for _, aKey := range aAccess.Keys {
-			if aKey != key {
-				continue
+			if aKey != "*" {
+				if aKey != key {
+					continue
+				}
 			}
 
-			if strings.Contains(strings.Join(aAccess.Levels, "%"), accesslevel) {
+			if strings.Contains(strings.Join(aAccess.Levels, "%"), strings.ToLower(accesslevel)) {
 				return true
 			}
 		}
