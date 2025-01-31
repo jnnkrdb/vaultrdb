@@ -8,10 +8,7 @@ import (
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
-const (
-	URI_Liveness  string = "/healthz/live"
-	URI_Readiness string = "/healthz/ready"
-)
+const pathPrefix string = "/health"
 
 // enables the endpoint for healthz
 //
@@ -20,14 +17,10 @@ const (
 //   - http://<host>:<port>/healthz/readiness
 func EnableEndpoint_Healthz(r *mux.Router) {
 
-	logging.SLog.Info("creating healthz endpoints",
-		"uri.liveness", URI_Liveness,
-		"uri.readiness", URI_Readiness,
-	)
-
-	r.Methods(http.MethodGet).Path(URI_Liveness).Handler(
+	logging.SLog.Info("creating healthz endpoints")
+	r.PathPrefix(pathPrefix).Path("/live").Methods(http.MethodGet).Handler(
 		server.DefaultMiddleware.ThenFunc(live))
 
-	r.Methods(http.MethodGet).Path(URI_Readiness).Handler(
+	r.PathPrefix(pathPrefix).Path("/ready").Methods(http.MethodGet).Handler(
 		server.DefaultMiddleware.ThenFunc(ready))
 }

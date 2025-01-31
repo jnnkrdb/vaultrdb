@@ -8,6 +8,8 @@ import (
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
+const pathPrefix string = "/meta"
+
 // enables the endpoint for metadata endpoint
 //
 // Routes:
@@ -15,11 +17,7 @@ import (
 //   - http://<host>:<port>/meta/license
 func EnableEndpoint_Metadata(r *mux.Router) {
 
-	logging.SLog.Info("creating metadata endpoints",
-		"uri.metadata.version", URI_Metadata_Version,
-		"uri.metadata.license", URI_Metadata_License,
-	)
-
-	r.Methods(http.MethodGet).Path(URI_Metadata_Version).Handler(server.DefaultMiddleware.ThenFunc(version))
-	r.Methods(http.MethodGet).Path(URI_Metadata_License).Handler(server.DefaultMiddleware.ThenFunc(license))
+	logging.SLog.Info("creating metadata endpoints")
+	r.PathPrefix(pathPrefix).Path("/version").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(version))
+	r.PathPrefix(pathPrefix).Path("/license").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(license))
 }
