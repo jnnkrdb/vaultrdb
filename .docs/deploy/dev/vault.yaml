@@ -1,0 +1,92 @@
+--- # -------------------------------------------------------------- ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vrdb-default
+  namespace: vaultrdb
+--- # -------------------------------------------------------------- Service (headless)
+apiVersion: v1
+kind: Service
+metadata:
+  name: vrdb-vault
+  namespace: vaultrdb
+spec:
+  clusterIP: None
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    jnnkrdb.de/service: vrdb
+    jnnkrdb.de/type: vault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vrdb-vault-nodeport
+  namespace: vaultrdb
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 30420
+  selector:
+    jnnkrdb.de/service: vrdb
+    jnnkrdb.de/type: vault
+--- # -------------------------------------------------------------- StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vrdb-vault
+  namespace: vaultrdb
+spec:
+  selector:
+    matchLabels:
+      jnnkrdb.de/service: vrdb
+      jnnkrdb.de/type: vault
+  serviceName: vrdb-vault
+  replicas: 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        jnnkrdb.de/service: vrdb
+        jnnkrdb.de/type: vault
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: vrdb-vault
+          image: ghcr.io/jnnkrdb/vaultrdb/vrdb-vault:dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            timeoutSeconds: 3
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 80
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 16Mi
