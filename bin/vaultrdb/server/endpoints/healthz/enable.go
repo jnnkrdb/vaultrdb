@@ -8,7 +8,7 @@ import (
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
-const pathPrefix string = "/health"
+const pathPrefix string = "/healthz"
 
 // enables the endpoint for healthz
 //
