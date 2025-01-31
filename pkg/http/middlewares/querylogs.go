@@ -1,6 +1,7 @@
 package mw
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,7 +21,7 @@ func QueryLog(next http.Handler) http.Handler {
 		logging.SLog.Info("finished request",
 			"request-url", r.URL.String(),
 			"request-method", r.Method,
-			"time-since", time.Since(start),
+			"time-since", fmt.Sprintf("%dms", time.Since(start).Microseconds()),
 		)
 	})
 }

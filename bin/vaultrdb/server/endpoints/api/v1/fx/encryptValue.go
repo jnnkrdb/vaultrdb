@@ -20,7 +20,10 @@ func EncryptValue(w http.ResponseWriter, r *http.Request) {
 
 	res, err := cryptography.Encrypt(configstore.GetConfig(configstore.EncryptionPassphrase), body.Value)
 	if err != nil {
-		logging.SLog.Info("couldn't encrypt body", "response-code", http.StatusBadRequest)
+		logging.SLog.Warn("couldn't encrypt body",
+			"response-code", http.StatusBadRequest,
+			"error", err.Error(),
+		)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
