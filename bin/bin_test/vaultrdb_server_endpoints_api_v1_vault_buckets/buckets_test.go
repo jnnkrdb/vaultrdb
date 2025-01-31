@@ -22,9 +22,9 @@ func prep(t *testing.T) *http.Server {
 	// create server
 	var router *mux.Router = mux.NewRouter().StrictSlash(true)
 
-	router.Path("/list/{bucketpath}").Methods(http.MethodGet).HandlerFunc(api_v1_buckets.List)
-	router.Path("/create/{bucketpath}").Methods(http.MethodPost).HandlerFunc(api_v1_buckets.Create)
-	router.Path("/delete/{bucketpath}/bucket/{bucket}").Methods(http.MethodDelete).HandlerFunc(api_v1_buckets.Delete)
+	router.PathPrefix("/test").Path("/list/{bucketpath}").Methods(http.MethodGet).HandlerFunc(api_v1_buckets.List)
+	router.PathPrefix("/test").Path("/create/{bucketpath}").Methods(http.MethodPost).HandlerFunc(api_v1_buckets.Create)
+	router.PathPrefix("/test").Path("/delete/{bucketpath}/bucket/{bucket}").Methods(http.MethodDelete).HandlerFunc(api_v1_buckets.Delete)
 
 	var srv = (&http.Server{
 		Addr:    "localhost:9000",
@@ -71,7 +71,7 @@ func Test_CreateListDelete(t *testing.T) {
 
 		t.Run(fmt.Sprintf("testing-create_%s", ll.path), func(t *testing.T) {
 
-			var url string = fmt.Sprintf("http://%s/create/%s", srv.Addr, ll.path)
+			var url string = fmt.Sprintf("http://%s/test/create/%s", srv.Addr, ll.path)
 
 			t.Logf("running post on (%s)", url)
 			resp, err := http.DefaultClient.Post(url, "", nil)
@@ -84,7 +84,7 @@ func Test_CreateListDelete(t *testing.T) {
 
 			// checking the path
 
-			url = fmt.Sprintf("http://%s/list/%s", srv.Addr, ll.bucketpath)
+			url = fmt.Sprintf("http://%s/test/list/%s", srv.Addr, ll.bucketpath)
 			t.Logf("running get on (%s)", url)
 			resp, err = http.DefaultClient.Get(url)
 			if err != nil {
