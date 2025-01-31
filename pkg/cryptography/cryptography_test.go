@@ -1,8 +1,29 @@
 package cryptography
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 )
+
+func Test_GetPassphraseFromCACertHASH(t *testing.T) {
+
+	var compString string = ""
+
+	for i := 0; i < 10; i++ {
+		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
+
+			tmp := GetPassphraseFromCACertHASH()
+			t.Logf("%s", tmp)
+
+			if strings.Contains(compString, tmp) {
+				t.Fatalf("the passphrase (%s) was generated before: %s", tmp, compString)
+			}
+
+			compString = fmt.Sprintf("%s__%s", compString, tmp)
+		})
+	}
+}
 
 func Test_randomizedTestCryptography(t *testing.T) {
 	var tests = []struct {
