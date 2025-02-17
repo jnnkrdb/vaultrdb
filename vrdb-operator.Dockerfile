@@ -28,18 +28,21 @@ RUN apk add --no-cache --update openssl
 # Copy the VaultRDB Directory Contents
 COPY vaultrdb/ /opt/vaultrdb
 
+# create vault user with home dir
+RUN addgroup -S vault && adduser -S vault -H -h /opt/vaultrdb/home -s /bin/sh -G vault -u 3453
+
 # Copy Operators Binary and Frontend Files
 COPY --from=operator /vaultrdb-operator /usr/local/bin/vaultrdb-operator
 
 # Set the user for the config and the operator binaries
-RUN chmod a+x /usr/local/bin/vaultrdb-operator &&\
-    chmod a+x -R /opt/vaultrdb &&\
-    chown 65532:65532 /usr/local/bin/vaultrdb-operator &&\
-    chown 65532:65532 -R /opt/vaultrdb
+# Set the user for the config and the operator binaries
+#RUN chmod a+x /usr/local/bin/vaultrdb-operator &&\
+#    chmod a+x -R /opt/vaultrdb &&\
+RUN chown vault:vault /usr/local/bin/vaultrdb-operator &&\
+    chown vault:vault -R /opt/vaultrdb
     
-USER 65532:65532
+USER vault:vault
 
 # set the entrypoints
-EXPOSE 80
 ENTRYPOINT ["/opt/vaultrdb/entrypoint.sh"]
 CMD [ "vaultrdb-operator" ]

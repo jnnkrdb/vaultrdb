@@ -38,7 +38,7 @@ RUN apk add --no-cache --update openssl
 COPY vaultrdb/ /opt/vaultrdb
 
 # create vault user with home dir
-RUN useradd -r -d /opt/vaultrdb/home -s /bin/sh -g vault -u 3454 vault
+RUN addgroup -S vault && adduser -S vault -H -h /opt/vaultrdb/home -s /bin/sh -G vault -u 3453
 
 # Copy Operators Binary and Frontend Files
 COPY --from=operator /vaultrdb /usr/local/bin/vaultrdb
