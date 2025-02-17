@@ -8,7 +8,7 @@ import (
 
 const (
 	URI_Metadata_License string = "/meta/license"
-	LICENSE_FILE         string = "/opt/vaultrdb/config/LICENSE"
+	LICENSE_FILE         string = "/opt/vaultrdb/home/LICENSE"
 )
 
 // sending the license as a byte response

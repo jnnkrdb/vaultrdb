@@ -4,7 +4,7 @@ set -e
 
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | starting the entrypoint.sh"
 
-. /opt/vaultrdb/config/env.sh
+. /opt/vaultrdb/home/env.sh
 
 # Execute Startup Scripts
 if [ -d "$VRDB_DIRECTORY_ROOT/entrypoint.d" ]; then

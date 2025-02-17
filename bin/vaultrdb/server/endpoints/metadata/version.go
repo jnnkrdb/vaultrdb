@@ -8,7 +8,7 @@ import (
 
 const (
 	URI_Metadata_Version string = "/meta/version"
-	VERSION_FILE         string = "/opt/vaultrdb/config/VERSION"
+	VERSION_FILE         string = "/opt/vaultrdb/home/VERSION"
 )
 
 func version(w http.ResponseWriter, r *http.Request) {

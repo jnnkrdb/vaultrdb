@@ -7,10 +7,10 @@ import (
 )
 
 // the default encryption passphrase will be created from the ca-certificate.
-// the certificate whould be located under /opt/vaultrdb/config/certs/ca-cert.sha
+// the certificate whould be located under /opt/vaultrdb/home/certs/ca-cert.sha
 //
 // can be changed
-//const _passphraseSourceFile string = "/opt/vaultrdb/config/certs/ca.crt"
+//const _passphraseSourceFile string = "/opt/vaultrdb/home/certs/ca.crt"
 
 const _defaultPassphrase string = "+Q3qw2K2NBR1pYMCWFYOcltFl3HxCcqAuWotezDmOS0="
 
