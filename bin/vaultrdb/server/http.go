@@ -15,7 +15,7 @@ import (
 // middleware used by the frontend http server
 var DefaultMiddleware middlewares.MiddleWareChain
 
-// edfault prot of the http server
+// default prot of the http server
 const _PORT int = 80
 
 var _SRV *http.Server
