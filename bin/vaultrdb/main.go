@@ -20,8 +20,8 @@ import (
 
 // flags for service config
 var (
-	bootSwaggerUI bool = *flag.Bool("swaggerui", false, "If set, then the swagger ui will be started, with the configured port via --swagger-port PORT. (Default: 8888)")
-	swaggerPort   int  = *flag.Int("swagger-port", 8888, "If set, then the swagger ui will be started, with the configured port. (Default: 8888)")
+	bootSwaggerUI bool = *flag.Bool("swaggerui", false, "If set, then the swagger ui will be started, with the configured port via --swagger-port.")
+	swaggerPort   int  = *flag.Int("swagger-port", 81, "If set, then the swagger ui will be started, with the configured port.")
 )
 
 // list of termination funcs
