@@ -20,8 +20,9 @@ import (
 
 // flags for service config
 var (
-	bootSwaggerUI bool = *flag.Bool("swaggerui", false, "If set, then the swagger ui will be activated.")
-	swaggerPort   int  = *flag.Int("swagger-port", 81, "Change the port of the Swagger Server.")
+	bootSwaggerUI *bool   = flag.Bool("swaggerui", false, "If set, then the swagger ui will be activated.")
+	swaggerPort   *int    = flag.Int("swagger-port", 81, "Change the port of the Swagger Server.")
+	flagLogLevel  *string = flag.String("loglevel", "error", "Set the level of the log output. Possible values: [debug, info, warn, error]")
 )
 
 // list of termination funcs
@@ -31,11 +32,12 @@ func main() {
 
 	flag.Parse()
 
-	logging.InitSLOG("Debug")
-	logging.SLog.Info("received flags", "arguments", os.Args, "non-flags", flag.Args())
+	logging.InitSLOG(*flagLogLevel)
+	var flagList = make(map[string]string)
 	flag.VisitAll(func(f *flag.Flag) {
-		logging.SLog.Debug("flag value", "name", f.Name, "value", f.Value)
+		flagList[f.Name] = f.Value.String()
 	})
+	logging.SLog.Info("received flags", "arguments", flagList)
 
 	// initialize the needed stores
 	configstore.InitDB()
@@ -54,9 +56,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	if bootSwaggerUI {
+	if *bootSwaggerUI {
 		logging.SLog.Info("starting swagger ui", "port", swaggerPort)
-		if err := swagger.StartSwaggerServer("/opt/vaultrdb/swagger", swaggerPort); err != nil {
+		if err := swagger.StartSwaggerServer("/opt/vaultrdb/swagger", *swaggerPort); err != nil {
 			logging.SLog.Error("error starting swagger ui", "error", err.Error())
 		}
 		terminationFuncs = append(terminationFuncs, swagger.StopSwaggerServer)
