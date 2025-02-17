@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -20,6 +21,10 @@ const _PORT int = 80
 
 var _SRV *http.Server
 
+var (
+	bootSwaggerUI *bool = flag.Bool("swaggerui", false, "If set, then the swagger ui will be activated.")
+)
+
 // starting the http endpoint
 func StartHTTP(fnc ...func(*mux.Router)) error {
 
@@ -31,7 +36,7 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 	)
 
 	// the instance of the http server, serving the frontend files
-	var router *mux.Router = mux.NewRouter().StrictSlash(true)
+	var router *mux.Router = mux.NewRouter()
 
 	// append the endpoints to the default router
 	logging.SLog.Info("creating the server and adding the required endpoints")
@@ -39,6 +44,11 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 	for _, f := range fnc {
 
 		f(router)
+	}
+
+	if *bootSwaggerUI {
+		logging.SLog.Info("starting swagger ui")
+		router.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("/opt/vaultrdb/swagger"))))
 	}
 
 	// booting the frontend http server

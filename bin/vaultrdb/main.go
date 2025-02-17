@@ -13,16 +13,13 @@ import (
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/healthz"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/metadata"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/ui"
-	"github.com/jnnkrdb/vaultrdb/pkg/http/swagger"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 	"github.com/jnnkrdb/vaultrdb/pkg/termination"
 )
 
 // flags for service config
 var (
-	bootSwaggerUI *bool   = flag.Bool("swaggerui", false, "If set, then the swagger ui will be activated.")
-	swaggerPort   *int    = flag.Int("swagger-port", 81, "Change the port of the Swagger Server.")
-	flagLogLevel  *string = flag.String("loglevel", "error", "Set the level of the log output. Possible values: [debug, info, warn, error]")
+	flagLogLevel *string = flag.String("loglevel", "error", "Set the level of the log output. Possible values: [debug, info, warn, error]")
 )
 
 // list of termination funcs
@@ -55,12 +52,6 @@ func main() {
 	if err := initialconfigs.SetInitialConfigsIfNotConfiguredAlready(); err != nil {
 		logging.SLog.Error("starting vaultrdb http backend async", "error", err.Error())
 		os.Exit(1)
-	}
-
-	if *bootSwaggerUI {
-		logging.SLog.Info("starting swagger ui", "port", swaggerPort)
-		swagger.Start("/opt/vaultrdb/swagger", *swaggerPort)
-		terminationFuncs = append(terminationFuncs, swagger.Stop)
 	}
 
 	// set the termination methods

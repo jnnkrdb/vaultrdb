@@ -22,10 +22,15 @@ var shutdownSignals = []os.Signal{
 // won't be used, but will throw a panic when closed twice
 var onlyOneSignalHandler = make(chan struct{})
 
+// collection of termination functions
+var terminationFunctions []func()
+
 // configured functions will be executed before shutdown, when
 // signal comes in once. when comes in twice, and shutdown is not
 // finished, the service will be killed anyways and throw an error
-func HandleTermination(terminationFunctions ...func()) context.Context {
+func HandleTermination(terminationFncs ...func()) context.Context {
+	terminationFunctions = terminationFncs
+
 	close(onlyOneSignalHandler)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -64,6 +69,11 @@ func HandleTermination(terminationFunctions ...func()) context.Context {
 	}()
 
 	return ctx
+}
+
+// add handler to termination functions
+func AddHandlers(fncs ...func()) {
+	terminationFunctions = append(terminationFunctions, fncs...)
 }
 
 // internally shut down the service with an sigterm
