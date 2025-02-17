@@ -20,8 +20,8 @@ import (
 
 // flags for service config
 var (
-	bootSwaggerUI bool = *flag.Bool("swaggerui", false, "If set, then the swagger ui will be started, with the configured port via --swagger-port.")
-	swaggerPort   int  = *flag.Int("swagger-port", 81, "If set, then the swagger ui will be started, with the configured port.")
+	bootSwaggerUI bool = *flag.Bool("swaggerui", false, "If set, then the swagger ui will be activated.")
+	swaggerPort   int  = *flag.Int("swagger-port", 81, "Change the port of the Swagger Server.")
 )
 
 // list of termination funcs
@@ -33,6 +33,9 @@ func main() {
 
 	logging.InitSLOG("Debug")
 	logging.SLog.Info("received flags", "arguments", os.Args, "non-flags", flag.Args())
+	flag.VisitAll(func(f *flag.Flag) {
+		logging.SLog.Debug("flag value", "name", f.Name, "value", f.Value)
+	})
 
 	// initialize the needed stores
 	configstore.InitDB()
