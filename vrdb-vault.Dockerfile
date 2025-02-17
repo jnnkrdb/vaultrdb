@@ -50,6 +50,6 @@ RUN chmod a+x /usr/local/bin/vaultrdb &&\
 USER 65532:65532
 
 # set the entrypoints
-EXPOSE 80
+#EXPOSE 80 81
 ENTRYPOINT ["/opt/vaultrdb/entrypoint.sh"]
 CMD [ "vaultrdb" ]

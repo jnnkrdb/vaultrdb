@@ -29,6 +29,8 @@ var terminationFuncs []func()
 
 func main() {
 
+	flag.Parse()
+
 	logging.InitSLOG("Debug")
 
 	// initialize the needed stores

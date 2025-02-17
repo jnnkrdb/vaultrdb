@@ -18,6 +18,10 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 80
+    - name: swagger
+      port: 81
+      protocol: TCP
+      targetPort: 81
   selector:
     jnnkrdb.de/service: vrdb
     jnnkrdb.de/type: vault
@@ -34,7 +38,12 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 80
-      nodePort: 30420
+      nodePort: 30080
+    - name: swagger
+      port: 81
+      protocol: TCP
+      targetPort: 81
+      nodePort: 30081
   selector:
     jnnkrdb.de/service: vrdb
     jnnkrdb.de/type: vault
@@ -63,9 +72,16 @@ spec:
         - name: vrdb-vault
           image: ghcr.io/jnnkrdb/vaultrdb/vrdb-vault:dev
           imagePullPolicy: Always
+          command:
+            - vaultrdb
+          args:
+            - --swaggerui
+            - --swagger-port 81
           ports:
             - containerPort: 80
               name: http
+            - containerPort: 81
+              name: swagger
           startupProbe:
             httpGet:
               path: /healthz/live
