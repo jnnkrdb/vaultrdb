@@ -15,9 +15,16 @@ echo "$(date +"%Y-%m-%d - %H:%M:%S") | ------------ version: $VRDB_VERSION"
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | ----- basicauth user: $BASICAUTH_USER"
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | ----- basicauth pass: $BASICAUTH_PASS"
 
+# replace the placeholders in the swagger.yaml files
+if [ -d "$VRDB_DIRECTORY_ROOT/swagger/apidocs" ]; then
+
+  find $VRDB_DIRECTORY_ROOT/swagger/apidocs -maxdepth 1 -iname "*.yaml" -type f \
+    -exec /bin/sh -c "echo '########################### - {}'" \; \
+    -exec /bin/sh -c "sed -i \"s|{{VERSION}}|$VRDB_VERSION|g\" {}" \;
+fi
+
 # replace the server address fqdn in the $swagger_dir/swagger.yaml for the swaggerui tests
 #sed -i "s|{{BASE_URL}}|$VRDB_BASE_URL|g" $swagger_dir/_swagger.yaml 
-sed -i "s|{{VERSION}}|$VRDB_VERSION|g" $swagger_dir/_swagger.yaml 
 #sed -i -e "s|{{BASICAUTH_USER}}|$BASICAUTH_USER|g" $swagger_dir/swagger-initializer.js 
 #sed -i -e "s|{{BASICAUTH_PASS}}|$BASICAUTH_PASS|g" $swagger_dir/swagger-initializer.js
  
