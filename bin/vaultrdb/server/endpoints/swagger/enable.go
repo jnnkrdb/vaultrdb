@@ -23,6 +23,6 @@ func EnableEndpoint_Swagger(r *mux.Router) {
 		"uri.swagger", URI_Swagger,
 	)
 
-	r.Methods(http.MethodGet).Path(URI_Swagger).Handler(server.DefaultMiddleware.Then(
-		http.StripPrefix("/swagger/", http.FileServer(http.Dir(DIR_Swagger)))))
+	r.Methods(http.MethodHead, http.MethodGet).Path(URI_Swagger).Handler(server.DefaultMiddleware.Then(
+		http.StripPrefix(URI_Swagger, http.FileServer(http.Dir(DIR_Swagger)))))
 }
