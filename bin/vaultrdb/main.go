@@ -32,6 +32,7 @@ func main() {
 	flag.Parse()
 
 	logging.InitSLOG("Debug")
+	logging.SLog.Info("received flags", "arguments", os.Args, "non-flags", flag.Args())
 
 	// initialize the needed stores
 	configstore.InitDB()
