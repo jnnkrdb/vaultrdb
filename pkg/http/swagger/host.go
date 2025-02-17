@@ -2,6 +2,7 @@ package swagger
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -11,13 +12,13 @@ import (
 
 var swaggerserver *http.Server
 
-func StartSwaggerServer(swaggerdir string, port int) error {
+func Start(swaggerdir string, port int) {
 
 	logging.SLog.Info("booting swagger ui server")
 
 	http.DefaultServeMux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir(swaggerdir))))
-	swaggerserver = &http.Server{
 
+	swaggerserver = &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 		// adding the cors options
 		Handler: cors.New(cors.Options{
@@ -37,10 +38,16 @@ func StartSwaggerServer(swaggerdir string, port int) error {
 		}).Handler(http.DefaultServeMux),
 	}
 
-	return swaggerserver.ListenAndServe()
+	go func() {
+		if err := swaggerserver.ListenAndServe(); err != nil {
+			if !errors.Is(err, http.ErrServerClosed) {
+				logging.SLog.Warn("error keeping up swagger http server", "error", err.Error())
+			}
+		}
+	}()
 }
 
-func StopSwaggerServer() {
+func Stop() {
 	logging.SLog.Info("shutting down the swagger server")
 	if err := swaggerserver.Shutdown(context.TODO()); err != nil {
 		logging.SLog.Error("error gracefully shutting down swagger http server", "error", err.Error())

@@ -33,6 +33,7 @@ func main() {
 	flag.Parse()
 
 	logging.InitSLOG(*flagLogLevel)
+
 	var flagList = make(map[string]string)
 	flag.VisitAll(func(f *flag.Flag) {
 		flagList[f.Name] = f.Value.String()
@@ -58,10 +59,8 @@ func main() {
 
 	if *bootSwaggerUI {
 		logging.SLog.Info("starting swagger ui", "port", swaggerPort)
-		if err := swagger.StartSwaggerServer("/opt/vaultrdb/swagger", *swaggerPort); err != nil {
-			logging.SLog.Error("error starting swagger ui", "error", err.Error())
-		}
-		terminationFuncs = append(terminationFuncs, swagger.StopSwaggerServer)
+		swagger.Start("/opt/vaultrdb/swagger", *swaggerPort)
+		terminationFuncs = append(terminationFuncs, swagger.Stop)
 	}
 
 	// set the termination methods
