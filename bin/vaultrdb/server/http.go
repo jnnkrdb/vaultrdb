@@ -46,10 +46,13 @@ func StartHTTP(fnc ...func(*mux.Router)) error {
 		f(router)
 	}
 
+	// if requested, then boot up the swagger ui
 	if *bootSwaggerUI {
 		logging.SLog.Info("starting swagger ui")
-		router.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("/opt/vaultrdb/swagger"))))
+		router.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/opt/vaultrdb/swagger"))))
 	}
+
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("/opt/vaultrdb/web")))
 
 	// booting the frontend http server
 	logging.SLog.Info("booting the server", "port", _PORT)

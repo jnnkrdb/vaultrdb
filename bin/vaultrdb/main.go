@@ -12,7 +12,6 @@ import (
 	v1 "github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/api/v1"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/healthz"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/metadata"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/ui"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 	"github.com/jnnkrdb/vaultrdb/pkg/termination"
 )
@@ -63,7 +62,6 @@ func main() {
 	if err := server.StartHTTP(
 		healthz.EnableEndpoint_Healthz,
 		metadata.EnableEndpoint_Metadata,
-		ui.EnableEndpoint_UI,
 		v1.EnableEndpoint_ApiV1,
 	); err != nil {
 		logging.SLog.Error("error keeping up the http server", "err", err.Error())
