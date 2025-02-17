@@ -76,7 +76,6 @@ spec:
             - vaultrdb
           args:
             - --swaggerui
-            - --swagger-port=81
             - --loglevel=debug
           ports:
             - containerPort: 80
