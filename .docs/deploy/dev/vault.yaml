@@ -76,7 +76,7 @@ spec:
             - vaultrdb
           args:
             - --swaggerui
-            - --swagger-port 81
+            - --swagger-port=81
           ports:
             - containerPort: 80
               name: http

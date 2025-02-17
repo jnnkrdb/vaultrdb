@@ -51,6 +51,7 @@ func main() {
 	}
 
 	if bootSwaggerUI {
+		logging.SLog.Info("starting swagger ui", "port", swaggerPort)
 		if err := swagger.StartSwaggerServer("/opt/vaultrdb/swagger", swaggerPort); err != nil {
 			logging.SLog.Error("error starting swagger ui", "error", err.Error())
 		}

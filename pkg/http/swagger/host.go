@@ -15,6 +15,7 @@ func StartSwaggerServer(swaggerdir string, port int) error {
 
 	logging.SLog.Info("booting swagger ui server")
 
+	http.DefaultServeMux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir(swaggerdir))))
 	swaggerserver = &http.Server{
 
 		Addr: fmt.Sprintf(":%d", port),
@@ -33,7 +34,7 @@ func StartSwaggerServer(swaggerdir string, port int) error {
 				"*",
 			},
 			AllowCredentials: true,
-		}).Handler(http.StripPrefix("/", http.FileServer(http.Dir(swaggerdir)))),
+		}).Handler(http.DefaultServeMux),
 	}
 
 	return swaggerserver.ListenAndServe()
