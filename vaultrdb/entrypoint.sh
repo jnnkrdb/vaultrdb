@@ -4,14 +4,12 @@ set -e
 
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | starting the entrypoint.sh"
 
-. /opt/vaultrdb/home/env.sh
-
 # Execute Startup Scripts
-if [ -d "$VRDB_DIRECTORY_ROOT/entrypoint.d" ]; then
+if [ -d "/opt/vaultrdb/entrypoint.d" ]; then
 
-  echo "$(date +"%Y-%m-%d - %H:%M:%S") | executing scripts from [$VRDB_DIRECTORY_ROOT/entrypoint.d]"
+  echo "$(date +"%Y-%m-%d - %H:%M:%S") | executing scripts from [/opt/vaultrdb/entrypoint.d]"
 
-  find $VRDB_DIRECTORY_ROOT/entrypoint.d -maxdepth 1 -iname "*.sh" -type f \
+  find /opt/vaultrdb/entrypoint.d -maxdepth 1 -iname "*.sh" -type f \
     -exec /bin/sh -c "echo '########################### - {}'" \; \
     -exec /bin/sh -c "{}" \;
 fi
@@ -19,4 +17,4 @@ fi
 echo "###########################"
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | finished entrypoint, starting vaulrdb-bin"
 
-exec $@
+exec $@ 
