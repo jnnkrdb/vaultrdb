@@ -1,0 +1,4 @@
+global:
+  imagePullSecrets: 
+    - name: testsecret-1
+    - name: testsecret-2

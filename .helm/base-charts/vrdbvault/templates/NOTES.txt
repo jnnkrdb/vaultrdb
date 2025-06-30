@@ -1,0 +1,5 @@
+################### VaultRDB KeyValue-Store ###################
+Sources and Versions:
+  - VRDB-Vault:
+      Repository: {{ .Values.image.repository }}
+         Version: {{ default .Chart.AppVersion .Values.image.tag }}

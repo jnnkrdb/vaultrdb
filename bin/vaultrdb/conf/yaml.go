@@ -27,10 +27,11 @@ type YamlConfig struct {
 
 	// setup configs for deployment and internal communication
 	Setup struct {
-		Replicas    uint   `yaml:"replicas"`
-		Namespace   string `yaml:"namespace"`
-		ServiceName string `yaml:"servicename"`
-		ExternalAPI struct {
+		Replicas           uint   `yaml:"replicas"`
+		Namespace          string `yaml:"namespace"`
+		ServiceName        string `yaml:"servicename"`
+		ClusterInternalURL string `yaml:"clusterinternalurl"`
+		ExternalAPI        struct {
 			FrontendUI struct {
 				Enabled bool `yaml:"enabled"`
 			} `yaml:"frontendui"`

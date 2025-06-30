@@ -1,0 +1,10 @@
+apiVersion: v2
+name: vrdboperator
+description: Deploy the VaultRDB Kubernetes Operator.
+type: application
+version: 0.0.1
+appVersion: master
+kubeVersion: ">=1.25.0-0"
+home: "https://github.com/jnnkrdb/vaultrdb"
+maintainers:
+  - name: Jannek

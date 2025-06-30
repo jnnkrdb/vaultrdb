@@ -1,0 +1,39 @@
+# this section contains global configs for the application
+global:
+  # this key is a list of possible imagePullSecrets, if required
+  imagePullSecrets: []
+
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  # Set the repository, which is used to receive the image.
+  repository: ghcr.io/jnnkrdb/vaultrdb/vrdb-operator
+  
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  
+  # This sets the pull policy for images.
+  pullpolicy: Always
+
+# This section builds out the deployed pod
+pod:
+  # This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  annotations: {}
+  
+  # This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  labels: {}
+
+  # Set required pod affinities or antiaffinities.
+  affinity: {}
+
+  # Set required pod tolerations.
+  tolerations: []
+  
+  # Set required pod nodeSelector labels.
+  nodeSelector: {}
+
+  # Set the resources which can be used per pod.
+  resources: {}
+

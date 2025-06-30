@@ -1,0 +1,10 @@
+# this section contains global configs for the application
+global:
+  # this key is a list of possible imagePullSecrets, if required
+  imagePullSecrets: []
+
+vrdbvault:
+  enabled: true
+
+vrdboperator:
+  enabled: true

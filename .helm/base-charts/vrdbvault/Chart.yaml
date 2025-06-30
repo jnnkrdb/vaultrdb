@@ -1,0 +1,10 @@
+apiVersion: v2
+name: vrdbvault
+description: Deploy VaultRDB Key Value Store.
+type: application
+version: 0.0.1
+appVersion: master
+kubeVersion: ">=1.25.0-0"
+home: "https://github.com/jnnkrdb/vaultrdb"
+maintainers:
+  - name: Jannek

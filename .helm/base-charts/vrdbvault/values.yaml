@@ -1,0 +1,75 @@
+# this section contains global configs for the application
+global:
+  # this key is a list of possible imagePullSecrets, if required
+  imagePullSecrets: []
+
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  # Set the repository, which is used to receive the image.
+  repository: ghcr.io/jnnkrdb/vaultrdb/vrdb-vault
+  
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  
+  # This sets the pull policy for images.
+  pullpolicy: Always
+
+# This section builds out the deployed pod
+pod:
+  # This is for setting Kubernetes Annotations to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  annotations: {}
+  
+  # This is for setting Kubernetes Labels to a Pod.
+  # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  labels: {}
+
+  # Set required pod affinities or antiaffinities.
+  affinity: {}
+
+  # Set required pod tolerations.
+  tolerations: []
+  
+  # Set required pod nodeSelector labels.
+  nodeSelector: {}
+
+  # Set the resources which can be used per pod.
+  resources: {}
+
+# This section sets the default service configs.
+service:
+
+  # Amount of pods requested.
+  replicas: 3
+
+# this section contains the content of the vault.yaml as raw string in vaml format. will be deployed as configmap
+vault:
+  # This is the content of the yaml file. If its empty, then the default will be used.
+  yaml: |-
+    setup:
+      replicas: 1
+      namespace: default
+      servicename: vaulth # this is the headless service of the vault statefulset
+      clusterinternalurl: cluster.local
+      externalapi:
+        frontendui:
+          enabled: false
+        swaggerui:
+          enabled: false
+    log:
+      level: error
+      formatjson: true
+    authz:
+      enabled: false
+      storage:
+        type: cache
+    configs:
+      enabled: false
+      storage:
+        type: cache
+    vault:
+      enabled: true
+      storage:
+        type: cache
+      

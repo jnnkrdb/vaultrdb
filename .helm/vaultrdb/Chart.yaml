@@ -1,0 +1,29 @@
+apiVersion: v2
+name: vaultrdb
+description: Deploy the complete VaultRDB Solution.
+type: application
+version: 0.0.1
+appVersion: master
+kubeVersion: ">=1.25.0-0"
+home: "https://github.com/jnnkrdb/vaultrdb"
+maintainers:
+  - name: Jannek
+dependencies:
+  - name: vrdbvault
+    version: 0.0.1
+    repository: "file://../base-charts/vrdbvault"
+    condition: vrdbvault.enabled
+    tags:
+      - frontend
+      - keyvaluestore
+  - name: vrdboperator
+    version: 0.0.1
+    repository: "file://../base-charts/vrdboperator"
+    condition: vrdboperator.enabled
+    tags:
+      - operator
+#  - name: vrdbinjector
+#    version: 0.0.1
+#    repository: "file://../base-charts/vrdbinjector"
+#    condition: vrdbinjector.enabled
+    

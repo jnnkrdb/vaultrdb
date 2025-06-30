@@ -1,7 +1,13 @@
 setup:
   replicas: 1
   namespace: default
-  servicename: vaulth # this is the headless service auf the vault statefulset
+  servicename: vaulth # this is the headless service of the vault statefulset
+  clusterinternalurl: cluster.local
+  externalapi:
+    frontendui:
+      enabled: false
+    swaggerui:
+      enabled: false
 log:
   level: error
   formatjson: true
@@ -14,6 +20,6 @@ configs:
   storage:
     type: cache
 vault:
-  enabled: false
+  enabled: true
   storage:
     type: cache

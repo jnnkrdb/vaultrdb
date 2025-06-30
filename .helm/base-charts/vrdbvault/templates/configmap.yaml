@@ -1,0 +1,11 @@
+--- # ------------------------------------------------------------------------------------------- ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vrdbvault-config
+  labels:
+    {{- include "vrdbvault.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "vrdbvault.defaultAnnotations" . | nindent 4 }}
+data:
+  vault.yaml: {{- .Values.vault.yaml | toYaml | indent 1 }}

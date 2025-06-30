@@ -1,0 +1,6 @@
+################### VaultRDB Operator ###################
+Sources and Versions:
+  - VRDB-Operator:
+      Repository: {{ .Values.image.repository }}
+         Version: {{ default .Chart.AppVersion .Values.image.tag }}
+    
