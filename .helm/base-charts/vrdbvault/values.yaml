@@ -40,8 +40,11 @@ pod:
 # This section sets the default service configs.
 service:
 
-  # Amount of pods requested.
-  replicas: 3
+  # Amount of pods requested. (Default: 1)
+  replicas: 
+
+  # set the nodeport if required
+  nodePort: 
 
 # this section contains the content of the vault.yaml as raw string in vaml format. will be deployed as configmap
 vault:
@@ -50,7 +53,7 @@ vault:
     setup:
       replicas: 1
       namespace: default
-      servicename: vaulth # this is the headless service of the vault statefulset
+      servicename: vaulth
       clusterinternalurl: cluster.local
       externalapi:
         frontendui:

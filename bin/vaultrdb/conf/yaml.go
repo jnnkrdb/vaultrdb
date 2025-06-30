@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const CONFIG_YAML string = "/opt/vaultrdb/vault.yaml"
+const CONFIG_YAML string = "/etc/vaultrdb/vault.yaml"
 
 var YC *YamlConfig = &YamlConfig{}
 

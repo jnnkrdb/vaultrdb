@@ -5,6 +5,8 @@ global:
 
 vrdbvault:
   enabled: true
+  image:
+    tag: dev
 
 vrdboperator:
-  enabled: true
+  enabled: false

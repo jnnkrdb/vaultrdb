@@ -36,6 +36,8 @@ RUN apk add --no-cache --update openssl
 
 # Copy the VaultRDB Directory Contents
 COPY vaultrdb/ /opt/vaultrdb
+RUN mkdir -p /etc/vaultrdb
+COPY vaultrdb/vault.yaml /etc/vaultrdb/vault.yaml
 
 # create vault user with home dir
 RUN addgroup -S vault && adduser -S vault -H -h /opt/vaultrdb/home -s /bin/sh -G vault -u 3453

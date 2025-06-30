@@ -1,0 +1,50 @@
+--- # ------------------------------------------------------------------------------------------- Service-ws
+apiVersion: v1
+kind: Service
+metadata:
+  name: vrdbvaulth
+  labels:
+    {{- include "vrdbvault.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "vrdbvault.defaultAnnotations" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    {{- include "vrdbvault.selectorLabels" . | nindent 4 }}
+    {{- with .Values.pod.labels }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+--- # ------------------------------------------------------------------------------------------- Service-http
+apiVersion: v1
+kind: Service
+metadata:
+  name: vrdbvault
+  labels:
+    {{- include "vrdbvault.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "vrdbvault.defaultAnnotations" . | nindent 4 }}
+spec:
+  {{- if .Values.service.nodePort }}
+  type: NodePort
+  {{- else }}
+  type: ClusterIP
+  {{- end }}
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+      {{- with .Values.service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+  selector:
+    {{- include "vrdbvault.selectorLabels" . | nindent 4 }}
+    {{- with .Values.pod.labels }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}

@@ -1,5 +1,6 @@
 
 # helm 
-.helm/tmp.yaml
+temp.yaml
+.helm/temp.yaml
 .helm/**/charts
 .helm/**/Chart.lock

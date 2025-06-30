@@ -1,0 +1,103 @@
+--- # ------------------------------------------------------------------------------------------- StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vrdbvault
+  labels:
+    {{- include "vrdbvault.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "vrdbvault.defaultAnnotations" . | nindent 4 }}
+spec:
+  replicas: {{ default 1 .Values.service.replicas }}
+  revisionHistoryLimit: 3
+  minReadySeconds: 10
+  serviceName: vrdbvaulth
+  selector:
+    matchLabels:
+      {{- include "vrdbvault.selectorLabels" . | nindent 6 }}    
+  template:
+    metadata:
+      annotations:
+        {{- include "vrdbvault.defaultAnnotations" . | nindent 8 }}
+        {{- with .Values.pod.annotations }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "vrdbvault.selectorLabels" . | nindent 8 }}    
+        {{- with .Values.pod.labels }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{ . | toYaml | nindent 8 }}
+      {{- end -}}
+      {{- with .Values.pod.affinity }}
+      affinity:
+        {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.tolerations }}
+      tolerations:
+        {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.nodeSelector }}
+      nodeSelector:
+        {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      serviceAccountName: sa-vrdbvault
+      {{- if .Values.vault.yaml }}
+      volumes:
+        - name: config
+          configMap:
+            name: vrdbvault-config
+            items:
+              - key: vault.yaml
+                path: vault.yaml
+      {{- end }}
+      containers:
+        - name: vrdbvault
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullpolicy }}
+          env:
+            - name: INSTANCE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: INSTANCE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+          {{- with .Values.pod.resources }}
+          resources:
+            {{ . | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.vault.yaml }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/vaultrdb
+              readOnly: true
+          {{- end }}
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
