@@ -23,6 +23,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHP_TOKEN }}
 
+      - id: Create Temp ~/.kube dir
+        run: mkdir -p ~/.kube
+
       - name: Build and run Dev Container task
         uses: devcontainers/ci@v0.3
         with:

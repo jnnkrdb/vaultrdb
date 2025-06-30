@@ -20,7 +20,7 @@ func (svj *StringValueJson) Receive(w http.ResponseWriter, body io.ReadCloser) e
 
 		if w != nil {
 
-			logging.SLog.Info("couldn't parse body into struct",
+			logging.Default.Info("couldn't parse body into struct",
 				"response-code", http.StatusBadRequest,
 				"string-value-json", *svj,
 			)
@@ -39,7 +39,7 @@ func (svj StringValueJson) Send(w http.ResponseWriter) {
 
 	if err := json.NewEncoder(w).Encode(svj); err != nil {
 
-		logging.SLog.Info("couldn't parse to json",
+		logging.Default.Info("couldn't parse to json",
 			"response-code", http.StatusBadRequest,
 		)
 

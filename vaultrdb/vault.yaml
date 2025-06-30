@@ -1,0 +1,19 @@
+setup:
+  replicas: 1
+  namespace: default
+  servicename: vaulth # this is the headless service auf the vault statefulset
+log:
+  level: error
+  formatjson: true
+authz:
+  enabled: false
+  storage:
+    type: cache
+configs:
+  enabled: false
+  storage:
+    type: cache
+vault:
+  enabled: false
+  storage:
+    type: cache

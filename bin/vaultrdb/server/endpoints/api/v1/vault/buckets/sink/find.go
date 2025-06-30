@@ -13,7 +13,7 @@ func Find(w http.ResponseWriter, r *http.Request) {
 
 	bucketpath, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
-		logging.SLog.Warn("bucketpath in query is missing",
+		logging.Default.Warn("bucketpath in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -23,7 +23,7 @@ func Find(w http.ResponseWriter, r *http.Request) {
 
 	key, ok := mux.Vars(r)["key"]
 	if !ok {
-		logging.SLog.Warn("key in query is missing",
+		logging.Default.Warn("key in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -33,7 +33,7 @@ func Find(w http.ResponseWriter, r *http.Request) {
 
 	res, err := vaultrdbstore.DB.ReadKey(bucketpath, key)
 	if err != nil {
-		logging.SLog.Error("error receiving key from bucket",
+		logging.Default.Error("error receiving key from bucket",
 			"bucket", bucketpath,
 			"key", key,
 			"response-code", http.StatusInternalServerError,

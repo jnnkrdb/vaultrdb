@@ -18,12 +18,12 @@ var (
 
 func InitDB() {
 
-	logging.SLog.Info("opening vaultrdbstore", "path", Path)
+	logging.Default.Info("opening vaultrdbstore", "path", Path)
 
 	if err := DB.OpenDB(Path, &bbolt.Options{
 		Timeout: 10 * time.Second,
 	}); err != nil {
 
-		logging.SLog.Error("error opening database", "err", err)
+		logging.Default.Error("error opening database", "err", err)
 	}
 }

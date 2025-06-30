@@ -13,7 +13,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 
 	bucketpath, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
-		logging.SLog.Warn("bucketpath in query is missing",
+		logging.Default.Warn("bucketpath in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -23,7 +23,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 
 	list, err := vaultrdbstore.DB.ReadKeys(bucketpath)
 	if err != nil {
-		logging.SLog.Error("error receiving keys from bucket",
+		logging.Default.Error("error receiving keys from bucket",
 			"bucketpath", bucketpath,
 			"response-code", http.StatusInternalServerError,
 		)

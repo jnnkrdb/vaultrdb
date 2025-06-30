@@ -4,7 +4,10 @@ go 1.22
 
 toolchain go1.23.2
 
-require gorm.io/gorm v1.25.12
+require (
+	gopkg.in/yaml.v3 v3.0.1
+	gorm.io/gorm v1.25.12
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

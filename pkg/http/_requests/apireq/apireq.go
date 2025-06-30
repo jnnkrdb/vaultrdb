@@ -24,7 +24,7 @@ type APIRequest struct {
 func (ar *APIRequest) FromBody(body io.ReadCloser) error {
 	if err := json.NewDecoder(body).Decode(ar); err != nil {
 
-		logging.SLog.Warn("couldn't receive object from json-body",
+		logging.Default.Warn("couldn't receive object from json-body",
 			"error", err.Error(),
 		)
 
@@ -51,7 +51,7 @@ func (ar *APIRequest) FromBody(body io.ReadCloser) error {
 func (ar APIRequest) Send(w http.ResponseWriter) error {
 	if err := json.NewEncoder(w).Encode(ar); err != nil {
 
-		logging.SLog.Warn("couldn't parse object to json",
+		logging.Default.Warn("couldn't parse object to json",
 			"response-code", http.StatusBadRequest,
 			"error", err.Error(),
 		)

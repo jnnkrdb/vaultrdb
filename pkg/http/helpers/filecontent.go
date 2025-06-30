@@ -12,7 +12,7 @@ func FilesContent(w http.ResponseWriter, r *http.Request, file string) {
 
 	if b, err := os.ReadFile(file); err != nil {
 
-		logging.SLog.Error("error reading bytes from file", "file", file, "error", err)
+		logging.Default.Error("error reading bytes from file", "file", file, "error", err)
 
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 

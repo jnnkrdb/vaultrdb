@@ -27,7 +27,7 @@ type KeyValueSet struct {
 
 func (kvs *KeyValueSet) BeforeCreate(tx *gorm.DB) (err error) {
 
-	logging.SLog.Info("executing *KeyValueSet.BeforeCreate(*gorm.DB)")
+	logging.Default.Info("executing *KeyValueSet.BeforeCreate(*gorm.DB)")
 
 	// does the keyvalueset already exist
 	var tmp = KeyValueSet{}
@@ -35,7 +35,7 @@ func (kvs *KeyValueSet) BeforeCreate(tx *gorm.DB) (err error) {
 
 		if result.RowsAffected != 0 {
 
-			logging.SLog.Info("keyvalueset with given key already exists", "kvs", *kvs, "tmp", tmp)
+			logging.Default.Info("keyvalueset with given key already exists", "kvs", *kvs, "tmp", tmp)
 
 			err = fmt.Errorf("keyvalueset already exists")
 		}

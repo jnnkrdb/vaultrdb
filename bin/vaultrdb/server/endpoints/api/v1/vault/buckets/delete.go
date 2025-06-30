@@ -12,7 +12,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 	bucketpath, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
-		logging.SLog.Warn("bucketpath in query is missing",
+		logging.Default.Warn("bucketpath in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -22,7 +22,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 	bucket, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
-		logging.SLog.Warn("bucket in query is missing",
+		logging.Default.Warn("bucket in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -31,7 +31,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := vaultrdbstore.DB.DeleteBucket(bucketpath, bucket); err != nil {
-		logging.SLog.Error("deleting bucket failed",
+		logging.Default.Error("deleting bucket failed",
 			"response-code", http.StatusInternalServerError,
 			"error", err.Error(),
 		)

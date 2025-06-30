@@ -17,7 +17,7 @@ const pathPrefix string = "/meta"
 //   - http://<host>:<port>/meta/license
 func EnableEndpoint_Metadata(r *mux.Router) {
 
-	logging.SLog.Info("creating metadata endpoints")
+	logging.Default.Info("creating metadata endpoints")
 	r.PathPrefix(pathPrefix).Path("/version").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(version))
 	r.PathPrefix(pathPrefix).Path("/license").Methods(http.MethodGet).Handler(server.DefaultMiddleware.ThenFunc(license))
 }

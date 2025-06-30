@@ -12,7 +12,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	bucketpath, ok := mux.Vars(r)["bucketpath"]
 	if !ok {
-		logging.SLog.Warn("bucketpath in query is missing",
+		logging.Default.Warn("bucketpath in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -21,7 +21,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := vaultrdbstore.DB.WriteBucket(bucketpath); err != nil {
-		logging.SLog.Error("error creating bucket",
+		logging.Default.Error("error creating bucket",
 			"bucket", bucketpath,
 			"response-code", http.StatusInternalServerError,
 			"error", err.Error(),

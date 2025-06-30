@@ -20,7 +20,7 @@ func DecryptValue(w http.ResponseWriter, r *http.Request) {
 
 	res, err := cryptography.Decrypt(configstore.GetConfig(configstore.EncryptionPassphrase), body.Value)
 	if err != nil {
-		logging.SLog.Warn("couldn't decrypt body",
+		logging.Default.Warn("couldn't decrypt body",
 			"response-code", http.StatusBadRequest,
 			"error", err.Error(),
 		)

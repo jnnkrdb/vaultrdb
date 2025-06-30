@@ -1,24 +1,16 @@
 package main
 
 import (
-	"flag"
 	"os"
 
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/conf"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/authstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore/initialconfigs"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server"
-	v1 "github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/api/v1"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/healthz"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/endpoints/metadata"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 	"github.com/jnnkrdb/vaultrdb/pkg/termination"
-)
-
-// flags for service config
-var (
-	flagLogLevel *string = flag.String("loglevel", "error", "Set the level of the log output. Possible values: [debug, info, warn, error]")
 )
 
 // list of termination funcs
@@ -26,15 +18,8 @@ var terminationFuncs []func()
 
 func main() {
 
-	flag.Parse()
-
-	logging.InitSLOG(*flagLogLevel)
-
-	var flagList = make(map[string]string)
-	flag.VisitAll(func(f *flag.Flag) {
-		flagList[f.Name] = f.Value.String()
-	})
-	logging.SLog.Info("received flags", "arguments", flagList)
+	// set the default logger
+	logging.Default = logging.GetLogger(conf.YC.Log.FormatJSON, conf.YC.Log.Level)
 
 	// initialize the needed stores
 	configstore.InitDB()
@@ -49,7 +34,7 @@ func main() {
 
 	// set the initial configs, if not already set
 	if err := initialconfigs.SetInitialConfigsIfNotConfiguredAlready(); err != nil {
-		logging.SLog.Error("starting vaultrdb http backend async", "error", err.Error())
+		logging.Default.Error("starting vaultrdb http backend async", "error", err.Error())
 		os.Exit(1)
 	}
 
@@ -57,14 +42,11 @@ func main() {
 	termination.HandleTermination(terminationFuncs...)
 
 	// starting the http server for vaultrdb
-	logging.SLog.Info("starting vaultrdb http backend async")
-	terminationFuncs = append(terminationFuncs, server.StopHTTP)
-	if err := server.StartHTTP(
-		healthz.EnableEndpoint_Healthz,
-		metadata.EnableEndpoint_Metadata,
-		v1.EnableEndpoint_ApiV1,
-	); err != nil {
-		logging.SLog.Error("error keeping up the http server", "err", err.Error())
+	logging.Default.Info("starting vaultrdb http backend async")
+	terminationFuncs = append(terminationFuncs, server.StopExternalAPI)
+
+	if err := server.StartExternalAPI(); err != nil {
+		logging.Default.Error("error keeping up the http server", "err", err.Error())
 		termination.Shutdown()
 	}
 }

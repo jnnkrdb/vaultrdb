@@ -21,7 +21,7 @@ func GetConfig(c Config) string {
 
 	res, err := DB.ReadKey(split[0], split[1])
 	if err != nil {
-		logging.SLog.Error("error reading requested key from configstore",
+		logging.Default.Error("error reading requested key from configstore",
 			"config", string(c),
 			"error", err.Error(),
 		)

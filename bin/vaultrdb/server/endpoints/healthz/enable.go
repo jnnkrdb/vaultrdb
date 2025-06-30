@@ -16,7 +16,7 @@ const pathPrefix string = "/healthz"
 //   - http://<host>:<port>/healthz/readiness
 func EnableEndpoint_Healthz(r *mux.Router) {
 
-	logging.SLog.Info("creating healthz endpoints")
+	logging.Default.Info("creating healthz endpoints")
 
 	r.PathPrefix(pathPrefix).Path("/live").Methods(http.MethodGet).HandlerFunc(live)
 

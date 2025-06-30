@@ -1,89 +1,44 @@
 package server
 
 import (
-	"context"
-	"flag"
-	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/gomw/middlewares"
-	mw "github.com/jnnkrdb/vaultrdb/pkg/http/middlewares"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/conf"
+	"github.com/jnnkrdb/vaultrdb/pkg/http/server"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
-	"github.com/rs/cors"
 )
 
 // middleware used by the frontend http server
 var DefaultMiddleware middlewares.MiddleWareChain
 
-// default prot of the http server
-const _PORT int = 80
-
-var _SRV *http.Server
-
-var (
-	bootSwaggerUI *bool = flag.Bool("swaggerui", false, "If set, then the swagger ui will be activated.")
-)
+// http server to handle the external api
+var ExternalAPI server.Server
 
 // starting the http endpoint
-func StartHTTP(fnc ...func(*mux.Router)) error {
+func StartExternalAPI() error {
 
-	// initializing the middleware for the http server
-	logging.SLog.Info("defining default middlewares for http endpoints")
-
-	DefaultMiddleware = middlewares.New(
-		mw.QueryLog,
-	)
-
-	// the instance of the http server, serving the frontend files
-	var router *mux.Router = mux.NewRouter()
-
-	// append the endpoints to the default router
-	logging.SLog.Info("creating the server and adding the required endpoints")
-
-	for _, f := range fnc {
-
-		f(router)
-	}
+	logging.Default.Info("initiating the external api", "port", 80)
+	ExternalAPI = server.NewServer(80)
 
 	// if requested, then boot up the swagger ui
-	if *bootSwaggerUI {
-		logging.SLog.Info("starting swagger ui")
-		router.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/opt/vaultrdb/swagger"))))
+	if conf.YC.Setup.ExternalAPI.SwaggerUI.Enabled {
+		logging.Default.Debug("enabling swagger ui", "setup.externalapi.swaggerui.enabled", conf.YC.Setup.ExternalAPI.SwaggerUI.Enabled)
+		ExternalAPI.GetRouter().PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", http.FileServer(http.Dir("/opt/vaultrdb/swagger"))))
 	}
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("/opt/vaultrdb/web")))
-
-	// booting the frontend http server
-	logging.SLog.Info("booting the server", "port", _PORT)
-
-	_SRV = &http.Server{
-		Addr: fmt.Sprintf(":%d", _PORT),
-		// adding the cors options
-		Handler: cors.New(cors.Options{
-			AllowedMethods: []string{
-				http.MethodHead,
-				http.MethodOptions,
-				http.MethodGet,
-				http.MethodPost,
-				http.MethodPut,
-				http.MethodPatch,
-				http.MethodDelete,
-			},
-			AllowedOrigins: []string{
-				"*",
-			},
-			AllowCredentials: true,
-		}).Handler(router),
+	// enable the ui frontend
+	if conf.YC.Setup.ExternalAPI.FrontendUI.Enabled {
+		ExternalAPI.GetRouter().PathPrefix("/").Handler(http.FileServer(http.Dir("/opt/vaultrdb/web")))
 	}
 
-	return _SRV.ListenAndServe()
+	return ExternalAPI.Start()
 }
 
 // stop the http backend server
-func StopHTTP() {
-	logging.SLog.Info("shutting down the server")
-	if err := _SRV.Shutdown(context.TODO()); err != nil {
-		logging.SLog.Error("error gracefully shutting down http server", "error", err.Error())
+func StopExternalAPI() {
+	logging.Default.Info("shutting down the server")
+	if err := ExternalAPI.Stop(); err != nil {
+		logging.Default.Error("error gracefully shutting down http server", "error", err.Error())
 	}
 }
