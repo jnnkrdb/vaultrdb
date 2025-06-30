@@ -7,7 +7,6 @@ import (
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/authstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore/initialconfigs"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/externalapi"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 	"github.com/jnnkrdb/vaultrdb/pkg/termination"
@@ -23,13 +22,11 @@ func main() {
 
 	// initialize the needed stores
 	configstore.InitDB()
-	vaultrdbstore.InitDB()
 	authstore.InitDB()
 
 	terminationFuncs = append(terminationFuncs,
 		func() { authstore.DB.CloseDB() },
 		func() { configstore.DB.CloseDB() },
-		func() { vaultrdbstore.DB.CloseDB() },
 	)
 
 	// set the initial configs, if not already set
