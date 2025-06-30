@@ -47,13 +47,13 @@ COPY --from=operator /vaultrdb /usr/local/bin/vaultrdb
 COPY --from=frontend /workspace/frontend/dist/ /opt/vaultrdb/web
 
 # Set the user for the config and the operator binaries
-#RUN chmod a+x /usr/local/bin/vaultrdb &&\
-#    chmod a+x -R /opt/vaultrdb &&\
-RUN chown vault:vault /usr/local/bin/vaultrdb &&\
+RUN chmod 744 /usr/local/bin/vaultrdb &&\
+    chmod 744 -R /opt/vaultrdb &&\
+    chown vault:vault /usr/local/bin/vaultrdb &&\
     chown vault:vault -R /opt/vaultrdb
     
 USER vault:vault
 
 # set the entrypoints
-ENTRYPOINT ["/opt/vaultrdb/entrypoint.sh"]
+ENTRYPOINT ["sh", "-c", "/opt/vaultrdb/entrypoint.sh"]
 CMD [ "vaultrdb" ]
