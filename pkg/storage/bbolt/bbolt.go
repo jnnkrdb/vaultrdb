@@ -34,6 +34,13 @@ func (bb BBoltDB) ListBuckets() ([]string, error) {
 	return result, err
 }
 
+func (bb BBoltDB) WriteBucket(bucket string) error {
+	return bb.db.Update(func(tx *bbolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(bucket))
+		return err
+	})
+}
+
 func (bb BBoltDB) DeleteBucket(bucket string) error {
 	return bb.db.Update(func(tx *bbolt.Tx) error {
 		return tx.DeleteBucket([]byte(bucket))
@@ -64,7 +71,7 @@ func (bb BBoltDB) GetKey(bucket, key string) (string, error) {
 	return result, err
 }
 
-func (bb BBoltDB) Write(bucket, key, value string) error {
+func (bb BBoltDB) WriteKey(bucket, key, value string) error {
 	return bb.db.Update(func(tx *bbolt.Tx) error {
 		if b, err := tx.CreateBucketIfNotExists([]byte(bucket)); err != nil {
 			return err

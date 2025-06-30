@@ -7,6 +7,9 @@ type Storage interface {
 	// Receive a list of Buckets
 	ListBuckets() ([]string, error)
 
+	// create a specific key-value from a bucket
+	WriteBucket(string) error
+
 	// delete a specific key-value from a bucket
 	DeleteBucket(string) error
 
@@ -17,7 +20,7 @@ type Storage interface {
 	GetKey(string, string) (string, error)
 
 	// write a defined key-value into a given bucket
-	Write(string, string, string) error
+	WriteKey(string, string, string) error
 
 	// delete a specific key-value from a bucket
 	DeleteKey(string, string) error

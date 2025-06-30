@@ -4,15 +4,17 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/conf"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 )
 
-func Create(w http.ResponseWriter, r *http.Request) {
+// returns 200 - OK when successful
+func Delete(w http.ResponseWriter, r *http.Request) {
+	var log = logging.FromContext(r.Context())
 
-	bucketpath, ok := mux.Vars(r)["bucketpath"]
+	bucket, ok := mux.Vars(r)["bucket"]
 	if !ok {
-		logging.Default.Warn("bucketpath in query is missing",
+		log.Warn("bucket in query is missing",
 			"response-code", http.StatusBadRequest,
 			"query", mux.Vars(r),
 		)
@@ -20,9 +22,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := vaultrdbstore.DB.WriteBucket(bucketpath); err != nil {
-		logging.Default.Error("error creating bucket",
-			"bucket", bucketpath,
+	if err := conf.Vault.DeleteBucket(bucket); err != nil {
+		log.Error("deleting bucket failed",
 			"response-code", http.StatusInternalServerError,
 			"error", err.Error(),
 		)

@@ -18,6 +18,11 @@ func (cs Cache) ListBuckets() ([]string, error) {
 	return bucketList, nil
 }
 
+func (cs Cache) WriteBucket(bucket string) error {
+	cs[bucket] = make(map[string]string)
+	return nil
+}
+
 func (cs Cache) DeleteBucket(bucket string) error {
 	delete(cs, bucket)
 	return nil
@@ -43,9 +48,9 @@ func (cs Cache) GetKey(bucket, key string) (string, error) {
 	return v, nil
 }
 
-func (cs Cache) Write(bucket, key, value string) error {
+func (cs Cache) WriteKey(bucket, key, value string) error {
 	if _, ok := cs[bucket]; !ok {
-		cs[bucket] = make(map[string]string)
+		cs.WriteBucket(bucket)
 	}
 	// recheck if the bucket exists now
 	if _, ok := cs[bucket]; !ok {

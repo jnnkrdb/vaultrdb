@@ -8,7 +8,7 @@ import (
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/configstore/initialconfigs"
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/internalstorage/vaultrdbstore"
-	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server"
+	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/server/externalapi"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
 	"github.com/jnnkrdb/vaultrdb/pkg/termination"
 )
@@ -38,14 +38,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	// starting the http server for vaultrdb
+	logging.Default.Info("starting vaultrdb http backend async")
+	terminationFuncs = append(terminationFuncs, externalapi.Stop)
+
 	// set the termination methods
 	termination.HandleTermination(terminationFuncs...)
 
-	// starting the http server for vaultrdb
-	logging.Default.Info("starting vaultrdb http backend async")
-	terminationFuncs = append(terminationFuncs, server.StopExternalAPI)
-
-	if err := server.StartExternalAPI(); err != nil {
+	if err := externalapi.Server.Start(); err != nil {
 		logging.Default.Error("error keeping up the http server", "err", err.Error())
 		termination.Shutdown()
 	}
