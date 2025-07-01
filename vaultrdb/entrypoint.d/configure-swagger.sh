@@ -13,9 +13,10 @@ echo "$(date +"%Y-%m-%d - %H:%M:%S") | ------------ version: $(cat /opt/vaultrdb
 
 # replace the placeholders in the swagger.yaml files
 if [ -d "/opt/vaultrdb/swagger/apidocs" ]; then
+  echo "$(date +"%Y-%m-%d - %H:%M:%S") | preparing:"
 
   find /opt/vaultrdb/swagger/apidocs -maxdepth 1 -iname "*.yaml" -type f \
-    -exec /bin/sh -c "echo '########################### - {}'" \; \
+    -exec /bin/sh -c "echo '- {}'" \; \
     -exec /bin/sh -c "sed -i \"s|{{VERSION}}|$(cat /opt/vaultrdb/home/VERSION)|g\" {}" \;
 fi
 

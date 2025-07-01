@@ -55,5 +55,5 @@ RUN chmod 744 /usr/local/bin/vaultrdb &&\
 USER vault:vault
 
 # set the entrypoints
-ENTRYPOINT ["sh", "-c", "/opt/vaultrdb/entrypoint.sh"]
+ENTRYPOINT ["/opt/vaultrdb/entrypoint.sh"]
 CMD [ "vaultrdb" ]
