@@ -46,11 +46,3 @@ func init() {
 
 	v1.EnableEndpoint_ApiV1(Server.GetRouter(), Server.GetMiddleware())
 }
-
-// stop the http backend server
-func Stop() {
-	logging.Default.Info("shutting down the server")
-	if err := Server.Stop(); err != nil {
-		logging.Default.Error("error gracefully shutting down http server", "error", err.Error())
-	}
-}

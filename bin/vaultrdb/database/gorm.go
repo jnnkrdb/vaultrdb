@@ -8,7 +8,6 @@ import (
 	// "github.com/mattn/go-sqlite3"
 	"github.com/glebarez/sqlite"
 	"github.com/jnnkrdb/vaultrdb/pkg/logging"
-	"github.com/jnnkrdb/vaultrdb/pkg/termination"
 
 	//"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -34,7 +33,7 @@ func Connect() {
 
 			logging.Default.Error("couldn't create database file in specified destination", "destination", DATABASE_PATH, "error", err.Error())
 
-			termination.Shutdown()
+			//termination.Shutdown()
 
 		} else {
 
@@ -47,7 +46,7 @@ func Connect() {
 
 		logging.Default.Error("error connecting to database", "error", err.Error())
 
-		termination.Shutdown()
+		//termination.Shutdown()
 
 	} else {
 

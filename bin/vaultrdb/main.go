@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/jnnkrdb/vaultrdb/bin/vaultrdb/conf"
@@ -12,22 +13,27 @@ import (
 	"github.com/jnnkrdb/vaultrdb/pkg/termination"
 )
 
-// list of termination funcs
-var terminationFuncs []func()
-
 func main() {
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// add the context to the termination handler
+	termination.AsyncHandle(ctx)
+	// testing with the own test handler for Close() error
+	termination.AddHandlers(&termination.Test{})
 
 	// set the default logger
 	logging.Default = logging.GetLogger(conf.YC.Log.FormatJSON, conf.YC.Log.Level)
+
+	// add logger to context
+	logging.IntoContext(ctx, logging.Default)
 
 	// initialize the needed stores
 	configstore.InitDB()
 	authstore.InitDB()
 
-	terminationFuncs = append(terminationFuncs,
-		func() { authstore.DB.CloseDB() },
-		func() { configstore.DB.CloseDB() },
-	)
+	termination.AddHandlers(conf.Authz, conf.Configs, conf.Vault)
 
 	// set the initial configs, if not already set
 	if err := initialconfigs.SetInitialConfigsIfNotConfiguredAlready(); err != nil {
@@ -37,13 +43,9 @@ func main() {
 
 	// starting the http server for vaultrdb
 	logging.Default.Info("starting vaultrdb http backend async")
-	terminationFuncs = append(terminationFuncs, externalapi.Stop)
-
-	// set the termination methods
-	termination.HandleTermination(terminationFuncs...)
+	termination.AddHandlers(&externalapi.Server)
 
 	if err := externalapi.Server.Start(); err != nil {
 		logging.Default.Error("error keeping up the http server", "err", err.Error())
-		termination.Shutdown()
 	}
 }

@@ -70,6 +70,6 @@ func (srv Server) StartTLS(certFile string, keyFile string) error {
 	return srv.httpsrv.ListenAndServeTLS(certFile, keyFile)
 }
 
-func (srv Server) Stop() error {
+func (srv *Server) Close() error {
 	return srv.httpsrv.Shutdown(context.TODO())
 }

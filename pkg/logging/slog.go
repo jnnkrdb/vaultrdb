@@ -30,14 +30,14 @@ func GetLogger(isJsonFormat bool, sloglevel string) *slog.Logger {
 	}
 
 	handlerOpts := &slog.HandlerOptions{
-		AddSource: (logLevel == slog.LevelDebug),
+		AddSource: logLevel == slog.LevelDebug,
 		Level:     logLevel,
 	}
 
 	if isJsonFormat {
 		return slog.New(slog.NewJSONHandler(os.Stdout, handlerOpts))
 	} else {
-		return slog.New(slog.NewJSONHandler(os.Stdout, handlerOpts))
+		return slog.New(slog.NewTextHandler(os.Stdout, handlerOpts))
 	}
 }
 
