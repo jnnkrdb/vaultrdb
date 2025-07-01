@@ -24,7 +24,7 @@ func NewServer(port uint) Server {
 	rtr := mux.NewRouter()
 
 	var httpserver = &http.Server{
-		Addr:                         fmt.Sprint(":%d", int(port)),
+		Addr:                         fmt.Sprintf(":%d", port),
 		DisableGeneralOptionsHandler: false,
 		// adding the cors options
 		Handler: cors.New(cors.Options{
